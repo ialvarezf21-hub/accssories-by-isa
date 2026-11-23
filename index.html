@@ -1695,11 +1695,15 @@
       <div class="brand-title-luxury" style="font-size:2.4rem;"><span class="script-initial">A</span>ccessories</div>
       <div class="brand-sub-luxury" style="margin-bottom:1.8rem;">BY ISA · ADMINISTRACIÓN</div>
       <div class="admin-form-group" style="text-align:left;">
-        <label>Clave de acceso</label>
-        <input type="password" id="admin-pass-input" class="form-input" placeholder="Ingresa tu clave" onkeyup="if(event.key==='Enter') loginAdmin()" />
+        <label for="admin-email-input">Correo de administradora</label>
+        <input type="email" id="admin-email-input" class="form-input" autocomplete="username" placeholder="Correo de acceso" onkeyup="if(event.key==='Enter') loginAdmin()" />
+      </div>
+      <div class="admin-form-group" style="text-align:left;">
+        <label for="admin-pass-input">Contraseña</label>
+        <input type="password" id="admin-pass-input" class="form-input" autocomplete="current-password" placeholder="Contraseña de Supabase Auth" onkeyup="if(event.key==='Enter') loginAdmin()" />
       </div>
       <button class="primary-cta-btn" onclick="loginAdmin()">Ingresar al Panel</button>
-      <p id="admin-auth-error" style="color:#B00020; font-size:0.75rem; margin-top:0.75rem; display:none;">Clave incorrecta.</p>
+      <p id="admin-auth-error" style="color:#B00020; font-size:0.75rem; margin-top:0.75rem; display:none;" role="alert"></p>
       <div style="margin-top:1.2rem;">
         <button class="btn-outline-sm" onclick="exitAdminToStore()">Volver al catálogo</button>
       </div>
@@ -1726,6 +1730,7 @@
           <button class="btn-outline-sm" onclick="logoutAdmin()">Cerrar sesión</button>
         </div>
       </div>
+      <p id="admin-sync-status" role="status" aria-live="polite" style="margin:0 0 1.2rem; color:var(--text-muted); font-size:0.75rem;"></p>
 
       <section class="admin-card admin-sales-summary" aria-labelledby="admin-sales-title">
         <h3 id="admin-sales-title">Resumen de Ventas y Ganancias</h3>
@@ -1863,22 +1868,29 @@
 
       <!-- TAB SEGURIDAD -->
       <div id="admin-tab-settings" class="admin-card" style="display:none; max-width:460px;">
-        <h3>Cambiar Clave de Administradora</h3>
-        <div class="admin-form-group">
-          <label>Nueva contraseña</label>
-          <input type="password" id="new-admin-pass" class="form-input" placeholder="Escribe la nueva clave" />
-        </div>
-        <button class="primary-cta-btn" onclick="updateAdminPassword()">Actualizar Clave</button>
+        <h3>Acceso de Administradora</h3>
+        <p style="color:var(--text-muted); font-size:0.82rem; line-height:1.6;">El correo y la contraseña del panel se administran de forma segura desde Supabase Auth.</p>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const WHATSAPP_NUMBER = "573216298879";
     const STORAGE_PRODUCTS_KEY = "isa_accessories_products_v2";
     const STORAGE_ORDERS_KEY = "isa_accessories_orders_v2";
     const STORAGE_INVESTMENT_KEY = "isa_accessories_investment_v1";
-    const STORAGE_PASS_KEY = "isa_accessories_admin_pass";
+    const STORAGE_PENDING_ORDERS_KEY = "isa_accessories_pending_orders_v1";
+    const STORAGE_PENDING_STOCK_KEY = "isa_accessories_pending_stock_v1";
+    const STORAGE_PENDING_ORDER_STATUS_KEY = "isa_accessories_pending_order_status_v1";
+    const STORAGE_PENDING_ORDER_DELETES_KEY = "isa_accessories_pending_order_deletes_v1";
+    const STORAGE_ADMIN_USER_ID_KEY = "isa_accessories_admin_user_id_v1";
+    const STORAGE_ORDERS_MIGRATED_KEY = "isa_accessories_orders_migrated_to_supabase_v1";
+    const SUPABASE_URL = "https://bivtwotvcpudqwijbfaf.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_X1_6KDOz_26AhAf6IFDNaA_7ZAK9M8N";
+    const supabaseClient = window.supabase
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY)
+      : null;
 
     const DEFAULT_PRODUCTS = [
       
@@ -2323,14 +2335,27 @@
       }));
     }
 
+    function loadOrders() {
+      const savedOrders = localStorage.getItem(STORAGE_ORDERS_KEY);
+      const orderList = savedOrders === null ? [] : JSON.parse(savedOrders);
+      if (!Array.isArray(orderList)) {
+        throw new Error(`El valor guardado para ${STORAGE_ORDERS_KEY} no es una lista de pedidos.`);
+      }
+      return orderList;
+    }
+
     let products = loadProducts();
-    let orders = JSON.parse(localStorage.getItem(STORAGE_ORDERS_KEY)) || [];
+    let orders = loadOrders();
     let activeCategory = "Todos";
     let selectedCardColors = {};
     let cart = [];
     let orderSubmissionPending = false;
     let orderConfirmed = false;
     let introSequenceTimer = null;
+    let adminRealtimeChannel = null;
+    let stockRealtimeChannel = null;
+    let adminSyncInterval = null;
+    let currentAdminUser = null;
 
     let currentDetailProduct = null;
     let currentDetailPhotoIdx = 0;
@@ -2363,6 +2388,273 @@
       renderAdminProducts();
     }
 
+    function readPendingRecords(storageKey) {
+      const saved = localStorage.getItem(storageKey);
+      if (saved === null) return [];
+      const records = JSON.parse(saved);
+      if (!Array.isArray(records)) {
+        throw new Error(`El valor guardado para ${storageKey} no es una lista.`);
+      }
+      return records;
+    }
+
+    function savePendingRecords(storageKey, records) {
+      localStorage.setItem(storageKey, JSON.stringify(records));
+    }
+
+    function queuePendingRecord(storageKey, record, recordKey) {
+      const records = readPendingRecords(storageKey);
+      const index = records.findIndex(item => item[recordKey] === record[recordKey]);
+      if (index === -1) records.push(record);
+      else records[index] = record;
+      savePendingRecords(storageKey, records);
+    }
+
+    function setAdminSyncStatus(message) {
+      const status = document.getElementById("admin-sync-status");
+      if (status) status.textContent = message;
+    }
+
+    function toCloudOrder(order) {
+      return {
+        id: String(order.id),
+        date: order.date || new Date().toLocaleDateString("es-CO"),
+        customer: order.customer || "Clienta",
+        items: order.items || "",
+        total: Number(order.total) || 0,
+        status: order.status || "Pendiente",
+        product_quantities: Array.isArray(order.product_quantities) ? order.product_quantities : [],
+        stock_deducted: Boolean(order.stock_deducted)
+      };
+    }
+
+    async function syncProductStockFromSupabase(seedMissing) {
+      if (!supabaseClient) return false;
+
+      const { data, error } = await supabaseClient
+        .from("product_stock")
+        .select("product_id, quantity");
+      if (error) throw error;
+
+      const stockRows = data || [];
+      if (seedMissing) {
+        const cloudIds = new Set(stockRows.map(row => row.product_id));
+        const missingRows = products
+          .filter(product => !cloudIds.has(product.id))
+          .map(product => ({
+            product_id: product.id,
+            quantity: getProductAvailableUnits(product)
+          }));
+
+        if (missingRows.length) {
+          const { error: seedError } = await supabaseClient
+            .from("product_stock")
+            .upsert(missingRows, { onConflict: "product_id" });
+          if (seedError) throw seedError;
+          return syncProductStockFromSupabase(false);
+        }
+      }
+
+      const cloudStock = new Map(stockRows.map(row => [row.product_id, Number(row.quantity)]));
+      products = products.map(product => cloudStock.has(product.id)
+        ? { ...product, stock: cloudStock.get(product.id) }
+        : product);
+      localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(products));
+      refreshProductAvailabilityViews();
+      return true;
+    }
+
+    async function syncOrdersFromSupabase(migrateLocalOrders) {
+      if (!supabaseClient) return false;
+
+      const fetchOrders = () => supabaseClient
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false });
+      let { data, error } = await fetchOrders();
+      if (error) throw error;
+
+      if (migrateLocalOrders && localStorage.getItem(STORAGE_ORDERS_MIGRATED_KEY) !== "true") {
+        const remoteIds = new Set((data || []).map(order => order.id));
+        const missingOrders = loadOrders()
+          .filter(order => !remoteIds.has(order.id))
+          .map(toCloudOrder);
+
+        if (missingOrders.length) {
+          const { error: migrationError } = await supabaseClient
+            .from("orders")
+            .upsert(missingOrders, { onConflict: "id", ignoreDuplicates: true });
+          if (migrationError) throw migrationError;
+          ({ data, error } = await fetchOrders());
+          if (error) throw error;
+        }
+        localStorage.setItem(STORAGE_ORDERS_MIGRATED_KEY, "true");
+      }
+
+      orders = data || [];
+      localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(orders));
+      renderAdminOrders();
+      return true;
+    }
+
+    async function flushPendingOrders() {
+      if (!supabaseClient || !navigator.onLine) return;
+      const pendingOrders = readPendingRecords(STORAGE_PENDING_ORDERS_KEY);
+      if (!pendingOrders.length) return;
+
+      const { error } = await supabaseClient
+        .from("orders")
+        .upsert(pendingOrders.map(toCloudOrder), { onConflict: "id", ignoreDuplicates: true });
+      if (error) throw error;
+      savePendingRecords(STORAGE_PENDING_ORDERS_KEY, []);
+    }
+
+    async function flushPendingAdminChanges() {
+      if (!supabaseClient || !currentAdminUser || !navigator.onLine) return;
+
+      const pendingStock = readPendingRecords(STORAGE_PENDING_STOCK_KEY);
+      if (pendingStock.length) {
+        const { error } = await supabaseClient
+          .from("product_stock")
+          .upsert(pendingStock, { onConflict: "product_id" });
+        if (error) throw error;
+        savePendingRecords(STORAGE_PENDING_STOCK_KEY, []);
+      }
+
+      const pendingStatuses = readPendingRecords(STORAGE_PENDING_ORDER_STATUS_KEY);
+      for (const pending of pendingStatuses) {
+        const { error } = await supabaseClient
+          .from("orders")
+          .update({ status: pending.status })
+          .eq("id", pending.id);
+        if (error) throw error;
+      }
+      if (pendingStatuses.length) savePendingRecords(STORAGE_PENDING_ORDER_STATUS_KEY, []);
+
+      const pendingDeletes = readPendingRecords(STORAGE_PENDING_ORDER_DELETES_KEY);
+      for (const pending of pendingDeletes) {
+        const { error } = await supabaseClient
+          .from("orders")
+          .delete()
+          .eq("id", pending.id);
+        if (error) throw error;
+      }
+      if (pendingDeletes.length) savePendingRecords(STORAGE_PENDING_ORDER_DELETES_KEY, []);
+    }
+
+    async function saveProductStockToSupabase(product) {
+      const stockRecord = {
+        product_id: product.id,
+        quantity: getProductAvailableUnits(product)
+      };
+
+      if (!supabaseClient || !currentAdminUser || !navigator.onLine) {
+        queuePendingRecord(STORAGE_PENDING_STOCK_KEY, stockRecord, "product_id");
+        setAdminSyncStatus("Cambio guardado localmente; se sincronizará cuando haya conexión y sesión de administradora.");
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient
+          .from("product_stock")
+          .upsert(stockRecord, { onConflict: "product_id" });
+        if (error) throw error;
+
+        const pendingStock = readPendingRecords(STORAGE_PENDING_STOCK_KEY)
+          .filter(record => record.product_id !== product.id);
+        savePendingRecords(STORAGE_PENDING_STOCK_KEY, pendingStock);
+        setAdminSyncStatus("Inventario sincronizado con Supabase.");
+      } catch (error) {
+        queuePendingRecord(STORAGE_PENDING_STOCK_KEY, stockRecord, "product_id");
+        setAdminSyncStatus("Cambio guardado localmente; Supabase no respondió y se reintentará.");
+        console.error("No se pudo actualizar el stock en Supabase.", error);
+      }
+    }
+
+    let adminSyncInProgress = false;
+
+    async function syncAdminData(migrateLocalOrders) {
+      if (!supabaseClient || !currentAdminUser || !navigator.onLine || adminSyncInProgress) return;
+      adminSyncInProgress = true;
+      setAdminSyncStatus("Sincronizando inventario y pedidos con Supabase…");
+
+      try {
+        await flushPendingOrders();
+        await flushPendingAdminChanges();
+        await syncProductStockFromSupabase(true);
+        await syncOrdersFromSupabase(migrateLocalOrders);
+        setAdminSyncStatus("Inventario y pedidos sincronizados.");
+      } catch (error) {
+        console.error("No se pudo completar la sincronización con Supabase.", error);
+        setAdminSyncStatus("Sin conexión con Supabase. Se muestran los datos guardados localmente y se reintentará automáticamente.");
+      } finally {
+        adminSyncInProgress = false;
+      }
+    }
+
+    async function syncPublicProductStock() {
+      if (!supabaseClient || !navigator.onLine) return;
+      try {
+        await syncProductStockFromSupabase(false);
+      } catch (error) {
+        console.error("No se pudo cargar el inventario de Supabase; se conserva el respaldo local.", error);
+      }
+    }
+
+    function startStockRealtime() {
+      if (!supabaseClient || stockRealtimeChannel) return;
+      stockRealtimeChannel = supabaseClient
+        .channel("public-product-stock-sync")
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "product_stock"
+        }, () => {
+          syncPublicProductStock();
+        })
+        .subscribe();
+    }
+
+    function startAdminRealtime() {
+      if (!supabaseClient || !currentAdminUser) return;
+      if (adminRealtimeChannel) supabaseClient.removeChannel(adminRealtimeChannel);
+      adminRealtimeChannel = supabaseClient
+        .channel("admin-orders-sync")
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "orders"
+        }, () => {
+          syncOrdersFromSupabase(false).catch(error => {
+            console.error("No se pudieron actualizar los pedidos en tiempo real.", error);
+          });
+        })
+        .subscribe();
+
+      window.clearInterval(adminSyncInterval);
+      adminSyncInterval = window.setInterval(() => {
+        syncAdminData(false);
+      }, 15000);
+    }
+
+    function stopAdminRealtime() {
+      if (adminRealtimeChannel && supabaseClient) {
+        supabaseClient.removeChannel(adminRealtimeChannel);
+      }
+      adminRealtimeChannel = null;
+      window.clearInterval(adminSyncInterval);
+      adminSyncInterval = null;
+      currentAdminUser = null;
+    }
+
+    window.addEventListener("online", () => {
+      flushPendingOrders().catch(error => {
+        console.error("No se pudieron sincronizar pedidos pendientes.", error);
+      });
+      syncAdminData(false);
+      syncPublicProductStock();
+    });
+
     function normalizeColorName(colorName) {
       return String(colorName || "").trim().replace(/\s+/g, " ").toLowerCase();
     }
@@ -2389,7 +2681,25 @@
       return colorKey ? product.colorImages[colorKey] : "";
     }
 
-    function handleRoute() {
+    function showAdminLogin(message) {
+      document.getElementById("admin-auth-screen").style.display = "block";
+      document.getElementById("admin-dashboard-screen").style.display = "none";
+      const error = document.getElementById("admin-auth-error");
+      error.textContent = message || "";
+      error.style.display = message ? "block" : "none";
+    }
+
+    async function isSupabaseAdmin(user) {
+      const { data, error } = await supabaseClient
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) throw error;
+      return Boolean(data);
+    }
+
+    async function handleRoute() {
       const isAdminHash = window.location.hash.toLowerCase() === "#admin";
       const storefront = document.getElementById("storefront-view");
       const adminView = document.getElementById("admin-view");
@@ -2402,13 +2712,47 @@
         intro.classList.remove("intro-running");
         storefront.style.display = "none";
         adminView.style.display = "block";
-        if (sessionStorage.getItem("isa_admin_logged") === "true") {
-          showAdminDashboard();
-        } else {
-          document.getElementById("admin-auth-screen").style.display = "block";
-          document.getElementById("admin-dashboard-screen").style.display = "none";
+        if (!supabaseClient) {
+          showAdminLogin("No se pudo cargar Supabase. Revisa tu conexión e inténtalo de nuevo.");
+          return;
+        }
+
+        try {
+          const { data, error } = await supabaseClient.auth.getSession();
+          if (error) throw error;
+          if (!data.session) {
+            stopAdminRealtime();
+            showAdminLogin("");
+            return;
+          }
+
+          let isAdmin = false;
+          try {
+            isAdmin = await isSupabaseAdmin(data.session.user);
+          } catch (error) {
+            const cachedAdminId = localStorage.getItem(STORAGE_ADMIN_USER_ID_KEY);
+            if (!navigator.onLine && cachedAdminId === data.session.user.id) {
+              isAdmin = true;
+              setAdminSyncStatus("Sin conexión; se usarán los datos guardados localmente.");
+            } else {
+              throw error;
+            }
+          }
+
+          if (!isAdmin) {
+            await supabaseClient.auth.signOut();
+            showAdminLogin("Esta cuenta no tiene acceso de administradora.");
+            return;
+          }
+
+          localStorage.setItem(STORAGE_ADMIN_USER_ID_KEY, data.session.user.id);
+          await showAdminDashboard(data.session.user);
+        } catch (error) {
+          console.error("No se pudo verificar el acceso de administradora.", error);
+          showAdminLogin("No se pudo verificar el acceso. Revisa la conexión e inténtalo nuevamente.");
         }
       } else {
+        stopAdminRealtime();
         adminView.style.display = "none";
         storefront.style.display = "flex";
         renderCatalog();
@@ -2416,6 +2760,22 @@
     }
 
     window.addEventListener("hashchange", handleRoute);
+    window.addEventListener("storage", event => {
+      if (event.key === STORAGE_PRODUCTS_KEY) {
+        products = loadProducts();
+        refreshProductAvailabilityViews();
+      }
+      if (event.key === STORAGE_ORDERS_KEY) {
+        orders = loadOrders();
+        renderAdminOrders();
+      }
+      if (event.key === null) {
+        products = loadProducts();
+        orders = loadOrders();
+        refreshProductAvailabilityViews();
+        renderAdminOrders();
+      }
+    });
 
     function startHeroCarousel() {
       const slides = Array.from(document.querySelectorAll(".hero-slide"));
@@ -2818,7 +3178,7 @@
       }, 2400);
     }
 
-    function confirmOrder() {
+    async function confirmOrder() {
       if (cart.length === 0 || orderSubmissionPending || orderConfirmed) return;
 
       const requestedUnits = new Map();
@@ -2842,64 +3202,79 @@
       const customerName = document.getElementById("customer-name-confirm").value.trim() || "Clienta";
       const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
       const summaryLines = cart.map(item => `• ${item.qty}x ${item.name} (${item.color}) - ${formatCOP(item.price * item.qty)}`).join("\n");
-      const nextProducts = products.map(product => {
-        const quantity = requestedUnits.get(product.id);
-        if (quantity === undefined) return product;
-
-        const updatedProduct = {
-          ...product,
-          stock: getProductAvailableUnits(product) - quantity
-        };
-        if (Object.prototype.hasOwnProperty.call(product, "availableQuantity")) {
-          updatedProduct.availableQuantity = updatedProduct.stock;
-        }
-        if (Object.prototype.hasOwnProperty.call(product, "units")) {
-          updatedProduct.units = updatedProduct.stock;
-        }
-        return updatedProduct;
-      });
       const order = {
-        id: "ORD-" + Date.now().toString().slice(-5),
+        id: `ORD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`,
         date: new Date().toLocaleDateString("es-CO"),
         customer: customerName,
         items: cart.map(item => `${item.qty}x ${item.name} (${item.color})`).join(", "),
         total: total,
-        status: "Pendiente"
+        status: "Pendiente",
+        product_quantities: Array.from(requestedUnits, ([product_id, quantity]) => ({ product_id, quantity })),
+        stock_deducted: false
       };
       const status = document.getElementById("order-confirmation-status");
-      const previousProducts = localStorage.getItem(STORAGE_PRODUCTS_KEY);
 
-      try {
-        localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(nextProducts));
-        localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify([order, ...orders]));
-      } catch (error) {
+      orderSubmissionPending = true;
+      document.getElementById("order-confirm-submit").disabled = true;
+      document.getElementById("order-confirmation-close").disabled = true;
+      document.getElementById("order-confirm-back").disabled = true;
+      document.getElementById("customer-name-confirm").disabled = true;
+
+      let savedInCloud = false;
+      if (supabaseClient && navigator.onLine) {
         try {
-          if (previousProducts === null) {
-            localStorage.removeItem(STORAGE_PRODUCTS_KEY);
-          } else {
-            localStorage.setItem(STORAGE_PRODUCTS_KEY, previousProducts);
-          }
-        } catch (rollbackError) {
-          console.error("No se pudo restaurar el inventario después de un error al guardar el pedido.", rollbackError);
+          const { error } = await supabaseClient.from("orders").insert(toCloudOrder(order));
+          if (error) throw error;
+          savedInCloud = true;
+        } catch (error) {
+          console.error("No se pudo guardar el pedido en Supabase; se conservará localmente.", error);
         }
-        status.textContent = "No se pudo guardar el pedido y actualizar el inventario. Intenta nuevamente.";
+      }
+
+      let queuedLocally = false;
+      try {
+        if (!savedInCloud) {
+          queuePendingRecord(STORAGE_PENDING_ORDERS_KEY, toCloudOrder(order), "id");
+          queuedLocally = true;
+        }
+      } catch (error) {
+        console.error("No se pudo guardar la cola local del pedido.", error);
+        orderSubmissionPending = false;
+        document.getElementById("order-confirm-submit").disabled = false;
+        document.getElementById("order-confirmation-close").disabled = false;
+        document.getElementById("order-confirm-back").disabled = false;
+        document.getElementById("customer-name-confirm").disabled = false;
+        status.textContent = "No se pudo guardar el pedido. Intenta nuevamente.";
         status.hidden = false;
         return;
       }
 
-      products = nextProducts;
-      orders.unshift(order);
+      orders = [order, ...orders.filter(existingOrder => existingOrder.id !== order.id)];
+      try {
+        localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(orders));
+      } catch (error) {
+        console.error("No se pudo guardar el respaldo local del pedido.", error);
+        if (!savedInCloud && !queuedLocally) {
+          orderSubmissionPending = false;
+          document.getElementById("order-confirm-submit").disabled = false;
+          document.getElementById("order-confirmation-close").disabled = false;
+          document.getElementById("order-confirm-back").disabled = false;
+          document.getElementById("customer-name-confirm").disabled = false;
+          status.textContent = "No se pudo guardar el pedido. Intenta nuevamente.";
+          status.hidden = false;
+          return;
+        }
+      }
+
       orderConfirmed = true;
       cart = [];
       updateCartUI();
-      refreshProductAvailabilityViews();
 
       const msg = `Hola Isa, soy *${customerName}*. Me gustaría pedir estas piezas de *Accessories BY ISA*:\n\n${summaryLines}\n\n*Total:* ${formatCOP(total)}\n¿Me confirmas disponibilidad?`;
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
       const whatsappWindow = window.open("about:blank", "_blank");
       if (whatsappWindow) whatsappWindow.opener = null;
 
-      orderSubmissionPending = true;
       document.getElementById("customer-name").value = customerName;
       document.getElementById("customer-name-confirm").value = customerName;
       document.getElementById("customer-name-confirm").disabled = true;
@@ -2907,7 +3282,9 @@
       document.getElementById("order-confirm-back").disabled = true;
       document.getElementById("order-confirm-submit").disabled = true;
 
-      status.textContent = "¡Pedido confirmado! Abriendo WhatsApp en un momento…";
+      status.textContent = savedInCloud
+        ? "¡Pedido recibido! Está pendiente de confirmación. Abriendo WhatsApp…"
+        : "Pedido guardado localmente; se sincronizará cuando vuelva la conexión. Abriendo WhatsApp…";
       status.hidden = false;
       launchOrderConfetti();
 
@@ -2915,7 +3292,7 @@
         orderSubmissionPending = false;
         document.getElementById("order-confirmation-close").disabled = false;
         document.getElementById("order-confirm-back").disabled = false;
-        status.textContent = "Pedido confirmado. Ya puedes cerrar esta ventana.";
+        status.textContent = "Pedido enviado. Ya puedes cerrar esta ventana.";
         if (whatsappWindow && !whatsappWindow.closed) {
           whatsappWindow.location.href = url;
         } else {
@@ -2924,25 +3301,45 @@
       }, 1200);
     }
 
-    function getAdminPass() {
-      return localStorage.getItem(STORAGE_PASS_KEY) || "isa2026";
-    }
+    async function loginAdmin() {
+      const email = document.getElementById("admin-email-input").value.trim();
+      const password = document.getElementById("admin-pass-input").value;
+      if (!supabaseClient) {
+        showAdminLogin("No se pudo cargar Supabase. Revisa tu conexión e inténtalo de nuevo.");
+        return;
+      }
 
-    function loginAdmin() {
-      const input = document.getElementById("admin-pass-input").value;
-      if (input === getAdminPass()) {
-        sessionStorage.setItem("isa_admin_logged", "true");
-        document.getElementById("admin-auth-error").style.display = "none";
-        showAdminDashboard();
-      } else {
-        document.getElementById("admin-auth-error").style.display = "block";
+      const button = document.querySelector("#admin-auth-screen .primary-cta-btn");
+      button.disabled = true;
+      showAdminLogin("");
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        if (!await isSupabaseAdmin(data.user)) {
+          await supabaseClient.auth.signOut();
+          throw new Error("Esta cuenta no tiene acceso de administradora.");
+        }
+
+        localStorage.setItem(STORAGE_ADMIN_USER_ID_KEY, data.user.id);
+        document.getElementById("admin-pass-input").value = "";
+        await showAdminDashboard(data.user);
+      } catch (error) {
+        console.error("No se pudo iniciar sesión en el panel.", error);
+        showAdminLogin(error.message || "No se pudo iniciar sesión. Revisa tus datos.");
+      } finally {
+        button.disabled = false;
       }
     }
 
-    function logoutAdmin() {
-      sessionStorage.removeItem("isa_admin_logged");
+    async function logoutAdmin() {
+      stopAdminRealtime();
+      localStorage.removeItem(STORAGE_ADMIN_USER_ID_KEY);
       document.getElementById("admin-pass-input").value = "";
-      handleRoute();
+      if (supabaseClient) {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) console.error("No se pudo cerrar la sesión de Supabase.", error);
+      }
+      showAdminLogin("");
     }
 
     function exitAdminToStore() {
@@ -2950,14 +3347,53 @@
       handleRoute();
     }
 
-    function showAdminDashboard() {
+    async function showAdminDashboard(user) {
+      currentAdminUser = user;
       document.getElementById("admin-auth-screen").style.display = "none";
       document.getElementById("admin-dashboard-screen").style.display = "block";
+      products = loadProducts();
+      orders = loadOrders();
       renderAdminProducts();
       renderAdminOrders();
+      if (navigator.onLine) {
+        await syncAdminData(true);
+      } else {
+        setAdminSyncStatus("Sin conexión; se usarán los datos guardados localmente.");
+      }
+      startAdminRealtime();
     }
 
-    function switchAdminTab(tab) {
+    async function switchAdminTab(tab) {
+      if (tab === "orders") {
+        try {
+          if (currentAdminUser && navigator.onLine) {
+            await syncOrdersFromSupabase(false);
+          } else {
+            orders = loadOrders();
+            renderAdminOrders();
+          }
+        } catch (error) {
+          console.error("No se pudieron cargar los pedidos desde Supabase.", error);
+          setAdminSyncStatus("No se pudieron actualizar los pedidos; se muestra el respaldo local.");
+          orders = loadOrders();
+          renderAdminOrders();
+        }
+      }
+      if (tab === "inventory") {
+        try {
+          if (currentAdminUser && navigator.onLine) {
+            await syncProductStockFromSupabase(false);
+          } else {
+            products = loadProducts();
+            renderAdminProducts();
+          }
+        } catch (error) {
+          console.error("No se pudo cargar el inventario desde Supabase.", error);
+          setAdminSyncStatus("No se pudo actualizar el inventario; se muestra el respaldo local.");
+          products = loadProducts();
+          renderAdminProducts();
+        }
+      }
       ["inventory", "orders", "settings"].forEach(t => {
         document.getElementById(`admin-tab-${t}`).style.display = t === tab ? (t === "inventory" ? "grid" : "block") : "none";
         document.getElementById(`tab-btn-${t}`).classList.toggle("active", t === tab);
@@ -3027,7 +3463,7 @@
       renderAdminSalesSummary();
     }
 
-    function saveProductFromAdmin() {
+    async function saveProductFromAdmin() {
       const id = document.getElementById("edit-product-id").value;
       const name = document.getElementById("prod-name").value.trim();
       const category = document.getElementById("prod-category").value;
@@ -3084,6 +3520,7 @@
       resetProductForm();
       renderAdminProducts();
       renderCatalog();
+      await saveProductStockToSupabase(productObj);
     }
 
     function editProductInAdmin(id) {
@@ -3146,9 +3583,65 @@
       `).join("");
     }
 
-    function deleteOrderInAdmin(idx) {
+    function isSupabaseTransportFailure(error) {
+      return !navigator.onLine || Boolean(error && !error.code && !error.status);
+    }
+
+    function applyOrderInventoryLocally(order) {
+      if (order.stock_deducted || !["Confirmado", "Entregado"].includes(order.status)) {
+        return products;
+      }
+
+      const quantities = new Map();
+      (order.product_quantities || []).forEach(item => {
+        quantities.set(item.product_id, (quantities.get(item.product_id) || 0) + Number(item.quantity));
+      });
+
+      for (const [productId, quantity] of quantities) {
+        const product = products.find(item => item.id === productId);
+        if (!product || quantity <= 0 || getProductAvailableUnits(product) < quantity) {
+          throw new Error(`No hay unidades suficientes del producto ${productId} en el respaldo local.`);
+        }
+      }
+
+      return products.map(product => {
+        const quantity = quantities.get(product.id);
+        if (quantity === undefined) return product;
+        const updatedProduct = {
+          ...product,
+          stock: getProductAvailableUnits(product) - quantity
+        };
+        if (Object.prototype.hasOwnProperty.call(product, "availableQuantity")) {
+          updatedProduct.availableQuantity = updatedProduct.stock;
+        }
+        if (Object.prototype.hasOwnProperty.call(product, "units")) {
+          updatedProduct.units = updatedProduct.stock;
+        }
+        return updatedProduct;
+      });
+    }
+
+    async function deleteOrderInAdmin(idx) {
       const order = orders[idx];
       if (!order || !window.confirm(`¿Eliminar el pedido de ${order.customer}?\nEsta acción no se puede deshacer.`)) return;
+
+      if (supabaseClient && currentAdminUser && navigator.onLine) {
+        try {
+          const { error } = await supabaseClient.from("orders").delete().eq("id", order.id);
+          if (error) throw error;
+        } catch (error) {
+          if (!isSupabaseTransportFailure(error)) {
+            alert("No se pudo eliminar el pedido de Supabase. Intenta nuevamente.");
+            console.error("No se pudo eliminar el pedido en Supabase.", error);
+            renderAdminOrders();
+            return;
+          }
+          queuePendingRecord(STORAGE_PENDING_ORDER_DELETES_KEY, { id: order.id }, "id");
+          setAdminSyncStatus("Eliminación guardada localmente; se sincronizará cuando vuelva la conexión.");
+        }
+      } else {
+        queuePendingRecord(STORAGE_PENDING_ORDER_DELETES_KEY, { id: order.id }, "id");
+      }
 
       const updatedOrders = orders.filter((_, orderIndex) => orderIndex !== idx);
       try {
@@ -3162,25 +3655,87 @@
       renderAdminOrders();
     }
 
-    function updateOrderStatus(idx, status) {
-      orders[idx].status = status;
-      localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(orders));
-    }
+    async function updateOrderStatus(idx, status) {
+      const order = orders[idx];
+      if (!order) return;
 
-    function updateAdminPassword() {
-      const newPass = document.getElementById("new-admin-pass").value.trim();
-      if (newPass.length < 4) {
-        alert("Usa una contraseña de al menos 4 caracteres.");
+      if (supabaseClient && currentAdminUser && navigator.onLine) {
+        let updatedOrder;
+        try {
+          const { data, error } = await supabaseClient
+            .from("orders")
+            .update({ status })
+            .eq("id", order.id)
+            .select("*")
+            .single();
+          if (error) throw error;
+          updatedOrder = data;
+        } catch (error) {
+          if (!isSupabaseTransportFailure(error)) {
+            alert(error.message || "No se pudo actualizar el estado del pedido.");
+            console.error("No se pudo actualizar el pedido en Supabase.", error);
+            renderAdminOrders();
+            return;
+          }
+          setAdminSyncStatus("Cambio guardado localmente; se sincronizará cuando vuelva la conexión.");
+        }
+
+        if (updatedOrder) {
+          orders[idx] = updatedOrder;
+          try {
+            localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(orders));
+          } catch (error) {
+            console.error("El estado se actualizó en Supabase, pero no se pudo guardar el respaldo local.", error);
+          }
+          try {
+            await syncProductStockFromSupabase(false);
+          } catch (error) {
+            console.error("El estado se actualizó, pero no se pudo refrescar el stock local.", error);
+            setAdminSyncStatus("Pedido actualizado en Supabase; el inventario se actualizará al reconectar.");
+          }
+          renderAdminOrders();
+          return;
+        }
+      }
+
+      const updatedOrder = { ...order, status };
+      let updatedProducts;
+      try {
+        updatedProducts = applyOrderInventoryLocally(updatedOrder);
+      } catch (error) {
+        alert(error.message);
+        renderAdminOrders();
         return;
       }
-      localStorage.setItem(STORAGE_PASS_KEY, newPass);
-      document.getElementById("new-admin-pass").value = "";
-      alert("Contraseña de administradora actualizada.");
+      if (updatedProducts !== products) {
+        updatedOrder.stock_deducted = true;
+      }
+
+      const updatedOrders = orders.slice();
+      updatedOrders[idx] = updatedOrder;
+      try {
+        localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(updatedProducts));
+        localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(updatedOrders));
+        queuePendingRecord(STORAGE_PENDING_ORDER_STATUS_KEY, { id: order.id, status }, "id");
+      } catch (error) {
+        alert("No se pudo guardar el cambio localmente. Intenta nuevamente.");
+        return;
+      }
+
+      products = updatedProducts;
+      orders = updatedOrders;
+      refreshProductAvailabilityViews();
+      renderAdminOrders();
     }
 
     handleRoute();
+    startStockRealtime();
     startHeroCarousel();
     runIntroSequence();
+    syncPublicProductStock();
+    flushPendingOrders().catch(error => {
+      console.error("No se pudieron sincronizar pedidos pendientes.", error);
+    });
   </script>
 </body>
 </html>
