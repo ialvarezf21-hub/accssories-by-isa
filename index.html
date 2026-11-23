@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accessories BY ISA | Acero Inoxidable</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Pinyon+Script&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg-primary: #FDF6F8;
+      --bg-secondary: #FCEEF2;
+      --bg-card: #FFFFFF;
+      --accent: #7A1C37;
+      --accent-hover: #5E1329;
+      --accent-soft: rgba(122, 28, 55, 0.08);
+      --text-main: #542533;
+      --text-muted: #7C5C66;
+      --border-soft: rgba(122, 28, 55, 0.14);
+      --gold-swatch: #D8B467;
+      --silver-swatch: #D2D5D9;
+      --rosegold-swatch: #E2A79C;
+      --black-swatch: #222222;
+      --pearl-swatch: #F5F1EB;
+      --shadow-soft: 0 12px 35px rgba(122, 28, 55, 0.06);
+      --transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ================= INTRO ANIMATION (LAZO + MARCA CENTRADA) ================= */
+    #intro-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #FFF9FB 0%, #FCEEF2 100%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+    }
+
+    #intro-overlay.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .intro-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .bow-wrapper {
+      width: 115px;
+      height: 115px;
+      margin-bottom: 1.2rem;
+    }
+
+    .intro-running .bow-wrapper {
+      animation: bowSpinAndSettle 1.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .bow-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .bow-ribbon-left,
+    .bow-ribbon-right {
+      transform-origin: 60px 48px;
+    }
+
+    .intro-running .bow-ribbon-left,
+    .intro-running .bow-ribbon-right {
+      animation: ribbonUnfold 1.4s ease-out 0.9s forwards;
+    }
+
+    .intro-brand-reveal {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .intro-running .intro-brand-reveal {
+      animation: brandFadeUp 1.1s cubic-bezier(0.22, 1, 0.36, 1) 1.15s forwards;
+    }
+
+    .brand-title-luxury {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.6rem, 6vw, 4.2rem);
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.03em;
+      line-height: 1;
+    }
+
+    .brand-title-luxury .script-initial {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 1.38em;
+      font-weight: 400;
+      margin-right: -4px;
+    }
+
+    .brand-sub-luxury {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.48em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 0.65rem;
+      padding-left: 0.48em;
+    }
+
+    @keyframes bowSpinAndSettle {
+      0% {
+        opacity: 0;
+        transform: scale(0.45) rotate(-180deg);
+      }
+      55% {
+        opacity: 1;
+        transform: scale(1.06) rotate(12deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes ribbonUnfold {
+      0% {
+        transform: scaleY(0.75);
+      }
+      60% {
+        transform: scaleY(1.05);
+      }
+      100% {
+        transform: scaleY(1);
+      }
+    }
+
+    @keyframes brandFadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #intro-overlay.intro-running .bow-wrapper,
+      #intro-overlay.intro-running .bow-ribbon-left,
+      #intro-overlay.intro-running .bow-ribbon-right,
+      #intro-overlay.intro-running .intro-brand-reveal {
+        animation-duration: 0.01ms;
+      }
+    }
+
+    /* ================= VISTA TIENDA CLIENTES ================= */
+    #storefront-view {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(253, 246, 248, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .header-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .header-bow-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .header-bow-link:hover {
+      background: var(--accent-soft);
+      transform: scale(1.05);
+    }
+
+    .header-bow-svg {
+      width: 34px;
+      height: 32px;
+      overflow: visible;
+    }
+
+    .header-logo {
+      text-align: center;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .header-logo-main {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.95rem;
+      font-weight: 500;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .header-logo-main .script-initial {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 1.32em;
+      margin-right: -3px;
+    }
+
+    .header-logo-sub {
+      font-size: 0.62rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-top: 0.25rem;
+      padding-left: 0.42em;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .bag-btn {
+      background: transparent;
+      border: 1px solid var(--border-soft);
+      color: var(--accent);
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: var(--transition);
+    }
+
+    .bag-btn:hover {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+    }
+
+    .bag-count {
+      background: var(--accent);
+      color: #FFFFFF;
+      font-size: 0.7rem;
+      font-weight: 500;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+      transition: var(--transition);
+    }
+
+    .bag-btn:hover .bag-count {
+      background: #FFFFFF;
+      color: var(--accent);
+    }
+
+    /* ================= HERO EDITORIAL CON FONDO DE ANILLOS ================= */
+    .hero-section-wrap {
+      max-width: 1240px;
+      width: 100%;
+      margin: 1.6rem auto 0;
+      padding: 0 1.5rem;
+    }
+
+    .hero-minimal {
+      position: relative;
+      min-height: 330px;
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid var(--border-soft);
+      background-image: url("./img/anillos-fondo.jpeg");
+      background-color: #FCEEF2;
+      background-size: cover;
+      background-position: center 48%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-slides {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      transform: translateX(100%);
+      transition: transform 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
+    .hero-slide.is-active {
+      z-index: 2;
+      transform: translateX(0);
+    }
+
+    .hero-slide.is-leaving {
+      z-index: 1;
+      transform: translateX(-100%);
+    }
+
+    .hero-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 48%;
+    }
+
+    .hero-minimal::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(253, 246, 248, 0.12) 0%,
+        rgba(253, 246, 248, 0.22) 52%,
+        rgba(253, 246, 248, 0.12) 100%
+      );
+      z-index: 1;
+    }
+
+    /* Texto ubicado en el espacio central entre los dedos */
+    .hero-finger-gap-copy {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      transform: translate(42px, -26px);
+      max-width: 340px;
+      text-shadow: 0 1px 8px rgba(255, 255, 255, 0.92), 0 0 14px rgba(255, 255, 255, 0.7);
+    }
+    .hero-finger-gap-copy h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.75rem, 3.2vw, 2.35rem);
+      font-weight: 600;
+      color: #64142D;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+    }
+
+    .hero-finger-gap-copy p {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: #64142D;
+      margin-top: 0.4rem;
+    }
+
+    /* ================= FILTROS DE CATEGORÍA ================= */
+    .filters-bar {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 1.6rem 1.5rem 2rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .filter-pill {
+      background: transparent;
+      border: 1px solid var(--border-soft);
+      color: var(--text-muted);
+      padding: 0.5rem 1.35rem;
+      border-radius: 999px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-pill:hover,
+    .filter-pill.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+    }
+
+    /* ================= GRILLA DE CATÁLOGO ================= */
+    .catalog-container {
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+      flex: 1;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+      gap: 2rem;
+    }
+
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(122, 28, 55, 0.3);
+    }
+
+    .product-media {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: var(--bg-secondary);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .product-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .product-card:hover .product-media img {
+      transform: scale(1.04);
+    }
+
+    .photo-count-badge {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--accent);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .product-body {
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 0.75rem;
+    }
+
+    .product-category-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .product-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.42rem;
+      font-weight: 500;
+      color: var(--text-main);
+      line-height: 1.2;
+      cursor: pointer;
+    }
+
+    .product-title:hover {
+      color: var(--accent);
+    }
+
+    .swatches-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 0.15rem;
+    }
+
+    .swatch-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(122, 28, 55, 0.28);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s ease;
+    }
+
+    .swatch-dot.selected {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 3.5px var(--accent);
+    }
+
+    .swatch-selected-name {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-left: 0.25rem;
+    }
+
+    .product-footer {
+      margin-top: auto;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .product-price {
+      font-size: 0.98rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+
+    .add-card-btn {
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.55rem 1.05rem;
+      border-radius: 999px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .add-card-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ================= FOOTER LIMPIO (SIN BOTONES OCULTOS) ================= */
+    .site-footer {
+      border-top: 1px solid var(--border-soft);
+      background: var(--bg-secondary);
+      padding: 2.2rem 1.5rem;
+      text-align: center;
+    }
+
+    .footer-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    .footer-copy {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    /* ================= MODAL DETALLE DE PRODUCTO MULTI-FOTO ================= */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 26, 32, 0.45);
+      backdrop-filter: blur(5px);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .detail-modal {
+      background: #FFFFFF;
+      border-radius: 20px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(45, 26, 32, 0.22);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .detail-gallery {
+      background: var(--bg-secondary);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .detail-main-photo {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #FFFFFF;
+    }
+
+    .detail-main-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border-soft);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .gallery-nav-btn.prev { left: 10px; }
+    .gallery-nav-btn.next { right: 10px; }
+
+    .detail-thumbs {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .detail-thumb {
+      width: 58px;
+      height: 58px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      opacity: 0.65;
+      transition: var(--transition);
+    }
+
+    .detail-thumb.active {
+      border-color: var(--accent);
+      opacity: 1;
+    }
+
+    .detail-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .detail-info {
+      padding: 2.2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .detail-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--text-main);
+      line-height: 1.15;
+    }
+
+    .detail-price {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .detail-description {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    .detail-specs {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      padding: 1rem 1.15rem;
+      display: grid;
+      gap: 0.55rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.8rem;
+    }
+
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .spec-label {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.68rem;
+      font-weight: 400;
+    }
+
+    .spec-value {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      color: var(--text-main);
+      text-align: right;
+    }
+
+    .detail-option-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      margin-bottom: 0.45rem;
+      display: block;
+    }
+
+    .qty-control {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .qty-control button {
+      background: transparent;
+      border: none;
+      width: 34px;
+      height: 34px;
+      color: var(--accent);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .qty-control span {
+      min-width: 32px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .primary-cta-btn {
+      background: var(--accent);
+      color: #FFFFFF;
+      border: none;
+      padding: 0.95rem 1.5rem;
+      border-radius: 999px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      width: 100%;
+      margin-top: auto;
+    }
+
+    .primary-cta-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ================= DRAWER CARRITO WHATSAPP ================= */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 26, 32, 0.42);
+      backdrop-filter: blur(4px);
+      z-index: 600;
+      display: none;
+      justify-content: flex-end;
+    }
+
+    .drawer-backdrop.open {
+      display: flex;
+    }
+
+    .cart-drawer {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 430px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -15px 0 45px rgba(45, 26, 32, 0.15);
+    }
+
+    .drawer-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.65rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .cart-item {
+      display: flex;
+      gap: 0.9rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-soft);
+      align-items: center;
+    }
+
+    .cart-item img {
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--bg-secondary);
+    }
+
+    .cart-item-info {
+      flex: 1;
+    }
+
+    .cart-item-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+    }
+
+    .cart-item-meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .cart-item-price {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      margin-top: 0.2rem;
+    }
+
+    .remove-item-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.35rem;
+    }
+
+    .drawer-footer {
+      padding: 1.4rem 1.5rem;
+      border-top: 1px solid var(--border-soft);
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.72rem 0.95rem;
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.82rem;
+      background: #FFFFFF;
+      color: var(--text-main);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .total-amount {
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .order-confirmation-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(45, 26, 32, 0.48);
+      backdrop-filter: blur(5px);
+    }
+
+    .order-confirmation-backdrop.open {
+      display: flex;
+    }
+
+    .order-confirmation-modal {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 560px);
+      max-height: min(90vh, 760px);
+      overflow-y: auto;
+      padding: clamp(1.25rem, 4vw, 2rem);
+      border: 1px solid var(--border-soft);
+      border-radius: 22px;
+      background: var(--bg-primary);
+      box-shadow: 0 24px 70px rgba(45, 26, 32, 0.22);
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .order-confirmation-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .order-confirmation-eyebrow,
+    .order-confirmation-label {
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .order-confirmation-title {
+      margin-top: 0.2rem;
+      color: var(--accent);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 500;
+      line-height: 1.15;
+    }
+
+    .order-confirmation-close {
+      flex: 0 0 auto;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border-soft);
+      border-radius: 50%;
+      background: #FFFFFF;
+      color: var(--accent);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .order-confirmation-section {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      background: #FFFFFF;
+    }
+
+    .order-confirmation-items {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 0.85rem;
+    }
+
+    .order-confirmation-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.25rem 1rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 0.8rem;
+    }
+
+    .order-confirmation-item:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .order-confirmation-item-name {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .order-confirmation-item-meta {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+
+    .order-confirmation-item-subtotal {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+      color: var(--accent);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .order-confirmation-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 0.9rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--border-soft);
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .order-confirmation-customer {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .order-confirmation-hint {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    .order-confirmation-status {
+      margin-top: 0.75rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid rgba(122, 28, 55, 0.18);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .order-confirmation-status[hidden] {
+      display: none;
+    }
+
+    .order-confirmation-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+    }
+
+    .order-confirmation-actions > * {
+      flex: 1;
+      margin-top: 0;
+    }
+
+    .order-confirmation-actions button:disabled,
+    .order-confirmation-close:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .order-confetti {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .order-confetti-piece {
+      position: absolute;
+      top: -16px;
+      width: 9px;
+      height: 13px;
+      border-radius: 2px;
+      opacity: 0;
+      animation: orderConfettiFall 1.7s ease-in forwards;
+    }
+
+    @keyframes orderConfettiFall {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, -5vh, 0) rotate(0deg);
+      }
+      12% {
+        opacity: 0.9;
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--confetti-drift), 105vh, 0) rotate(620deg);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .order-confirmation-actions {
+        flex-direction: column-reverse;
+      }
+    }
+
+    /* ================= VISTA PRIVADA PANEL ADMIN (#admin) ================= */
+    #admin-view {
+      display: none;
+      min-height: 100vh;
+      background: var(--bg-primary);
+    }
+
+    .admin-login-box {
+      max-width: 410px;
+      margin: 10vh auto;
+      background: #FFFFFF;
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .admin-dashboard {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .admin-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 2rem;
+    }
+
+    .admin-brand-block {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .admin-sales-summary {
+      margin-bottom: 1.5rem;
+    }
+
+    .admin-sales-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .admin-sales-metric {
+      padding: 1rem;
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+    }
+
+    .admin-sales-label {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .admin-sales-value {
+      display: block;
+      margin-top: 0.45rem;
+      color: #7A1C37;
+      font-size: clamp(1.2rem, 2.4vw, 1.75rem);
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .admin-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .admin-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .admin-form-group {
+      margin-bottom: 0.9rem;
+    }
+
+    .admin-form-group label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .admin-table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.85rem 0.75rem;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    th {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .btn-outline-sm {
+      background: transparent;
+      border: 1px solid var(--border-soft);
+      color: var(--accent);
+      padding: 0.4rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-outline-sm:hover {
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+
+    @media (max-width: 820px) {
+      .header-inner {
+        grid-template-columns: 1fr auto 1fr;
+      }
+      .hero-finger-gap-copy {
+        transform: translate(0, -18px);
+        max-width: 270px;
+      }
+      .detail-modal {
+        grid-template-columns: 1fr;
+      }
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+      .admin-sales-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= ANIMACIÓN DE ENTRADA (LAZO + NOMBRE CENTRADO) ================= -->
+  <div id="intro-overlay">
+    <div class="intro-stage">
+      <div class="bow-wrapper">
+        <svg class="bow-svg" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M58 48C42 28 16 26 16 44C16 58 38 56 58 48Z" stroke="#7A1C37" stroke-width="3.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M62 48C78 28 104 26 104 44C104 58 82 56 62 48Z" stroke="#7A1C37" stroke-width="3.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+          <path class="bow-ribbon-left" d="M57 51C49 68 46 86 40 99" stroke="#7A1C37" stroke-width="3.2" stroke-linecap="round"/>
+          <path class="bow-ribbon-right" d="M63 51C71 68 74 86 80 99" stroke="#7A1C37" stroke-width="3.2" stroke-linecap="round"/>
+          <circle cx="60" cy="48" r="5" fill="#7A1C37"/>
+        </svg>
+      </div>
+      <div class="intro-brand-reveal">
+        <div class="brand-title-luxury"><span class="script-initial">A</span>ccessories</div>
+        <div class="brand-sub-luxury">BY ISA</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SESIÓN 1: TIENDA PÚBLICA PARA CLIENTES ================= -->
+  <div id="storefront-view">
+    <header class="site-header">
+      <div class="header-inner">
+        <!-- Lazo en la esquina superior izquierda -->
+        <div class="header-left">
+          <a class="header-bow-link" onclick="replayIntro()" title="Accessories BY ISA" aria-label="Inicio">
+            <svg class="header-bow-svg" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 48C42 28 16 26 16 44C16 58 38 56 58 48Z" stroke="#7A1C37" stroke-width="4.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M62 48C78 28 104 26 104 44C104 58 82 56 62 48Z" stroke="#7A1C37" stroke-width="4.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M57 51C49 68 46 86 40 99" stroke="#7A1C37" stroke-width="4.2" stroke-linecap="round"/>
+              <path d="M63 51C71 68 74 86 80 99" stroke="#7A1C37" stroke-width="4.2" stroke-linecap="round"/>
+              <circle cx="60" cy="48" r="5.5" fill="#7A1C37"/>
+            </svg>
+          </a>
+        </div>
+
+        <a class="header-logo" onclick="replayIntro()">
+          <span class="header-logo-main"><span class="script-initial">A</span>ccessories</span>
+          <span class="header-logo-sub">BY ISA</span>
+        </a>
+
+        <div class="header-actions">
+          <button class="bag-btn" onclick="toggleCart(true)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 7h12l1 13H5L6 7z"/>
+              <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
+            </svg>
+            <span>Bolsa</span>
+            <span class="bag-count" id="bag-count">0</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="hero-section-wrap">
+      <section class="hero-minimal">
+        <div class="hero-slides" aria-hidden="true">
+          <div class="hero-slide is-active"><img src="./img/anillos-fondo.jpeg" alt="" /></div>
+          <div class="hero-slide"><img src="./img/anillos-fondo-2.jpeg" alt="" /></div>
+          <div class="hero-slide"><img src="./img/anillos-fondo-3.jpeg" alt="" /></div>
+          <div class="hero-slide"><img src="./img/anillos-fondo-4.jpeg" alt="" /></div>
+          <div class="hero-slide"><img src="./img/anillos-fondo-5.jpeg" alt="" /></div>
+          <div class="hero-slide"><img src="./img/anillos-fondo-6.jpeg" alt="" /></div>
+        </div>
+        <div class="hero-finger-gap-copy">
+          <h1>Colección Esencial</h1>
+          <p>Acero inoxidable · Brillo eterno</p>
+        </div>
+      </section>
+    </div>
+
+    <nav class="filters-bar" id="filters-bar">
+      <button class="filter-pill active" data-category="Todos" onclick="setCategory('Todos')">Todos</button>
+      <button class="filter-pill" data-category="Collares" onclick="setCategory('Collares')">Collares</button>
+      <button class="filter-pill" data-category="Aretes" onclick="setCategory('Aretes')">Aretes</button>
+      <button class="filter-pill" data-category="Pulseras" onclick="setCategory('Pulseras')">Pulseras</button>
+      <button class="filter-pill" data-category="Sets" onclick="setCategory('Sets')">Sets</button>
+    </nav>
+
+    <main class="catalog-container">
+      <div class="products-grid" id="products-grid"></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-brand">Accessories BY ISA</div>
+      <div class="footer-copy">Joyería en Acero Inoxidable · Pedidos vía WhatsApp</div>
+    </footer>
+  </div>
+
+  <!-- MODAL DETALLE DE PRODUCTO (MULTI-FOTO + ESPECIFICACIONES) -->
+  <div class="modal-backdrop" id="detail-modal-backdrop" onclick="closeDetailOnBackdrop(event)">
+    <div class="detail-modal">
+      <button class="modal-close-btn" onclick="closeProductDetail()" aria-label="Cerrar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <div class="detail-gallery">
+        <div class="detail-main-photo">
+          <img id="detail-main-img" src="" alt="" />
+          <button class="gallery-nav-btn prev" id="gallery-prev-btn" onclick="stepDetailPhoto(-1)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M15 18l-6-6 6-6"/>
+            </svg>
+          </button>
+          <button class="gallery-nav-btn next" id="gallery-next-btn" onclick="stepDetailPhoto(1)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
+        <div class="detail-thumbs" id="detail-thumbs"></div>
+      </div>
+
+      <div class="detail-info">
+        <span class="product-category-label" id="detail-category"></span>
+        <h2 class="detail-title" id="detail-title"></h2>
+        <div class="detail-price" id="detail-price"></div>
+        <p class="detail-description" id="detail-description"></p>
+
+        <div class="detail-specs">
+          <div class="spec-row">
+            <span class="spec-label">Material</span>
+            <span class="spec-value" id="detail-material"></span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Resistencia</span>
+            <span class="spec-value">Resistente al agua · Hipoalergénico</span>
+          </div>
+        </div>
+
+        <div>
+          <span class="detail-option-label">Tono disponible: <strong id="detail-color-label"></strong></span>
+          <div class="swatches-row" id="detail-swatches"></div>
+        </div>
+
+        <div>
+          <span class="detail-option-label">Cantidad</span>
+          <div class="qty-control">
+            <button onclick="changeDetailQty(-1)">−</button>
+            <span id="detail-qty">1</span>
+            <button onclick="changeDetailQty(1)">+</button>
+          </div>
+        </div>
+
+        <button class="primary-cta-btn" onclick="addDetailToCart()">Agregar a la bolsa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRAWER CARRITO WHATSAPP -->
+  <div class="drawer-backdrop" id="cart-backdrop" onclick="closeCartOnBackdrop(event)">
+    <aside class="cart-drawer">
+      <div class="drawer-header">
+        <h2>Tu Bolsa</h2>
+        <button class="btn-outline-sm" onclick="toggleCart(false)">Cerrar</button>
+      </div>
+
+      <div class="drawer-body" id="cart-items-container"></div>
+
+      <div class="drawer-footer">
+        <input type="text" id="customer-name" class="form-input" placeholder="Tu nombre para el pedido" />
+        <div class="total-row">
+          <span>Total estimado</span>
+          <span class="total-amount" id="cart-total">$0</span>
+        </div>
+        <button class="primary-cta-btn" onclick="checkoutWhatsApp()">Revisar y realizar pedido</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="order-confirmation-backdrop" id="order-confirmation-backdrop" onclick="closeOrderConfirmationOnBackdrop(event)">
+    <section class="order-confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="order-confirmation-title">
+      <div class="order-confirmation-header">
+        <div>
+          <p class="order-confirmation-eyebrow">Antes de enviar</p>
+          <h2 class="order-confirmation-title" id="order-confirmation-title">Confirma tu pedido</h2>
+        </div>
+        <button class="order-confirmation-close" id="order-confirmation-close" type="button" aria-label="Volver a la bolsa" onclick="closeOrderConfirmation()">×</button>
+      </div>
+      <div class="order-confirmation-section">
+        <span class="order-confirmation-label">Resumen de productos</span>
+        <div class="order-confirmation-items" id="order-confirmation-items"></div>
+        <div class="order-confirmation-total">
+          <span>Total en COP</span>
+          <span id="order-confirmation-total"></span>
+        </div>
+      </div>
+      <div class="order-confirmation-section order-confirmation-customer">
+        <label class="order-confirmation-label" for="customer-name-confirm">Nombre de la clienta</label>
+        <input type="text" id="customer-name-confirm" class="form-input" autocomplete="name" placeholder="Tu nombre para el pedido" />
+        <p class="order-confirmation-hint">Verifica el nombre o vuelve a la bolsa para editar tu pedido.</p>
+      </div>
+      <p class="order-confirmation-status" id="order-confirmation-status" role="status" aria-live="polite" hidden></p>
+      <div class="order-confirmation-actions">
+        <button class="btn-outline-sm" id="order-confirm-back" type="button" onclick="closeOrderConfirmation()">Volver a la bolsa</button>
+        <button class="primary-cta-btn" id="order-confirm-submit" type="button" onclick="confirmOrder()">Confirmar y abrir WhatsApp</button>
+      </div>
+    </section>
+    <div class="order-confetti" id="order-confetti" aria-hidden="true"></div>
+  </div>
+
+  <!-- ================= SESIÓN 2: PANEL DE ADMINISTRADOR (#admin) ================= -->
+  <div id="admin-view">
+    <!-- Pantalla de acceso -->
+    <div id="admin-auth-screen" class="admin-login-box">
+      <div style="display:flex; justify-content:center; margin-bottom:0.6rem;">
+        <svg style="width:48px; height:44px;" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M58 48C42 28 16 26 16 44C16 58 38 56 58 48Z" stroke="#7A1C37" stroke-width="3.6" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M62 48C78 28 104 26 104 44C104 58 82 56 62 48Z" stroke="#7A1C37" stroke-width="3.6" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M57 51C49 68 46 86 40 99" stroke="#7A1C37" stroke-width="3.6" stroke-linecap="round"/>
+          <path d="M63 51C71 68 74 86 80 99" stroke="#7A1C37" stroke-width="3.6" stroke-linecap="round"/>
+          <circle cx="60" cy="48" r="5" fill="#7A1C37"/>
+        </svg>
+      </div>
+      <div class="brand-title-luxury" style="font-size:2.4rem;"><span class="script-initial">A</span>ccessories</div>
+      <div class="brand-sub-luxury" style="margin-bottom:1.8rem;">BY ISA · ADMINISTRACIÓN</div>
+      <div class="admin-form-group" style="text-align:left;">
+        <label>Clave de acceso</label>
+        <input type="password" id="admin-pass-input" class="form-input" placeholder="Ingresa tu clave" onkeyup="if(event.key==='Enter') loginAdmin()" />
+      </div>
+      <button class="primary-cta-btn" onclick="loginAdmin()">Ingresar al Panel</button>
+      <p id="admin-auth-error" style="color:#B00020; font-size:0.75rem; margin-top:0.75rem; display:none;">Clave incorrecta.</p>
+      <div style="margin-top:1.2rem;">
+        <button class="btn-outline-sm" onclick="exitAdminToStore()">Volver al catálogo</button>
+      </div>
+    </div>
+
+    <!-- Dashboard privado -->
+    <div id="admin-dashboard-screen" class="admin-dashboard" style="display:none;">
+      <div class="admin-topbar">
+        <div class="admin-brand-block">
+          <svg style="width:44px; height:40px; flex-shrink:0;" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M58 48C42 28 16 26 16 44C16 58 38 56 58 48Z" stroke="#7A1C37" stroke-width="3.8" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M62 48C78 28 104 26 104 44C104 58 82 56 62 48Z" stroke="#7A1C37" stroke-width="3.8" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M57 51C49 68 46 86 40 99" stroke="#7A1C37" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M63 51C71 68 74 86 80 99" stroke="#7A1C37" stroke-width="3.8" stroke-linecap="round"/>
+            <circle cx="60" cy="48" r="5" fill="#7A1C37"/>
+          </svg>
+          <div>
+            <h2 style="font-family:'Cormorant Garamond',serif; font-size:2rem; color:var(--accent); line-height:1.05;"><span style="font-family:'Pinyon Script',cursive; font-size:1.25em;">A</span>ccessories BY ISA</h2>
+            <p style="font-size:0.72rem; color:var(--text-muted); letter-spacing:0.18em; text-transform:uppercase; margin-top:0.2rem;">Gestión de inventario y pedidos</p>
+          </div>
+        </div>
+        <div style="display:flex; gap:0.6rem;">
+          <button class="btn-outline-sm" onclick="exitAdminToStore()">Ver catálogo público</button>
+          <button class="btn-outline-sm" onclick="logoutAdmin()">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <section class="admin-card admin-sales-summary" aria-labelledby="admin-sales-title">
+        <h3 id="admin-sales-title">Resumen de Ventas y Ganancias</h3>
+        <div class="admin-sales-grid">
+          <div class="admin-sales-metric">
+            <span class="admin-sales-label">Venta total proyectada (COP)</span>
+            <strong class="admin-sales-value" id="admin-projected-sales">$0</strong>
+          </div>
+          <div class="admin-sales-metric">
+            <label class="admin-sales-label" for="admin-investment">Valor invertido en este pedido / lote (COP)</label>
+            <input
+              type="number"
+              id="admin-investment"
+              class="form-input"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              oninput="updateAdminInvestment(this.value)"
+            />
+          </div>
+          <div class="admin-sales-metric">
+            <span class="admin-sales-label">Ganancia estimada (COP)</span>
+            <strong class="admin-sales-value" id="admin-estimated-profit">$0</strong>
+          </div>
+        </div>
+      </section>
+
+      <div class="admin-tabs">
+        <button class="filter-pill active" id="tab-btn-inventory" onclick="switchAdminTab('inventory')">Inventario</button>
+        <button class="filter-pill" id="tab-btn-orders" onclick="switchAdminTab('orders')">Pedidos recibidos</button>
+        <button class="filter-pill" id="tab-btn-settings" onclick="switchAdminTab('settings')">Seguridad</button>
+      </div>
+
+      <!-- TAB INVENTARIO -->
+      <div id="admin-tab-inventory" class="admin-grid">
+        <div class="admin-card">
+          <h3 id="form-product-heading">Agregar Nueva Pieza</h3>
+          <input type="hidden" id="edit-product-id" />
+
+          <div class="admin-form-group">
+            <label>Nombre del producto</label>
+            <input type="text" id="prod-name" class="form-input" placeholder="Ej. Collar Cruz Minimalista" />
+          </div>
+
+          <div class="admin-form-group">
+            <label>Categoría</label>
+            <select id="prod-category" class="form-input">
+              <option value="Collares">Collares</option>
+              <option value="Aretes">Aretes</option>
+              <option value="Pulseras">Pulseras</option>
+              <option value="Sets">Sets</option>
+            </select>
+          </div>
+
+          <div class="admin-form-group">
+            <label>Precio (COP)</label>
+            <input type="number" id="prod-price" class="form-input" placeholder="38000" />
+          </div>
+
+          <div class="admin-form-group">
+            <label for="prod-stock">Unidades disponibles</label>
+            <input type="number" id="prod-stock" class="form-input" min="0" step="1" value="1" required />
+          </div>
+
+          <div class="admin-form-group">
+            <label>Material</label>
+            <input type="text" id="prod-material" class="form-input" value="Acero inoxidable 316L" />
+          </div>
+
+          <div class="admin-form-group">
+            <label>Tonos disponibles (separados por coma)</label>
+            <input type="text" id="prod-colors" class="form-input" list="prod-colors-options" placeholder="Dorado, Plateado, Esmeralda" />
+            <datalist id="prod-colors-options">
+              <option value="Blanco">Blanco</option>
+              <option value="Negro">Negro</option>
+              <option value="Esmeralda">Esmeralda</option>
+            </datalist>
+          </div>
+
+          <div class="admin-form-group">
+            <label>Descripción breve</label>
+            <textarea id="prod-desc" class="form-input" rows="2" placeholder="Detalle elegante resistente al agua..."></textarea>
+          </div>
+
+          <div class="admin-form-group">
+            <label>Rutas o URLs de fotos (una por línea)</label>
+            <textarea id="prod-images" class="form-input" rows="3" placeholder="./img/foto1.jpg&#10;./img/foto2.jpg"></textarea>
+          </div>
+
+          <div style="display:flex; gap:0.6rem;">
+            <button class="primary-cta-btn" onclick="saveProductFromAdmin()">Guardar Producto</button>
+            <button class="btn-outline-sm" id="cancel-edit-btn" style="display:none;" onclick="resetProductForm()">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3>Catálogo Actual</h3>
+          <div class="admin-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pieza</th>
+                  <th>Categoría</th>
+                  <th>Tonos</th>
+                  <th>Unidades</th>
+                  <th>Precio</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB PEDIDOS -->
+      <div id="admin-tab-orders" class="admin-card" style="display:none;">
+        <h3>Historial de Pedidos Enviados a WhatsApp</h3>
+        <div class="admin-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Clienta</th>
+                <th>Detalle</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="admin-orders-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB SEGURIDAD -->
+      <div id="admin-tab-settings" class="admin-card" style="display:none; max-width:460px;">
+        <h3>Cambiar Clave de Administradora</h3>
+        <div class="admin-form-group">
+          <label>Nueva contraseña</label>
+          <input type="password" id="new-admin-pass" class="form-input" placeholder="Escribe la nueva clave" />
+        </div>
+        <button class="primary-cta-btn" onclick="updateAdminPassword()">Actualizar Clave</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WHATSAPP_NUMBER = "573216298879";
+    const STORAGE_PRODUCTS_KEY = "isa_accessories_products_v2";
+    const STORAGE_ORDERS_KEY = "isa_accessories_orders_v2";
+    const STORAGE_INVESTMENT_KEY = "isa_accessories_investment_v1";
+    const STORAGE_PASS_KEY = "isa_accessories_admin_pass";
+
+    const DEFAULT_PRODUCTS = [
+      
+      {
+        id: "p1",
+        name: "Collar Oval Chic",
+        category: "Collares",
+        price: 9000,
+        material: "Acero inoxidable, chapado en oro con recubriemto de PVD",
+        colors: ["Dorado", "Plateado"],
+        description: "Un accesorio delicado y lleno de estilo. ♡ Disponible en color dorado y plateado, ideal para darle un toque de elegancia y brillo a cualquier outfit. Un básico hermoso que no puede faltar en tu colección.",
+        colorImages: {
+          
+          "Dorado": "./img/collar-titanio-2.jpeg",
+          "Plateado": "./img/collar-titanio-3.jpeg",
+        },
+          images: [
+          "./img/collar-titanio-1.jpeg",
+          "./img/collar-titanio-2.jpeg",
+          "./img/collar-titanio-3.jpeg",
+          "./img/collar-titanio-4.jpeg"
+        ]
+      },
+      {
+        id: "p2",
+        name: "Set diseño en cruz",
+        category: "Sets",
+        price: 16000,
+        material: "Acero inoxidable chapado en oro con recubrimiento de PVD",
+        colors: ["Dorado"],
+        description: "Un diseño que combina elegancia, delicadeza y significado. ♡ Este hermoso set incluye collar y pulsera con detalles en forma de cruz, perfectos para complementar tus looks con un toque especial y sofisticado.",
+        images: [
+          "./img/set-cruz-1.jpeg",
+          "./img/set-cruz-2.jpeg",
+          "./img/set-cruz-3.jpeg",
+        ]
+      },
+{
+        id: "p3",
+        name: "Collar Frutas Multicolor",
+        category: "Collares",
+        price: 17000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Acero inoxidable 304",
+        chainType: "Redondo",
+        colors: ["Amarillo", "Rojo", "Rosado"],
+        description: "Un toque de dulzura y color para tus looks. 🍓✨ Un collar lleno de pequeños detalles frutales que lo hacen único, divertido y súper delicado. Perfecto para darle un toque especial a tus outfits y destacar con mucho estilo. ❤️",
+        colorImages: {
+          "Amarillo": "./img/collar-frutas-3.jpeg",
+          "Rojo": "./img/collar-frutas-2.jpeg",
+          "Rosado": "./img/collar-frutas-1.jpeg"
+        },
+        images: [
+          "./img/collar-frutas-1.jpeg",
+          "./img/collar-frutas-2.jpeg",
+          "./img/collar-frutas-3.jpeg"
+        ]
+      },
+
+{
+        id: "p4",
+        name: "Set Flor Dorada",
+        category: "Sets",
+        price: 23000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Proceso de enchapado en oro",
+        colors: ["Dorado"],
+        description: "Set de 3 piezas — Cadena, aretes y pulsera que se complementan perfectamente para crear un look armonioso, elegante y lleno de estilo.",
+        images: [
+          "./img/set-flor-1.jpeg",
+          "./img/set-flor-2.jpeg",
+          "./img/set-flor-3.jpeg",
+          "./img/set-flor-4.jpeg"
+        ]
+      },
+
+      {
+        id: "p5",
+        name: "Collar Perlitas de Oro",
+        category: "Collares",
+        price: 9000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Proceso de enchapado en oro",
+        chainType: "Cadena con bolitas",
+        colors: ["Plateado", "Dorado"],
+        description: "La sencillez también tiene su encanto. ♡ Un collar delicado con pequeñas bolitas alrededor que aportan un brillo especial y elegante. Disponible en dorado y plateado, perfecto para combinar con tus accesorios favoritos y lucir hermosa en cualquier ocasión.",
+        colorImages: {
+          "Plateado": "./img/collar-basico-2.jpeg",
+          "Dorado": "./img/collar-basico-1.jpeg"
+        },
+        images: [
+          "./img/collar-basico-1.jpeg",
+          "./img/collar-basico-2.jpeg",
+          "./img/collar-basico-3.jpeg",
+          "./img/collar-basico-4.jpeg"
+        ]
+      },
+
+      {
+        id: "p6",
+        name: "Collar Conchitas",
+        category: "Collares",
+        price: 18000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Proceso de enchapado en oro",
+        chainType: "Cadena delicada",
+        colors: ["Plateado", "Dorado"],
+        description: "Un pedacito del mar para complementar tu estilo. 🐚 Un collar delicado con detalles de conchitas marinas que le dan un toque fresco, femenino y encantador. Disponible en dorado y plateado, perfecto para lucir un estilo playero y lleno de personalidad.",
+        colorImages: {
+          "Plateado": "./img/collar-conchitas-4.jpeg",
+          "Dorado": "./img/collar-conchitas-3.jpeg"
+        },
+        images: [
+          "./img/collar-conchitas-1.jpeg",
+          "./img/collar-conchitas-2.jpeg",
+          "./img/collar-conchitas-3.jpeg",
+          "./img/collar-conchitas-4.jpeg"
+        ]
+      },
+
+      {
+        id: "p7",
+        name: "Set Lacitos",
+        category: "Sets",
+        price: 23000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Proceso de enchapado en oro",
+        chainType: "Cadena delicada",
+        colors: ["Dorado"],
+        description: "Un toque de dulzura y encanto para tu estilo. Este hermoso set incluye aretes, pulsera y collar con delicados detalles de lacitos en dorado y azul. Una combinación femenina, delicada y súper coqueta, perfecta para darle un toque especial a cualquier look.",
+        images: [
+          "./img/set-lacitos-1.jpeg",
+          "./img/set-lacitos-2.jpeg",
+          "./img/set-lacitos-3.jpeg"
+        ]
+      },
+
+      {
+        id: "p8",
+        name: "Collar Elegante",
+        category: "Collares",
+        price: 9000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Acero inoxidable acabado plateado",
+        chainType: "Cadena fina",
+        colors: ["Plateado"],
+        description: "La elegancia hecha accesorio. ♡ Un hermoso collar plateado con un diseño sofisticado y delicado, ideal para darle un toque de brillo y distinción a tus outfits. Perfecto para ocasiones especiales o para lucir elegante todos los días.",
+        images: [
+          "./img/collar-elegante-1.jpeg",
+          "./img/collar-elegante-2.jpeg"
+        ]
+      },
+
+      {
+        id: "p9",
+        name: "Collar Piedras Naturales",
+        category: "Collares",
+        price: 21000,
+        material: "Acero inoxidable y piedras naturales",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Acero inoxidable con detalle natural",
+        chainType: "Cadena delicada",
+        colors: ["Azul Agua Marina"],
+        description: "Un collar único y lleno de encanto. Sus piedras naturales le dan un toque especial, delicado y elegante a cualquier look.",
+        images: [
+          "./img/collar-natural-1.jpeg",
+          "./img/collar-natural-2.jpeg",
+          "./img/collar-natural-3.jpeg"
+        ]
+      },
+
+      {
+        id: "p10",
+        name: "Aretes",
+        category: "Aretes",
+        price: 6000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua, al deslustre y hipoalergénico",
+        classification: "Diseños variados en acero inoxidable",
+        chainType: "Aretes variados",
+        colors: ["Blanco", "Negro", "Dorado"],
+        colorImages: {
+          "Blanco": "./img/aretes-1.jpeg",
+          "Negro": "./img/aretes-3.jpeg",
+          "Dorado": "./img/aretes-6.jpeg"
+        },
+        description: "Aretes encantadores en diferentes diseños y colores, ideales para darle un toque especial a cualquier look. Detalles delicados, versátiles y llenos de estilo para combinar y lucir en cualquier ocasión.",
+        images: [
+          "./img/aretes-1.jpeg",
+          "./img/aretes-2.jpeg",
+          "./img/aretes-3.jpeg",
+          "./img/aretes-4.jpeg",
+          "./img/aretes-5.jpeg",
+          "./img/aretes-6.jpeg",
+          "./img/aretes-7.jpeg",
+          "./img/aretes-8.jpeg"
+        ]
+      },
+
+      {
+        id: "p11",
+        name: "Set Diseño de Cruz+Diamante",
+        category: "Sets",
+        price: 16000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Conjunto cadena y pulsera en tono dorado",
+        chainType: "Cadena y pulsera coordinadas",
+        colors: ["Dorado"],
+        description: "Un conjunto que complementa tu estilo con la armonía perfecta entre cadena y pulsera. Su diseño coordinado aporta un toque sofisticado, ideal para lucirlo junto o por separado. Dos piezas, infinitas formas de brillar.",
+        images: [
+          "./img/set-cruzdiamante-1.jpeg",
+          "./img/set-cruzdiamante-2.jpeg",
+          "./img/set-cruzdiamante-3.jpeg"
+        ]
+      },
+
+      {
+        id: "p12",
+        name: "Collar Gotas Doradas",
+        category: "Collares",
+        price: 9000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Collar en acero inoxidable tono dorado",
+        chainType: "Cadena fina con dije doble gota",
+        colors: ["Dorado"],
+        description: "Collar dorado con un delicado dije de doble gota que aporta movimiento y elegancia. Su diseño moderno y femenino lo convierte en el complemento perfecto para cualquier ocasión.",
+        images: [
+          "./img/collar-gotas-1.jpeg",
+          "./img/collar-gotas-2.jpeg",
+          "./img/collar-gotas-3.jpeg"
+        ]
+      },
+
+      {
+        id: "p13",
+        name: "Pulsera Encanto",
+        category: "Pulseras",
+        price: 10900,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Pulsera en acero inoxidable disponible en varios tonos",
+        chainType: "Pulsera ajustable",
+        colors: ["Negro", "Blanco", "Rosado"],
+        colorImages: {
+          "Negro": "./img/pulsera-1.jpeg",
+          "Blanco": "./img/pulsera-2.jpeg",
+          "Rosado": "./img/pulsera-3.jpeg"
+        },
+        description: "Una pulsera encantadora que destaca por su diseño y belleza, disponible en cuatro colores preciosos para elegir tu favorito. Un detalle especial que hará brillar cada uno de tus looks. Ten algo único y hermoso.",
+        images: [
+          "./img/pulsera-1.jpeg",
+          "./img/pulsera-2.jpeg",
+          "./img/pulsera-3.jpeg",
+          "./img/pulsera-4.jpeg"
+        ]
+      },
+
+      {
+        id: "p14",
+        name: "Set Encanto Esmeralda",
+        category: "Sets",
+        price: 17000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Conjunto collar y pulsera con piedras esmeralda",
+        chainType: "Collar y pulsera coordinados",
+        colors: ["Esmeralda"],
+        description: "Un conjunto lleno de encanto, con piedras en hermosos tonos esmeralda que aportan un toque de color y distinción. Su combinación de collar y pulsera crea un look sofisticado y cautivador.",
+        images: [
+          "./img/set-esmeralda-1.jpeg",
+          "./img/set-esmeralda-2.jpeg",
+          "./img/set-esmeralda-3.jpeg",
+          "./img/set-esmeralda-4.jpeg"
+        ]
+      },
+
+      {
+        id: "p15",
+        name: "Set patrón floral",
+        category: "Sets",
+        price: 28000,
+        material: "Perlas artificiales y acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Doble collar en acero inoxidable con perlas artificiales",
+        chainType: "Doble collar diseño floral",
+        colors: ["Blanco"],
+        colorImages: {
+          "Blanco": "./img/set-patronfloral-1.jpeg"
+        },
+        description: "Un delicado set de doble collar en acero inoxidable, con hermoso diseño floral y detalles de perlas artificiales. Una combinación romántica y elegante que aporta un encanto especial a tu estilo.",
+        images: [
+          "./img/set-patronfloral-1.jpeg",
+          "./img/set-patronfloral-2.jpeg",
+          "./img/set-patronfloral-3.jpeg",
+          "./img/set-patronfloral-4.jpeg",
+          "./img/set-patronfloral-5.jpeg"
+        ]
+      },
+
+      {
+        id: "p16",
+        name: "Collar de Anillos",
+        category: "Collares",
+        price: 20000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Collar en acero inoxidable con dos anillos entrelazados",
+        chainType: "Cadena con dije de doble anillo",
+        colors: ["Dorado"],
+        colorImages: {
+          "Dorado": "./img/collar-deanillos-1.jpeg"
+        },
+        description: "Un collar dorado con dos anillos entrelazados que simbolizan unión y conexión. Un diseño delicado y significativo, perfecto para llevar un detalle especial siempre contigo.",
+        images: [
+          "./img/collar-deanillos-1.jpeg",
+          "./img/collar-deanillos-2.jpeg"
+        ]
+      },
+
+      {
+        id: "p17",
+        name: "Pulseras Tipo Brazalete",
+        category: "Pulseras",
+        price: 11000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Brazaletes en acero inoxidable con diseños complementarios",
+        chainType: "Pulseras tipo brazalete",
+        colors: ["Dorado"],
+        colorImages: {
+          "Dorado": "./img/pulsera-brazalete-1.jpeg"
+        },
+        description: "brazaletes con diseños diferentes que se complementan a la perfección. Ideales para lucir juntos y crear una combinación llena de personalidad, estilo y elegancia.",
+        images: [
+          "./img/pulsera-brazalete-1.jpeg",
+          "./img/pulsera-brazalete-2.jpeg",
+          "./img/pulsera-brazalete-3.jpeg"
+        ]
+      },
+
+      {
+        id: "p18",
+        name: "Set de Dama",
+        category: "Sets",
+        price: 16000,
+        material: "Acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Dúo dorado en acero inoxidable de acabado luminoso",
+        chainType: "Conjunto coordinado en tono dorado",
+        colors: ["Dorado"],
+        colorImages: {
+          "Dorado": "./img/set-cruzdoble-1.jpeg"
+        },
+        description: "Un dúo dorado que roba miradas desde el primer instante. Su acabado luminoso y diseño armonioso hacen de este set una elección perfecta para quienes aman destacar con pequeños detalles.",
+        images: [
+          "./img/set-cruzdoble-1.jpeg",
+          "./img/set-cruzdoble-2.jpeg",
+          "./img/set-cruzdoble-3.jpeg",
+          "./img/set-cruzdoble-4.jpeg"
+        ]
+      },
+
+      {
+        id: "p19",
+        name: "Set en Piedras Naturales",
+        category: "Sets",
+        price: 40000,
+        material: "Piedras naturales y acero inoxidable",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Conjunto de pulsera y collar en tonos esmeralda",
+        chainType: "Collar y pulsera coordinados",
+        colors: ["Esmeralda"],
+        colorImages: {
+          "Esmeralda": "./img/set-piedrasnaturales-1.jpeg"
+        },
+        description: "Un set de pulsera y collar elaborado con piedras naturales en hermosos tonos esmeralda. 💚 Una combinación exclusiva que transmite frescura, elegancia y belleza en cada detalle.",
+        images: [
+          "./img/set-piedrasnaturales-1.jpeg",
+          "./img/set-piedrasnaturales-2.jpeg",
+          "./img/set-piedrasnaturales-3.jpeg"
+        ]
+      },
+
+      {
+        id: "p20",
+        name: "Pulsera Perlada",
+        category: "Pulseras",
+        price: 9000,
+        material: "Acero inoxidable y perlas",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Pulsera con delicadas perlas en tono blanco",
+        chainType: "Pulsera de diseño atemporal con perlas",
+        colors: ["Blanco"],
+        colorImages: {
+          "Blanco": "./img/pulsera-perlada-1.jpeg"
+        },
+        description: "Una pulsera con delicadas perlas que destaca por su belleza natural y acabado sutil. Su diseño atemporal aporta un toque de dulzura y distinción a cualquier ocasión.",
+        images: [
+          "./img/pulsera-perlada-1.jpeg",
+          "./img/pulsera-perlada-2.jpeg"
+        ]
+      },
+
+      {
+        id: "p21",
+        name: "Collar Perlado",
+        category: "Collares",
+        price: 9000,
+        material: "Acero inoxidable y perlas",
+        craftsmanship: "Resistente al agua y al deslustre",
+        classification: "Collar perlado en acero inoxidable de estilo clásico",
+        chainType: "Collar delicado con perlas",
+        colors: ["Blanco"],
+        colorImages: {
+          "Blanco": "./img/collar-perlado-1.jpeg"
+        },
+        description: "Un collar perlado que refleja delicadeza en cada detalle. Su encanto clásico y femenino aporta un aire romántico, perfecto para quienes aman la belleza de lo sencillo.",
+        images: [
+          "./img/collar-perlado-1.jpeg",
+          "./img/collar-perlado-2.jpeg"
+        ]
+      }
+    ];
+
+    let products = JSON.parse(localStorage.getItem(STORAGE_PRODUCTS_KEY)) || DEFAULT_PRODUCTS;
+    let orders = JSON.parse(localStorage.getItem(STORAGE_ORDERS_KEY)) || [];
+    let activeCategory = "Todos";
+    let selectedCardColors = {};
+    let cart = [];
+    let orderSubmissionPending = false;
+    let orderConfirmed = false;
+    let introSequenceTimer = null;
+
+    let currentDetailProduct = null;
+    let currentDetailPhotoIdx = 0;
+    let currentDetailColor = "";
+    let currentDetailQty = 1;
+
+    function formatCOP(val) {
+      return "$" + Number(val).toLocaleString("es-CO");
+    }
+
+    function normalizeColorName(colorName) {
+      return String(colorName || "").trim().replace(/\s+/g, " ").toLowerCase();
+    }
+
+    function getSwatchColor(colorName) {
+      const c = normalizeColorName(colorName);
+      if (c.includes("esmeralda")) return "#1F7A63";
+      if (c.includes("aguamarina") || c.includes("agua marina") || c.includes("aqua")) return "#5EC8C2";
+      if (c.includes("amarillo")) return "#F2C94C";
+      if (c.includes("rojo")) return "#C8324B";
+      if (c.includes("azul")) return "#6B9AC4";
+      if (c.includes("rosa") || c.includes("rosado")) return "var(--rosegold-swatch)";
+      if (c.includes("plata") || c.includes("plateado")) return "var(--silver-swatch)";
+      if (c.includes("negro")) return "#222222";
+      if (c.includes("blanco") || c.includes("nácar")) return "#F8F6F2";
+      return "var(--gold-swatch)";
+    }
+
+    function getProductColorImage(product, color) {
+      if (!product.colorImages) return "";
+      const colorKey = Object.keys(product.colorImages).find(
+        key => normalizeColorName(key) === normalizeColorName(color)
+      );
+      return colorKey ? product.colorImages[colorKey] : "";
+    }
+
+    function handleRoute() {
+      const isAdminHash = window.location.hash.toLowerCase() === "#admin";
+      const storefront = document.getElementById("storefront-view");
+      const adminView = document.getElementById("admin-view");
+      const intro = document.getElementById("intro-overlay");
+
+      if (isAdminHash) {
+        clearTimeout(introSequenceTimer);
+        intro.style.display = "none";
+        intro.classList.add("fade-out");
+        intro.classList.remove("intro-running");
+        storefront.style.display = "none";
+        adminView.style.display = "block";
+        if (sessionStorage.getItem("isa_admin_logged") === "true") {
+          showAdminDashboard();
+        } else {
+          document.getElementById("admin-auth-screen").style.display = "block";
+          document.getElementById("admin-dashboard-screen").style.display = "none";
+        }
+      } else {
+        adminView.style.display = "none";
+        storefront.style.display = "flex";
+        renderCatalog();
+      }
+    }
+
+    window.addEventListener("hashchange", handleRoute);
+
+    function startHeroCarousel() {
+      const slides = Array.from(document.querySelectorAll(".hero-slide"));
+      if (slides.length < 2 || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      let activeIndex = slides.findIndex(slide => slide.classList.contains("is-active"));
+      if (activeIndex < 0) activeIndex = 0;
+
+      window.setInterval(() => {
+        const outgoingSlide = slides[activeIndex];
+        const nextIndex = (activeIndex + 1) % slides.length;
+        const incomingSlide = slides[nextIndex];
+
+        incomingSlide.classList.add("is-active");
+        outgoingSlide.classList.add("is-leaving");
+
+        window.setTimeout(() => {
+          outgoingSlide.classList.remove("is-active", "is-leaving");
+          activeIndex = nextIndex;
+        }, 1200);
+      }, 5000);
+    }
+
+    function runIntroSequence() {
+      const overlay = document.getElementById("intro-overlay");
+      clearTimeout(introSequenceTimer);
+
+      if (!overlay) {
+        renderCategories();
+        renderCatalog();
+        return;
+      }
+
+      if (window.location.hash.toLowerCase() === "#admin") {
+        overlay.style.display = "none";
+        overlay.classList.add("fade-out");
+        overlay.classList.remove("intro-running");
+        return;
+      }
+
+      overlay.style.display = "flex";
+      overlay.classList.remove("fade-out", "intro-running");
+      void overlay.offsetWidth;
+      overlay.classList.add("intro-running");
+
+      introSequenceTimer = window.setTimeout(() => {
+        if (window.location.hash.toLowerCase() === "#admin") {
+          overlay.style.display = "none";
+          overlay.classList.add("fade-out");
+          overlay.classList.remove("intro-running");
+          return;
+        }
+
+        overlay.classList.add("fade-out");
+        renderCategories();
+        renderCatalog();
+      }, 2800);
+    }
+
+    function replayIntro() {
+      runIntroSequence();
+    }
+
+    function setCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll("#filters-bar .filter-pill").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.category === cat);
+      });
+      renderCatalog();
+    }
+
+    function renderCategories() {
+      const categories = ["Todos", "Collares", "Aretes", "Pulseras", "Sets"];
+      products.forEach(product => {
+        if (product.category && !categories.includes(product.category)) {
+          categories.push(product.category);
+        }
+      });
+
+      const filters = document.getElementById("filters-bar");
+      filters.innerHTML = categories.map(category => `
+        <button class="filter-pill ${category === activeCategory ? "active" : ""}" data-category="${category}" onclick="setCategory('${category}')">${category}</button>
+      `).join("");
+    }
+
+    function selectCardColor(prodId, color, event) {
+      event.stopPropagation();
+      selectedCardColors[prodId] = color;
+      renderCatalog();
+    }
+
+    function renderCatalog() {
+      const grid = document.getElementById("products-grid");
+      const filtered = activeCategory === "Todos"
+        ? products
+        : products.filter(p => p.category === activeCategory);
+
+      grid.innerHTML = filtered.map(prod => {
+        const currentColor = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
+        const mainImg = getProductColorImage(prod, currentColor) || (prod.images && prod.images.length ? prod.images[0] : "");
+        const extraPhotos = prod.images && prod.images.length > 1 ? `<span class="photo-count-badge">+${prod.images.length - 1} fotos</span>` : "";
+
+        const swatchesHtml = prod.colors.map(col => `
+          <span
+            class="swatch-dot ${normalizeColorName(col) === normalizeColorName(currentColor) ? "selected" : ""}"
+            style="background:${getSwatchColor(col)}"
+            title="${col}"
+            onclick="selectCardColor('${prod.id}', '${col}', event)"
+          ></span>
+        `).join("");
+
+        return `
+          <article class="product-card">
+            <div class="product-media" onclick="openProductDetail('${prod.id}')">
+              <img src="${mainImg}" alt="${prod.name}" loading="lazy" />
+              ${extraPhotos}
+            </div>
+            <div class="product-body">
+              <span class="product-category-label">${prod.category}</span>
+              <h2 class="product-title" onclick="openProductDetail('${prod.id}')">${prod.name}</h2>
+              <div class="swatches-row">
+                ${swatchesHtml}
+                <span class="swatch-selected-name">${currentColor}</span>
+              </div>
+              <div class="product-footer">
+                <span class="product-price">${formatCOP(prod.price)}</span>
+                <button class="add-card-btn" onclick="quickAddToCart('${prod.id}')">Agregar</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function openProductDetail(prodId) {
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+
+      currentDetailProduct = prod;
+      currentDetailColor = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
+      const colorImage = getProductColorImage(prod, currentDetailColor);
+      currentDetailPhotoIdx = colorImage && prod.images
+        ? prod.images.findIndex(image => image.trim() === colorImage.trim())
+        : 0;
+      if (currentDetailPhotoIdx < 0) currentDetailPhotoIdx = 0;
+      currentDetailQty = 1;
+
+      document.getElementById("detail-category").textContent = prod.category;
+      document.getElementById("detail-title").textContent = prod.name;
+      document.getElementById("detail-price").textContent = formatCOP(prod.price);
+      document.getElementById("detail-description").textContent = prod.description || "Pieza de acero inoxidable de alta durabilidad.";
+      document.getElementById("detail-material").textContent = prod.material || "Acero inoxidable 316L";
+      document.getElementById("detail-qty").textContent = "1";
+
+      renderDetailGallery();
+      const colorImageIsInGallery = (prod.images || []).some(image => image.trim() === colorImage.trim());
+      if (colorImage && !colorImageIsInGallery) {
+        document.getElementById("detail-main-img").src = colorImage;
+        document.querySelectorAll("#detail-thumbs .detail-thumb").forEach(thumb => {
+          thumb.classList.remove("active");
+        });
+      }
+      renderDetailSwatches();
+
+      document.getElementById("detail-modal-backdrop").classList.add("open");
+    }
+
+    function renderDetailGallery() {
+      const imgs = currentDetailProduct.images || [];
+      document.getElementById("detail-main-img").src = imgs[currentDetailPhotoIdx] || "";
+
+      const showArrows = imgs.length > 1;
+      document.getElementById("gallery-prev-btn").style.display = showArrows ? "flex" : "none";
+      document.getElementById("gallery-next-btn").style.display = showArrows ? "flex" : "none";
+
+      const thumbsEl = document.getElementById("detail-thumbs");
+      thumbsEl.innerHTML = imgs.length > 1 ? imgs.map((src, i) => `
+        <div class="detail-thumb ${i === currentDetailPhotoIdx ? "active" : ""}" onclick="setDetailPhoto(${i})">
+          <img src="${src}" alt="Vista ${i + 1}" />
+        </div>
+      `).join("") : "";
+    }
+
+    function setDetailPhoto(index) {
+      currentDetailPhotoIdx = index;
+      renderDetailGallery();
+    }
+
+    function stepDetailPhoto(dir) {
+      const len = currentDetailProduct.images.length;
+      currentDetailPhotoIdx = (currentDetailPhotoIdx + dir + len) % len;
+      renderDetailGallery();
+    }
+
+    function renderDetailSwatches() {
+      document.getElementById("detail-color-label").textContent = currentDetailColor;
+      const container = document.getElementById("detail-swatches");
+      container.innerHTML = currentDetailProduct.colors.map(col => `
+        <span
+          class="swatch-dot ${normalizeColorName(col) === normalizeColorName(currentDetailColor) ? "selected" : ""}"
+          style="background:${getSwatchColor(col)}"
+          onclick="selectDetailColor('${col}')"
+        ></span>
+      `).join("");
+    }
+
+    function selectDetailColor(col) {
+      currentDetailColor = col;
+      const targetSrc = getProductColorImage(currentDetailProduct, col);
+      const imgs = currentDetailProduct.images || [];
+      const foundIdx = targetSrc
+        ? imgs.findIndex(imgPath => imgPath.trim() === targetSrc.trim())
+        : -1;
+
+      if (foundIdx !== -1) {
+        currentDetailPhotoIdx = foundIdx;
+        renderDetailGallery();
+      } else {
+        currentDetailPhotoIdx = 0;
+        renderDetailGallery();
+        if (targetSrc) {
+          document.getElementById("detail-main-img").src = targetSrc;
+          document.querySelectorAll("#detail-thumbs .detail-thumb").forEach(thumb => {
+            thumb.classList.remove("active");
+          });
+        }
+      }
+
+      renderDetailSwatches();
+    }
+
+    function changeDetailQty(delta) {
+      currentDetailQty = Math.max(1, currentDetailQty + delta);
+      document.getElementById("detail-qty").textContent = currentDetailQty;
+    }
+
+    function closeProductDetail() {
+      document.getElementById("detail-modal-backdrop").classList.remove("open");
+    }
+
+    function closeDetailOnBackdrop(e) {
+      if (e.target.id === "detail-modal-backdrop") closeProductDetail();
+    }
+
+    function quickAddToCart(prodId) {
+      const prod = products.find(p => p.id === prodId);
+      if (!prod) return;
+      const color = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
+      addItemToCart(prod, color, 1);
+      toggleCart(true);
+    }
+
+    function addDetailToCart() {
+      if (!currentDetailProduct) return;
+      addItemToCart(currentDetailProduct, currentDetailColor, currentDetailQty);
+      closeProductDetail();
+      toggleCart(true);
+    }
+
+    function addItemToCart(prod, color, qty) {
+      const existing = cart.find(item => item.id === prod.id && item.color === color);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({
+          id: prod.id,
+          name: prod.name,
+          price: prod.price,
+          color: color,
+          qty: qty,
+          image: prod.images[0] || ""
+        });
+      }
+      orderConfirmed = false;
+      updateCartUI();
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      orderConfirmed = false;
+      updateCartUI();
+    }
+
+    function toggleCart(open) {
+      document.getElementById("cart-backdrop").classList.toggle("open", open);
+      if (open) updateCartUI();
+    }
+
+    function closeCartOnBackdrop(e) {
+      if (e.target.id === "cart-backdrop") toggleCart(false);
+    }
+
+    function updateCartUI() {
+      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+      document.getElementById("bag-count").textContent = totalItems;
+
+      const container = document.getElementById("cart-items-container");
+      if (cart.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:var(--text-muted); margin-top:2rem; font-size:0.85rem;">Tu bolsa está vacía.</p>`;
+        document.getElementById("cart-total").textContent = "$0";
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = cart.map((item, idx) => {
+        total += item.price * item.qty;
+        return `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}" />
+            <div class="cart-item-info">
+              <div class="cart-item-title">${item.name}</div>
+              <div class="cart-item-meta">Tono: ${item.color} · Cant: ${item.qty}</div>
+              <div class="cart-item-price">${formatCOP(item.price * item.qty)}</div>
+            </div>
+            <button class="remove-item-btn" onclick="removeFromCart(${idx})" aria-label="Eliminar">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+              </svg>
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("cart-total").textContent = formatCOP(total);
+    }
+
+    function checkoutWhatsApp() {
+      if (cart.length === 0) return;
+
+      const customerName = document.getElementById("customer-name").value.trim() || "Clienta";
+      const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
+      const itemsContainer = document.getElementById("order-confirmation-items");
+      itemsContainer.textContent = "";
+
+      cart.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "order-confirmation-item";
+
+        const name = document.createElement("span");
+        name.className = "order-confirmation-item-name";
+        name.textContent = item.name;
+
+        const details = document.createElement("span");
+        details.className = "order-confirmation-item-meta";
+        details.textContent = `Tono: ${item.color} · Cantidad: ${item.qty}`;
+
+        const subtotal = document.createElement("span");
+        subtotal.className = "order-confirmation-item-subtotal";
+        subtotal.textContent = formatCOP(item.price * item.qty);
+
+        row.append(name, details, subtotal);
+        itemsContainer.appendChild(row);
+      });
+
+      document.getElementById("order-confirmation-total").textContent = formatCOP(total);
+      document.getElementById("customer-name-confirm").value = customerName;
+      const status = document.getElementById("order-confirmation-status");
+      status.textContent = orderConfirmed ? "Este pedido ya fue confirmado." : "";
+      status.hidden = !orderConfirmed;
+      document.getElementById("order-confetti").textContent = "";
+      document.getElementById("order-confirmation-close").disabled = orderSubmissionPending;
+      document.getElementById("order-confirm-back").disabled = orderSubmissionPending;
+      document.getElementById("order-confirm-submit").disabled = orderSubmissionPending || orderConfirmed;
+      document.getElementById("customer-name-confirm").disabled = orderSubmissionPending;
+      document.getElementById("order-confirmation-backdrop").classList.add("open");
+      document.getElementById("customer-name-confirm").focus();
+    }
+
+    function closeOrderConfirmation() {
+      if (orderSubmissionPending) return;
+      document.getElementById("customer-name").value = document.getElementById("customer-name-confirm").value.trim();
+      document.getElementById("order-confirmation-backdrop").classList.remove("open");
+    }
+
+    function closeOrderConfirmationOnBackdrop(event) {
+      if (event.target.id === "order-confirmation-backdrop") closeOrderConfirmation();
+    }
+
+    function launchOrderConfetti() {
+      const container = document.getElementById("order-confetti");
+      const colors = ["#FCEEF2", "#7A1C37", "#D8B467", "#E2A79C"];
+      container.textContent = "";
+
+      for (let i = 0; i < 36; i += 1) {
+        const piece = document.createElement("span");
+        piece.className = "order-confetti-piece";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.backgroundColor = colors[i % colors.length];
+        piece.style.animationDelay = `${Math.random() * 0.25}s`;
+        piece.style.animationDuration = `${1.3 + Math.random() * 0.6}s`;
+        piece.style.setProperty("--confetti-drift", `${Math.round(Math.random() * 180 - 90)}px`);
+        if (i % 3 === 0) piece.style.borderRadius = "50%";
+        container.appendChild(piece);
+      }
+
+      window.setTimeout(() => {
+        container.textContent = "";
+      }, 2400);
+    }
+
+    function confirmOrder() {
+      if (cart.length === 0 || orderSubmissionPending) return;
+
+      const customerName = document.getElementById("customer-name-confirm").value.trim() || "Clienta";
+      const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
+      const summaryLines = cart.map(item => `• ${item.qty}x ${item.name} (${item.color}) - ${formatCOP(item.price * item.qty)}`).join("\n");
+      const order = {
+        id: "ORD-" + Date.now().toString().slice(-5),
+        date: new Date().toLocaleDateString("es-CO"),
+        customer: customerName,
+        items: cart.map(item => `${item.qty}x ${item.name} (${item.color})`).join(", "),
+        total: total,
+        status: "Pendiente"
+      };
+
+      try {
+        localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify([order, ...orders]));
+      } catch (error) {
+        const status = document.getElementById("order-confirmation-status");
+        status.textContent = "No se pudo guardar el pedido en este dispositivo. Intenta nuevamente.";
+        status.hidden = false;
+        return;
+      }
+      orders.unshift(order);
+      orderConfirmed = true;
+
+      const msg = `Hola Isa, soy *${customerName}*. Me gustaría pedir estas piezas de *Accessories BY ISA*:\n\n${summaryLines}\n\n*Total:* ${formatCOP(total)}\n¿Me confirmas disponibilidad?`;
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+      const whatsappWindow = window.open("about:blank", "_blank");
+      if (whatsappWindow) whatsappWindow.opener = null;
+
+      orderSubmissionPending = true;
+      document.getElementById("customer-name").value = customerName;
+      document.getElementById("customer-name-confirm").value = customerName;
+      document.getElementById("customer-name-confirm").disabled = true;
+      document.getElementById("order-confirmation-close").disabled = true;
+      document.getElementById("order-confirm-back").disabled = true;
+      document.getElementById("order-confirm-submit").disabled = true;
+
+      const status = document.getElementById("order-confirmation-status");
+      status.textContent = "¡Pedido confirmado! Abriendo WhatsApp en un momento…";
+      status.hidden = false;
+      launchOrderConfetti();
+
+      window.setTimeout(() => {
+        orderSubmissionPending = false;
+        document.getElementById("order-confirmation-close").disabled = false;
+        document.getElementById("order-confirm-back").disabled = false;
+        status.textContent = "Pedido confirmado. Ya puedes cerrar esta ventana.";
+        if (whatsappWindow && !whatsappWindow.closed) {
+          whatsappWindow.location.href = url;
+        } else {
+          window.location.href = url;
+        }
+      }, 1200);
+    }
+
+    function getAdminPass() {
+      return localStorage.getItem(STORAGE_PASS_KEY) || "isa2026";
+    }
+
+    function loginAdmin() {
+      const input = document.getElementById("admin-pass-input").value;
+      if (input === getAdminPass()) {
+        sessionStorage.setItem("isa_admin_logged", "true");
+        document.getElementById("admin-auth-error").style.display = "none";
+        showAdminDashboard();
+      } else {
+        document.getElementById("admin-auth-error").style.display = "block";
+      }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem("isa_admin_logged");
+      document.getElementById("admin-pass-input").value = "";
+      handleRoute();
+    }
+
+    function exitAdminToStore() {
+      history.replaceState(null, "", window.location.pathname);
+      handleRoute();
+    }
+
+    function showAdminDashboard() {
+      document.getElementById("admin-auth-screen").style.display = "none";
+      document.getElementById("admin-dashboard-screen").style.display = "block";
+      renderAdminProducts();
+      renderAdminOrders();
+    }
+
+    function switchAdminTab(tab) {
+      ["inventory", "orders", "settings"].forEach(t => {
+        document.getElementById(`admin-tab-${t}`).style.display = t === tab ? (t === "inventory" ? "grid" : "block") : "none";
+        document.getElementById(`tab-btn-${t}`).classList.toggle("active", t === tab);
+      });
+    }
+
+    function getProductAvailableUnits(product) {
+      const unitsValue = product.stock !== undefined && product.stock !== null
+        ? product.stock
+        : product.units !== undefined && product.units !== null
+          ? product.units
+          : 1;
+      const units = Number(unitsValue);
+      return Number.isFinite(units) && units >= 0 ? units : 1;
+    }
+
+    function calculateProjectedSales() {
+      return products.reduce((total, product) => {
+        const price = Number(product.price);
+        return Number.isFinite(price)
+          ? total + price * getProductAvailableUnits(product)
+          : total;
+      }, 0);
+    }
+
+    function renderAdminSalesSummary() {
+      const savedInvestment = localStorage.getItem(STORAGE_INVESTMENT_KEY);
+      const parsedInvestment = savedInvestment === null ? 0 : Number(savedInvestment);
+      const investment = Number.isFinite(parsedInvestment) && parsedInvestment >= 0 ? parsedInvestment : 0;
+      const projectedSales = calculateProjectedSales();
+
+      document.getElementById("admin-investment").value = String(investment);
+      document.getElementById("admin-projected-sales").textContent = formatCOP(projectedSales);
+      document.getElementById("admin-estimated-profit").textContent = formatCOP(projectedSales - investment);
+    }
+
+    function updateAdminInvestment(value) {
+      const parsedInvestment = Number(value);
+      const investment = Number.isFinite(parsedInvestment) ? Math.max(parsedInvestment, 0) : 0;
+      try {
+        localStorage.setItem(STORAGE_INVESTMENT_KEY, String(investment));
+      } catch (error) {
+        alert("No se pudo guardar el valor invertido. Intenta nuevamente.");
+        return;
+      }
+
+      document.getElementById("admin-estimated-profit").textContent = formatCOP(calculateProjectedSales() - investment);
+    }
+
+    function renderAdminProducts() {
+      const tbody = document.getElementById("admin-products-tbody");
+      tbody.innerHTML = products.map(p => `
+        <tr>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.category}</td>
+          <td>${p.colors.join(", ")}</td>
+          <td>${getProductAvailableUnits(p)}</td>
+          <td>${formatCOP(p.price)}</td>
+          <td style="display:flex; gap:0.4rem;">
+            <button class="btn-outline-sm" onclick="editProductInAdmin('${p.id}')">Editar</button>
+            <button class="btn-outline-sm" onclick="deleteProductInAdmin('${p.id}')">Eliminar</button>
+          </td>
+        </tr>
+      `).join("");
+      renderAdminSalesSummary();
+    }
+
+    function saveProductFromAdmin() {
+      const id = document.getElementById("edit-product-id").value;
+      const name = document.getElementById("prod-name").value.trim();
+      const category = document.getElementById("prod-category").value;
+      const price = Number(document.getElementById("prod-price").value);
+      const stockInput = document.getElementById("prod-stock").value.trim();
+      const stock = Number(stockInput);
+      const material = document.getElementById("prod-material").value.trim();
+      const colors = document.getElementById("prod-colors").value.split(",").map(color => color.trim().replace(/\s+/g, " ")).filter(Boolean);
+      const description = document.getElementById("prod-desc").value.trim();
+      const images = document.getElementById("prod-images").value.split("\n").map(u => u.trim()).filter(Boolean);
+
+      if (!name || !price || images.length === 0 || !stockInput || !Number.isInteger(stock) || stock < 0) {
+        alert("Completa nombre, precio, unidades disponibles válidas y una ruta de imagen.");
+        return;
+      }
+
+      const productObj = {
+        id: id || "p" + Date.now(),
+        name,
+        category,
+        price,
+        stock,
+        material: material || "Acero inoxidable 316L",
+        colors: colors.length ? colors : ["Dorado"],
+        description,
+        images
+      };
+
+      if (id) {
+        const idx = products.findIndex(p => p.id === id);
+        if (idx !== -1) products[idx] = productObj;
+      } else {
+        products.unshift(productObj);
+      }
+
+      localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(products));
+      resetProductForm();
+      renderAdminProducts();
+    }
+
+    function editProductInAdmin(id) {
+      const p = products.find(item => item.id === id);
+      if (!p) return;
+      document.getElementById("form-product-heading").textContent = "Editar Pieza";
+      document.getElementById("edit-product-id").value = p.id;
+      document.getElementById("prod-name").value = p.name;
+      document.getElementById("prod-category").value = p.category;
+      document.getElementById("prod-price").value = p.price;
+      document.getElementById("prod-stock").value = getProductAvailableUnits(p);
+      document.getElementById("prod-material").value = p.material || "";
+      document.getElementById("prod-colors").value = p.colors.join(", ");
+      document.getElementById("prod-desc").value = p.description || "";
+      document.getElementById("prod-images").value = p.images.join("\n");
+      document.getElementById("cancel-edit-btn").style.display = "inline-block";
+    }
+
+    function resetProductForm() {
+      document.getElementById("form-product-heading").textContent = "Agregar Nueva Pieza";
+      document.getElementById("edit-product-id").value = "";
+      document.getElementById("prod-name").value = "";
+      document.getElementById("prod-price").value = "";
+      document.getElementById("prod-stock").value = "1";
+      document.getElementById("prod-colors").value = "";
+      document.getElementById("prod-desc").value = "";
+      document.getElementById("prod-images").value = "";
+      document.getElementById("cancel-edit-btn").style.display = "none";
+    }
+
+    function deleteProductInAdmin(id) {
+      products = products.filter(p => p.id !== id);
+      localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(products));
+      renderAdminProducts();
+    }
+
+    function renderAdminOrders() {
+      const tbody = document.getElementById("admin-orders-tbody");
+      if (orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);">Aún no hay pedidos registrados.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = orders.map((o, idx) => `
+        <tr>
+          <td>${o.date}</td>
+          <td><strong>${o.customer}</strong></td>
+          <td>${o.items}</td>
+          <td>${formatCOP(o.total)}</td>
+          <td>
+            <select class="form-input" style="padding:0.35rem 0.6rem;" onchange="updateOrderStatus(${idx}, this.value)">
+              <option value="Pendiente" ${o.status === "Pendiente" ? "selected" : ""}>Pendiente</option>
+              <option value="Confirmado" ${o.status === "Confirmado" ? "selected" : ""}>Confirmado</option>
+              <option value="Entregado" ${o.status === "Entregado" ? "selected" : ""}>Entregado</option>
+            </select>
+          </td>
+          <td>
+            <button type="button" class="btn-outline-sm" onclick="deleteOrderInAdmin(${idx})" aria-label="Eliminar pedido">Eliminar</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function deleteOrderInAdmin(idx) {
+      const order = orders[idx];
+      if (!order || !window.confirm(`¿Eliminar el pedido de ${order.customer}?\nEsta acción no se puede deshacer.`)) return;
+
+      const updatedOrders = orders.filter((_, orderIndex) => orderIndex !== idx);
+      try {
+        localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(updatedOrders));
+      } catch (error) {
+        alert("No se pudo eliminar el pedido del almacenamiento. Intenta nuevamente.");
+        return;
+      }
+
+      orders = updatedOrders;
+      renderAdminOrders();
+    }
+
+    function updateOrderStatus(idx, status) {
+      orders[idx].status = status;
+      localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify(orders));
+    }
+
+    function updateAdminPassword() {
+      const newPass = document.getElementById("new-admin-pass").value.trim();
+      if (newPass.length < 4) {
+        alert("Usa una contraseña de al menos 4 caracteres.");
+        return;
+      }
+      localStorage.setItem(STORAGE_PASS_KEY, newPass);
+      document.getElementById("new-admin-pass").value = "";
+      alert("Contraseña de administradora actualizada.");
+    }
+
+    handleRoute();
+    startHeroCarousel();
+    runIntroSequence();
+  </script>
+</body>
+</html>
