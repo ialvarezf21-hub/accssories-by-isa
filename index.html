@@ -520,6 +520,12 @@
       color: var(--text-muted);
     }
 
+    .product-stock-status {
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+
     .product-title {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.42rem;
@@ -1367,6 +1373,101 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (max-width: 640px) {
+      .catalog-container {
+        padding: 0 0.75rem 3rem;
+      }
+
+      .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .product-card {
+        border-radius: 12px;
+      }
+
+      .product-media {
+        aspect-ratio: 1.08 / 1;
+      }
+
+      .photo-count-badge {
+        right: 8px;
+        bottom: 8px;
+        padding: 0.2rem 0.45rem;
+        font-size: 0.56rem;
+      }
+
+      .product-body {
+        padding: 0.8rem;
+        gap: 0.5rem;
+      }
+
+      .product-category-label {
+        font-size: 0.56rem;
+        letter-spacing: 0.12em;
+      }
+
+      .product-title {
+        font-size: 1.05rem;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+      }
+
+      .product-stock-status {
+        font-size: 0.62rem;
+      }
+
+      .swatches-row {
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .swatch-dot {
+        width: 17px;
+        height: 17px;
+      }
+
+      .swatch-selected-name {
+        font-size: 0.64rem;
+        margin-left: 0;
+      }
+
+      .product-footer {
+        gap: 0.35rem;
+        padding-top: 0.6rem;
+      }
+
+      .product-price {
+        font-size: 0.8rem;
+        letter-spacing: 0.01em;
+      }
+
+      .add-card-btn {
+        padding: 0.42rem 0.5rem;
+        font-size: 0.57rem;
+        letter-spacing: 0.06em;
+      }
+
+      .bag-btn {
+        gap: 0.35rem;
+        padding: 0.38rem 0.65rem;
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+      }
+
+      .bag-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      .bag-count {
+        min-width: 18px;
+        height: 18px;
+        font-size: 0.62rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1496,6 +1597,10 @@
           <div class="spec-row">
             <span class="spec-label">Material</span>
             <span class="spec-value" id="detail-material"></span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Disponibilidad</span>
+            <span class="spec-value" id="detail-stock"></span>
           </div>
           <div class="spec-row">
             <span class="spec-label">Resistencia</span>
@@ -2206,7 +2311,19 @@
       }
     ];
 
-    let products = JSON.parse(localStorage.getItem(STORAGE_PRODUCTS_KEY)) || DEFAULT_PRODUCTS;
+    function loadProducts() {
+      const savedProducts = localStorage.getItem(STORAGE_PRODUCTS_KEY);
+      const productList = savedProducts === null ? DEFAULT_PRODUCTS : JSON.parse(savedProducts);
+      if (!Array.isArray(productList)) {
+        throw new Error(`El valor guardado para ${STORAGE_PRODUCTS_KEY} no es una lista de productos.`);
+      }
+      return productList.map(product => ({
+        ...product,
+        stock: getProductAvailableUnits(product)
+      }));
+    }
+
+    let products = loadProducts();
     let orders = JSON.parse(localStorage.getItem(STORAGE_ORDERS_KEY)) || [];
     let activeCategory = "Todos";
     let selectedCardColors = {};
@@ -2222,6 +2339,28 @@
 
     function formatCOP(val) {
       return "$" + Number(val).toLocaleString("es-CO");
+    }
+
+    function formatProductAvailability(product) {
+      const units = getProductAvailableUnits(product);
+      if (units === 0) return "Agotado";
+      return `${units} ${units === 1 ? "unidad disponible" : "unidades disponibles"}`;
+    }
+
+    function refreshProductAvailabilityViews() {
+      document.querySelectorAll(".product-card[data-product-id]").forEach(card => {
+        const product = products.find(item => item.id === card.dataset.productId);
+        const stockLabel = card.querySelector(".product-stock-status");
+        if (product && stockLabel) stockLabel.textContent = formatProductAvailability(product);
+      });
+
+      if (currentDetailProduct) {
+        currentDetailProduct = products.find(item => item.id === currentDetailProduct.id) || currentDetailProduct;
+        const detailStock = document.getElementById("detail-stock");
+        if (detailStock) detailStock.textContent = formatProductAvailability(currentDetailProduct);
+      }
+
+      renderAdminProducts();
     }
 
     function normalizeColorName(colorName) {
@@ -2389,7 +2528,7 @@
         `).join("");
 
         return `
-          <article class="product-card">
+          <article class="product-card" data-product-id="${prod.id}">
             <div class="product-media" onclick="openProductDetail('${prod.id}')">
               <img src="${mainImg}" alt="${prod.name}" loading="lazy" />
               ${extraPhotos}
@@ -2397,6 +2536,7 @@
             <div class="product-body">
               <span class="product-category-label">${prod.category}</span>
               <h2 class="product-title" onclick="openProductDetail('${prod.id}')">${prod.name}</h2>
+              <span class="product-stock-status">${formatProductAvailability(prod)}</span>
               <div class="swatches-row">
                 ${swatchesHtml}
                 <span class="swatch-selected-name">${currentColor}</span>
@@ -2429,6 +2569,7 @@
       document.getElementById("detail-price").textContent = formatCOP(prod.price);
       document.getElementById("detail-description").textContent = prod.description || "Pieza de acero inoxidable de alta durabilidad.";
       document.getElementById("detail-material").textContent = prod.material || "Acero inoxidable 316L";
+      document.getElementById("detail-stock").textContent = formatProductAvailability(prod);
       document.getElementById("detail-qty").textContent = "1";
 
       renderDetailGallery();
@@ -2678,11 +2819,45 @@
     }
 
     function confirmOrder() {
-      if (cart.length === 0 || orderSubmissionPending) return;
+      if (cart.length === 0 || orderSubmissionPending || orderConfirmed) return;
+
+      const requestedUnits = new Map();
+      cart.forEach(item => {
+        requestedUnits.set(item.id, (requestedUnits.get(item.id) || 0) + item.qty);
+      });
+
+      for (const [productId, quantity] of requestedUnits) {
+        const product = products.find(item => item.id === productId);
+        const availableUnits = product ? getProductAvailableUnits(product) : 0;
+        if (!product || quantity > availableUnits) {
+          const status = document.getElementById("order-confirmation-status");
+          status.textContent = product
+            ? `No hay suficientes unidades de ${product.name}. Disponibles: ${availableUnits}. Vuelve a la bolsa para ajustar la cantidad.`
+            : "Uno de los productos ya no está disponible en el inventario. Vuelve a la bolsa y actualiza tu pedido.";
+          status.hidden = false;
+          return;
+        }
+      }
 
       const customerName = document.getElementById("customer-name-confirm").value.trim() || "Clienta";
       const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
       const summaryLines = cart.map(item => `• ${item.qty}x ${item.name} (${item.color}) - ${formatCOP(item.price * item.qty)}`).join("\n");
+      const nextProducts = products.map(product => {
+        const quantity = requestedUnits.get(product.id);
+        if (quantity === undefined) return product;
+
+        const updatedProduct = {
+          ...product,
+          stock: getProductAvailableUnits(product) - quantity
+        };
+        if (Object.prototype.hasOwnProperty.call(product, "availableQuantity")) {
+          updatedProduct.availableQuantity = updatedProduct.stock;
+        }
+        if (Object.prototype.hasOwnProperty.call(product, "units")) {
+          updatedProduct.units = updatedProduct.stock;
+        }
+        return updatedProduct;
+      });
       const order = {
         id: "ORD-" + Date.now().toString().slice(-5),
         date: new Date().toLocaleDateString("es-CO"),
@@ -2691,17 +2866,33 @@
         total: total,
         status: "Pendiente"
       };
+      const status = document.getElementById("order-confirmation-status");
+      const previousProducts = localStorage.getItem(STORAGE_PRODUCTS_KEY);
 
       try {
+        localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(nextProducts));
         localStorage.setItem(STORAGE_ORDERS_KEY, JSON.stringify([order, ...orders]));
       } catch (error) {
-        const status = document.getElementById("order-confirmation-status");
-        status.textContent = "No se pudo guardar el pedido en este dispositivo. Intenta nuevamente.";
+        try {
+          if (previousProducts === null) {
+            localStorage.removeItem(STORAGE_PRODUCTS_KEY);
+          } else {
+            localStorage.setItem(STORAGE_PRODUCTS_KEY, previousProducts);
+          }
+        } catch (rollbackError) {
+          console.error("No se pudo restaurar el inventario después de un error al guardar el pedido.", rollbackError);
+        }
+        status.textContent = "No se pudo guardar el pedido y actualizar el inventario. Intenta nuevamente.";
         status.hidden = false;
         return;
       }
+
+      products = nextProducts;
       orders.unshift(order);
       orderConfirmed = true;
+      cart = [];
+      updateCartUI();
+      refreshProductAvailabilityViews();
 
       const msg = `Hola Isa, soy *${customerName}*. Me gustaría pedir estas piezas de *Accessories BY ISA*:\n\n${summaryLines}\n\n*Total:* ${formatCOP(total)}\n¿Me confirmas disponibilidad?`;
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
@@ -2716,7 +2907,6 @@
       document.getElementById("order-confirm-back").disabled = true;
       document.getElementById("order-confirm-submit").disabled = true;
 
-      const status = document.getElementById("order-confirmation-status");
       status.textContent = "¡Pedido confirmado! Abriendo WhatsApp en un momento…";
       status.hidden = false;
       launchOrderConfetti();
@@ -2777,9 +2967,11 @@
     function getProductAvailableUnits(product) {
       const unitsValue = product.stock !== undefined && product.stock !== null
         ? product.stock
-        : product.units !== undefined && product.units !== null
-          ? product.units
-          : 1;
+        : product.availableQuantity !== undefined && product.availableQuantity !== null
+          ? product.availableQuantity
+          : product.units !== undefined && product.units !== null
+            ? product.units
+            : 1;
       const units = Number(unitsValue);
       return Number.isFinite(units) && units >= 0 ? units : 1;
     }
@@ -2852,7 +3044,9 @@
         return;
       }
 
+      const existingProduct = id ? products.find(product => product.id === id) : null;
       const productObj = {
+        ...(existingProduct || {}),
         id: id || "p" + Date.now(),
         name,
         category,
@@ -2864,16 +3058,32 @@
         images
       };
 
-      if (id) {
-        const idx = products.findIndex(p => p.id === id);
-        if (idx !== -1) products[idx] = productObj;
-      } else {
-        products.unshift(productObj);
+      if (existingProduct && Object.prototype.hasOwnProperty.call(existingProduct, "availableQuantity")) {
+        productObj.availableQuantity = stock;
+      }
+      if (existingProduct && Object.prototype.hasOwnProperty.call(existingProduct, "units")) {
+        productObj.units = stock;
       }
 
-      localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(products));
+      const nextProducts = products.slice();
+      if (existingProduct) {
+        const idx = nextProducts.findIndex(product => product.id === id);
+        nextProducts[idx] = productObj;
+      } else {
+        nextProducts.unshift(productObj);
+      }
+
+      try {
+        localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(nextProducts));
+      } catch (error) {
+        alert("No se pudo guardar el producto en este dispositivo. Intenta nuevamente.");
+        return;
+      }
+
+      products = nextProducts;
       resetProductForm();
       renderAdminProducts();
+      renderCatalog();
     }
 
     function editProductInAdmin(id) {
