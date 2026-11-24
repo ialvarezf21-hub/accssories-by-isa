@@ -479,6 +479,7 @@
       background: var(--bg-secondary);
       overflow: hidden;
       cursor: pointer;
+      touch-action: pan-y;
     }
 
     .product-media img {
@@ -686,6 +687,7 @@
       border-radius: 14px;
       overflow: hidden;
       background: #FFFFFF;
+      touch-action: pan-y;
     }
 
     .detail-main-photo img {
@@ -723,9 +725,11 @@
     .detail-thumb {
       width: 58px;
       height: 58px;
+      padding: 0;
       border-radius: 10px;
       overflow: hidden;
       border: 2px solid transparent;
+      background: transparent;
       cursor: pointer;
       opacity: 0.65;
       transition: var(--transition);
@@ -935,6 +939,21 @@
     .cart-item-meta {
       font-size: 0.72rem;
       color: var(--text-muted);
+    }
+
+    .order-item-detail {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin: 0.25rem 0;
+    }
+
+    .order-item-detail img {
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      object-fit: cover;
+      border-radius: 7px;
     }
 
     .cart-item-price {
@@ -1247,6 +1266,244 @@
       flex-wrap: wrap;
     }
 
+    .finance-subtabs {
+      display: flex;
+      gap: 0.6rem;
+      margin: 0 0 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .finance-section {
+      display: none;
+    }
+
+    .finance-section.active {
+      display: block;
+    }
+
+    .finance-kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .finance-kpi {
+      min-width: 0;
+      padding: 1rem;
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+    }
+
+    .finance-kpi span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .finance-kpi strong {
+      display: block;
+      margin-top: 0.4rem;
+      color: var(--accent);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      overflow-wrap: anywhere;
+    }
+
+    .finance-note {
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      line-height: 1.6;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .finance-toolbar,
+    .finance-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.8rem;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+
+    .finance-purchase-line {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(80px, 0.55fr) minmax(100px, 0.75fr);
+      gap: 0.5rem;
+      align-items: end;
+      margin-bottom: 0.6rem;
+    }
+
+    .finance-purchase-line > * {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .finance-purchase-line .finance-purchase-remove {
+      grid-column: 1 / -1;
+      justify-self: end;
+      width: auto;
+    }
+
+    .admin-grid > *,
+    .admin-card,
+    .admin-table-wrap {
+      min-width: 0;
+    }
+
+    .finance-chart-list {
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .finance-chart-row {
+      display: grid;
+      grid-template-columns: minmax(90px, 140px) 1fr auto;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.75rem;
+    }
+
+    .finance-chart-label {
+      color: var(--text-muted);
+      overflow-wrap: anywhere;
+    }
+
+    .finance-chart-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--bg-secondary);
+    }
+
+    .finance-chart-bar {
+      height: 100%;
+      min-width: 2px;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .finance-chart-value {
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .finance-product-cost-fields {
+      padding: 1rem;
+      margin: 0 0 1rem;
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      background: var(--bg-secondary);
+    }
+
+    .finance-product-cost-fields[hidden] {
+      display: none;
+    }
+
+    .finance-product-cost-fields h4 {
+      color: var(--accent);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .finance-inline-metrics {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin: -0.3rem 0 0.7rem;
+    }
+
+    .finance-status {
+      min-height: 1.2rem;
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      margin: 0.5rem 0;
+    }
+
+    #finance-print-report {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        margin: 16mm;
+      }
+
+      body {
+        background: #FFFFFF !important;
+        color: #542533 !important;
+      }
+
+      body * {
+        visibility: hidden !important;
+      }
+
+      #finance-print-report,
+      #finance-print-report * {
+        visibility: visible !important;
+      }
+
+      #finance-print-report {
+        position: absolute;
+        inset: 0;
+        display: block !important;
+        width: 100%;
+        padding: 0;
+        background: #FFFFFF;
+        color: #542533;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10pt;
+      }
+
+      .finance-print-brand {
+        padding-bottom: 12px;
+        margin-bottom: 18px;
+        border-bottom: 2px solid #7A1C37;
+      }
+
+      .finance-print-brand h1,
+      .finance-print-report h2 {
+        color: #7A1C37;
+        font-family: 'Cormorant Garamond', serif;
+      }
+
+      .finance-print-brand h1 {
+        font-size: 26pt;
+      }
+
+      .finance-print-report h2 {
+        margin: 18px 0 8px;
+        font-size: 17pt;
+      }
+
+      .finance-print-report table {
+        width: 100%;
+        margin: 6px 0 14px;
+        border-collapse: collapse;
+        font-size: 8.5pt;
+      }
+
+      .finance-print-report th,
+      .finance-print-report td {
+        padding: 6px;
+        border: 1px solid #E8D8DE;
+      }
+
+      .finance-print-report th {
+        background: #FCEEF2 !important;
+        color: #542533;
+        text-align: left;
+      }
+
+      .finance-print-note {
+        color: #7C5C66;
+        font-size: 8.5pt;
+      }
+    }
+
     .admin-grid {
       display: grid;
       grid-template-columns: 380px 1fr;
@@ -1372,11 +1629,23 @@
       .admin-sales-grid {
         grid-template-columns: 1fr;
       }
+      .finance-chart-row {
+        grid-template-columns: minmax(72px, 100px) 1fr auto;
+        gap: 0.4rem;
+      }
     }
 
     @media (max-width: 640px) {
       .catalog-container {
         padding: 0 0.75rem 3rem;
+      }
+
+      .finance-purchase-line {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .finance-purchase-line .finance-purchase-product {
+        grid-column: 1 / -1;
       }
 
       .products-grid {
@@ -1571,7 +1840,10 @@
       </button>
 
       <div class="detail-gallery">
-        <div class="detail-main-photo">
+        <div class="detail-main-photo"
+          onpointerdown="startDetailPhotoSwipe(event)"
+          onpointerup="endDetailPhotoSwipe(event)"
+          onpointercancel="cancelDetailPhotoSwipe()">
           <img id="detail-main-img" src="" alt="" />
           <button class="gallery-nav-btn prev" id="gallery-prev-btn" onclick="stepDetailPhoto(-1)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -1585,6 +1857,7 @@
           </button>
         </div>
         <div class="detail-thumbs" id="detail-thumbs"></div>
+        <p class="detail-option-label">Modelo seleccionado: <strong id="detail-model-label"></strong></p>
       </div>
 
       <div class="detail-info">
@@ -1742,13 +2015,12 @@
           <div class="admin-sales-metric">
             <label class="admin-sales-label" for="admin-investment">Valor invertido en este pedido / lote (COP)</label>
             <input
-              type="number"
+              type="text"
               id="admin-investment"
               class="form-input"
-              min="0"
-              step="1"
               inputmode="numeric"
-              oninput="updateAdminInvestment(this.value)"
+              oninput="formatAdminInvestment(this)"
+              onchange="normalizeAdminInvestment(this)"
             />
           </div>
           <div class="admin-sales-metric">
@@ -1761,6 +2033,7 @@
       <div class="admin-tabs">
         <button class="filter-pill active" id="tab-btn-inventory" onclick="switchAdminTab('inventory')">Inventario</button>
         <button class="filter-pill" id="tab-btn-orders" onclick="switchAdminTab('orders')">Pedidos recibidos</button>
+        <button class="filter-pill" id="tab-btn-finance" onclick="switchAdminTab('finance')">Finanzas</button>
         <button class="filter-pill" id="tab-btn-settings" onclick="switchAdminTab('settings')">Seguridad</button>
       </div>
 
@@ -1769,6 +2042,8 @@
         <div class="admin-card">
           <h3 id="form-product-heading">Agregar Nueva Pieza</h3>
           <input type="hidden" id="edit-product-id" />
+          <input type="hidden" id="new-product-request-id" />
+          <input type="hidden" id="new-product-id" />
 
           <div class="admin-form-group">
             <label>Nombre del producto</label>
@@ -1786,13 +2061,30 @@
           </div>
 
           <div class="admin-form-group">
-            <label>Precio (COP)</label>
-            <input type="number" id="prod-price" class="form-input" placeholder="38000" />
+            <label>Precio de venta (COP)</label>
+            <input type="text" id="prod-price" class="form-input" inputmode="numeric" placeholder="38.000" oninput="formatProductPriceInput(this)" onchange="normalizeProductPriceInput(this)" />
           </div>
 
           <div class="admin-form-group">
             <label for="prod-stock">Unidades disponibles</label>
             <input type="number" id="prod-stock" class="form-input" min="0" step="1" value="1" required />
+          </div>
+
+          <div class="finance-product-cost-fields" id="prod-cost-fields">
+            <h4>Costos y margen del producto nuevo</h4>
+            <p class="finance-note">Estos datos son privados y no se aplican a productos antiguos.</p>
+            <div class="admin-form-group">
+              <label for="prod-unit-cost">Precio de compra por unidad (COP)</label>
+              <input type="text" id="prod-unit-cost" class="form-input" inputmode="numeric" oninput="formatCOPInput(this); updateCalculatedProductPrice()" />
+            </div>
+            <div class="admin-form-group">
+              <label for="prod-margin">Porcentaje de ganancia deseado</label>
+              <input type="number" id="prod-margin" class="form-input" min="0" step="0.01" inputmode="decimal" oninput="updateCalculatedProductPrice()" />
+            </div>
+            <p class="finance-inline-metrics">
+              Ganancia por unidad: <strong id="prod-unit-profit">—</strong>
+              · Precio de venta editable para redondeo comercial.
+            </p>
           </div>
 
           <div class="admin-form-group">
@@ -1818,6 +2110,12 @@
           <div class="admin-form-group">
             <label>Rutas o URLs de fotos (una por línea)</label>
             <textarea id="prod-images" class="form-input" rows="3" placeholder="./img/foto1.jpg&#10;./img/foto2.jpg"></textarea>
+          </div>
+
+          <div class="admin-form-group">
+            <label for="prod-image-models">Nombre del modelo por foto (opcional, una por línea y en el mismo orden)</label>
+            <textarea id="prod-image-models" class="form-input" rows="3" placeholder="Modelo 1&#10;Perla&#10;Modelo 3"></textarea>
+            <p class="finance-note">En el pedido aparecerá junto al tono elegido, por ejemplo: Blanco - Perla.</p>
           </div>
 
           <div style="display:flex; gap:0.6rem;">
@@ -1871,6 +2169,185 @@
         <h3>Acceso de Administradora</h3>
         <p style="color:var(--text-muted); font-size:0.82rem; line-height:1.6;">El correo y la contraseña del panel se administran de forma segura desde Supabase Auth.</p>
       </div>
+
+      <!-- TAB FINANZAS -->
+      <section id="admin-tab-finance" style="display:none;">
+        <div class="finance-subtabs" aria-label="Secciones de Finanzas">
+          <button class="filter-pill active" id="finance-subtab-btn-summary" onclick="switchFinanceSection('summary')">Resumen</button>
+          <button class="filter-pill" id="finance-subtab-btn-purchases" onclick="switchFinanceSection('purchases')">Inversiones</button>
+          <button class="filter-pill" id="finance-subtab-btn-profitability" onclick="switchFinanceSection('profitability')">Costos y precios</button>
+          <button class="filter-pill" id="finance-subtab-btn-sales" onclick="switchFinanceSection('sales')">Ventas y ganancias</button>
+          <button class="filter-pill" id="finance-subtab-btn-expenses" onclick="switchFinanceSection('expenses')">Gastos</button>
+        </div>
+        <p id="finance-data-status" class="finance-status" role="status" aria-live="polite"></p>
+
+        <section class="finance-section active" id="finance-section-summary">
+          <div class="finance-toolbar">
+            <div class="admin-form-group">
+              <label for="finance-date-from">Desde</label>
+              <input type="date" id="finance-date-from" class="form-input" onchange="renderFinanceDashboard()" />
+            </div>
+            <div class="admin-form-group">
+              <label for="finance-date-to">Hasta</label>
+              <input type="date" id="finance-date-to" class="form-input" onchange="renderFinanceDashboard()" />
+            </div>
+            <button type="button" class="btn-outline-sm" onclick="clearFinanceDateFilters()">Limpiar fechas</button>
+            <button type="button" class="btn-outline-sm" onclick="printFinanceReport()">Exportar PDF</button>
+          </div>
+          <p class="finance-note">Aquí está tu resumen financiero.</p>
+          <div class="finance-kpis">
+            <div class="finance-kpi"><span>Inversión en inventario</span><strong id="finance-kpi-investment">—</strong></div>
+            <div class="finance-kpi"><span>Venta potencial del inventario</span><strong id="finance-kpi-potential-sales">—</strong></div>
+            <div class="finance-kpi"><span>Ganancia potencial</span><strong id="finance-kpi-potential-profit">—</strong></div>
+            <div class="finance-kpi"><span>Ventas registradas</span><strong id="finance-kpi-sales">—</strong></div>
+            <div class="finance-kpi"><span>Ganancia de ventas</span><strong id="finance-kpi-gross-profit">—</strong></div>
+            <div class="finance-kpi"><span>Gastos registrados</span><strong id="finance-kpi-expenses">—</strong></div>
+            <div class="finance-kpi"><span>Ganancia real</span><strong id="finance-kpi-net-profit">—</strong></div>
+          </div>
+          <div class="admin-grid">
+            <div class="admin-card">
+              <h3>Ventas por mes</h3>
+              <div id="finance-sales-chart" class="finance-chart-list"></div>
+            </div>
+            <div class="admin-card">
+              <h3>Ganancia de ventas por mes</h3>
+              <div id="finance-profit-chart" class="finance-chart-list"></div>
+            </div>
+          </div>
+          <div class="admin-grid" style="margin-top:1rem;">
+            <div class="admin-card">
+              <h3>Inversiones en mercancía por mes</h3>
+              <div id="finance-investment-chart" class="finance-chart-list"></div>
+            </div>
+            <div class="admin-card">
+              <h3>Gastos por categoría</h3>
+              <div id="finance-expenses-chart" class="finance-chart-list"></div>
+            </div>
+          </div>
+          <div class="admin-card" style="margin-top:1rem;">
+            <h3>Ingresos y egresos por mes</h3>
+            <div id="finance-cashflow-chart" class="finance-chart-list"></div>
+          </div>
+        </section>
+
+        <section class="finance-section" id="finance-section-purchases">
+          <div class="admin-grid">
+            <div class="admin-card">
+              <h3>Registrar inversión</h3>
+              <input type="hidden" id="finance-purchase-request-id" />
+              <div class="admin-form-group">
+                <label for="finance-purchase-description">Descripción</label>
+                <input type="text" id="finance-purchase-description" class="form-input" placeholder="Compra al proveedor" />
+              </div>
+              <div class="admin-form-group">
+                <label for="finance-purchase-date">Fecha de compra</label>
+                <input type="date" id="finance-purchase-date" class="form-input" />
+              </div>
+              <div class="admin-form-group">
+                <label for="finance-purchase-supplier">Proveedor (opcional)</label>
+                <input type="text" id="finance-purchase-supplier" class="form-input" />
+              </div>
+              <div class="admin-form-group">
+                <label>Piezas compradas</label>
+                <div id="finance-purchase-lines"></div>
+                <button type="button" class="btn-outline-sm" onclick="addFinancePurchaseLine()">Agregar otra pieza</button>
+                <p class="finance-note">Elige las piezas de esta compra. Para un diseño nuevo, agrégalo primero en Inventario.</p>
+              </div>
+              <button type="button" class="primary-cta-btn" onclick="recordInventoryRestock()">Guardar inversión</button>
+            </div>
+            <div class="admin-card">
+              <h3>Historial de inversiones</h3>
+              <div class="admin-table-wrap">
+                <table>
+                  <thead><tr><th>Fecha</th><th>Producto</th><th>Valor unitario</th><th>Cantidad total de productos</th><th>Total en $</th></tr></thead>
+                  <tbody id="finance-purchases-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="finance-section" id="finance-section-profitability">
+          <div class="admin-card">
+            <div class="finance-toolbar">
+              <div class="admin-form-group">
+                <label for="finance-product-search">Buscar producto</label>
+                <input type="search" id="finance-product-search" class="form-input" oninput="renderFinanceProfitability()" placeholder="Nombre o categoría" />
+              </div>
+              <div class="admin-form-group">
+                <label for="finance-product-sort">Ordenar</label>
+                <select id="finance-product-sort" class="form-input" onchange="renderFinanceProfitability()">
+                  <option value="name">Nombre</option>
+                  <option value="profit">Ganancia posible</option>
+                  <option value="margin">Porcentaje</option>
+                  <option value="price">Precio de venta</option>
+                </select>
+              </div>
+            </div>
+            <div class="admin-table-wrap">
+              <table>
+                <thead><tr><th>Pieza</th><th>Categoría</th><th>Valor de compra</th><th>Ganancia %</th><th>Precio de venta</th><th>Ganancia por pieza</th><th>Disponibles</th><th>Inversión disponible</th><th>Venta posible</th><th>Ganancia posible</th></tr></thead>
+                <tbody id="finance-profitability-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section id="finance-print-report" class="finance-print-report" aria-hidden="true"></section>
+
+        <section class="finance-section" id="finance-section-sales">
+          <div class="admin-card">
+            <h3>Ventas confirmadas</h3>
+            <p class="finance-note">Los pedidos pendientes no se incluyen como ventas. Los costos y precios quedan guardados como valores históricos.</p>
+            <div class="admin-table-wrap">
+              <table>
+                <thead><tr><th>Fecha</th><th>Pedido</th><th>Ingresos</th><th>Costo de compra</th><th>Ganancia de ventas</th><th>Detalle</th></tr></thead>
+                <tbody id="finance-sales-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="finance-section" id="finance-section-expenses">
+          <div class="admin-grid">
+            <div class="admin-card">
+              <h3>Registrar gasto</h3>
+              <input type="hidden" id="finance-expense-request-id" />
+              <div class="admin-form-group">
+                <label for="finance-expense-concept">Concepto</label>
+                <input type="text" id="finance-expense-concept" class="form-input" />
+              </div>
+              <div class="admin-form-group">
+                <label for="finance-expense-category">Categoría</label>
+                <select id="finance-expense-category" class="form-input">
+                  <option>Empaques</option><option>Publicidad</option><option>Envíos</option><option>Materiales</option><option>Otros</option>
+                </select>
+              </div>
+              <div class="admin-form-group">
+                <label for="finance-expense-amount">Valor (COP)</label>
+                <input type="text" id="finance-expense-amount" class="form-input" inputmode="numeric" oninput="formatCOPInput(this)" />
+              </div>
+              <div class="admin-form-group">
+                <label for="finance-expense-date">Fecha</label>
+                <input type="date" id="finance-expense-date" class="form-input" />
+              </div>
+              <div class="admin-form-group">
+                <label for="finance-expense-description">Descripción (opcional)</label>
+                <textarea id="finance-expense-description" class="form-input" rows="2"></textarea>
+              </div>
+              <button type="button" class="primary-cta-btn" onclick="recordBusinessExpense()">Guardar gasto</button>
+            </div>
+            <div class="admin-card">
+              <h3>Historial de gastos</h3>
+              <div class="admin-table-wrap">
+                <table>
+                  <thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Valor</th></tr></thead>
+                  <tbody id="finance-expenses-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
     </div>
   </div>
 
@@ -2348,6 +2825,7 @@
     let orders = loadOrders();
     let activeCategory = "Todos";
     let selectedCardColors = {};
+    let selectedCardImageIndices = {};
     let cart = [];
     let orderSubmissionPending = false;
     let orderConfirmed = false;
@@ -2356,14 +2834,108 @@
     let stockRealtimeChannel = null;
     let adminSyncInterval = null;
     let currentAdminUser = null;
+    let financeProductCosts = [];
+    let financePurchases = [];
+    let financeSales = [];
+    let financeExpenses = [];
+    let financeSaleOrderIds = new Set();
+    let financeDataLoaded = false;
+    let adminChangesDeferred = false;
 
     let currentDetailProduct = null;
     let currentDetailPhotoIdx = 0;
     let currentDetailColor = "";
     let currentDetailQty = 1;
+    let detailPhotoSwipeStart = null;
+    let productCardSwipeStart = null;
+    let suppressProductCardClickUntil = 0;
+
+    function formatCOPNumber(value) {
+      return Number(value).toLocaleString("es-CO", { maximumFractionDigits: 0 });
+    }
 
     function formatCOP(val) {
-      return "$" + Number(val).toLocaleString("es-CO");
+      return "$" + formatCOPNumber(val);
+    }
+
+    function parseCOPInput(value) {
+      const rawValue = String(value === null || value === undefined ? "" : value)
+        .replace(/[^\d.,]/g, "");
+      if (!/\d/.test(rawValue)) return NaN;
+
+      const separatorIndex = Math.max(rawValue.lastIndexOf("."), rawValue.lastIndexOf(","));
+      const decimalDigits = separatorIndex === -1
+        ? ""
+        : rawValue.slice(separatorIndex + 1);
+      const normalized = decimalDigits.length > 0 && decimalDigits.length <= 2
+        ? `${rawValue.slice(0, separatorIndex).replace(/[.,]/g, "")}.${decimalDigits}`
+        : rawValue.replace(/[.,]/g, "");
+      const amount = Number(normalized);
+      return Number.isFinite(amount) ? Math.round(amount) : NaN;
+    }
+
+    function formatCOPInput(input) {
+      const rawValue = input.value;
+      const selection = typeof input.selectionStart === "number"
+        ? input.selectionStart
+        : rawValue.length;
+      const digitsBeforeSelection = rawValue.slice(0, selection).replace(/\D/g, "").length;
+      const parsed = parseCOPInput(rawValue);
+      const digits = Number.isFinite(parsed) ? String(parsed) : "";
+      input.value = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+      let caret = 0;
+      let digitCount = 0;
+      while (caret < input.value.length && digitCount < digitsBeforeSelection) {
+        if (/\d/.test(input.value[caret])) digitCount += 1;
+        caret += 1;
+      }
+      input.setSelectionRange(caret, caret);
+      return digits ? Number(digits) : NaN;
+    }
+
+    function localDateValue() {
+      const now = new Date();
+      return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    }
+
+    function localOrderDateTime(date = new Date()) {
+      const dateText = date.toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
+      const timeText = date.toLocaleTimeString("es-CO", {
+        timeZone: "America/Bogota",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hourCycle: "h23"
+      });
+      return `${dateText} ${timeText}`;
+    }
+
+    function escapeHtml(value) {
+      return String(value === null || value === undefined ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function createRequestId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+      const bytes = new Uint8Array(16);
+      if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+        window.crypto.getRandomValues(bytes);
+      } else {
+        for (let index = 0; index < bytes.length; index += 1) {
+          bytes[index] = Math.floor(Math.random() * 256);
+        }
+      }
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+      return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
     }
 
     function formatProductAvailability(product) {
@@ -2413,6 +2985,10 @@
     function setAdminSyncStatus(message) {
       const status = document.getElementById("admin-sync-status");
       if (status) status.textContent = message;
+    }
+
+    function isMissingFinanceSchema(error) {
+      return Boolean(error && ["42P01", "PGRST205"].includes(error.code));
     }
 
     function toCloudOrder(order) {
@@ -2514,32 +3090,81 @@
 
       const pendingStock = readPendingRecords(STORAGE_PENDING_STOCK_KEY);
       if (pendingStock.length) {
+        const managedIds = new Set(financeProductCosts.map(cost => cost.product_id));
+        const legacyStockChanges = pendingStock.filter(record => !managedIds.has(record.product_id));
+        const protectedChanges = pendingStock.length - legacyStockChanges.length;
+        if (protectedChanges) {
+          adminChangesDeferred = true;
+          setAdminSyncStatus("Se omitieron cambios de stock directos para productos con costo; usa Inversiones para reponerlos.");
+        }
+        if (legacyStockChanges.length) {
         const { error } = await supabaseClient
           .from("product_stock")
-          .upsert(pendingStock, { onConflict: "product_id" });
+          .upsert(legacyStockChanges, { onConflict: "product_id" });
         if (error) throw error;
+        }
         savePendingRecords(STORAGE_PENDING_STOCK_KEY, []);
       }
 
       const pendingStatuses = readPendingRecords(STORAGE_PENDING_ORDER_STATUS_KEY);
+      const remainingStatuses = [];
       for (const pending of pendingStatuses) {
+        if (pending.status === "Confirmado") {
+          const order = orders.find(item => item.id === pending.id);
+          const items = order && order.product_quantities;
+          const hasSnapshots = Array.isArray(items) && items.length > 0 &&
+            items.every(item => item.product_name && Number.isFinite(Number(item.unit_price)));
+          if (!hasSnapshots) {
+            remainingStatuses.push(pending);
+            adminChangesDeferred = true;
+            setAdminSyncStatus("Un pedido confirmado sin precios históricos requiere revisión manual antes de sincronizarse.");
+            continue;
+          }
+          const { error } = await supabaseClient.rpc("confirm_order_as_sale", {
+            p_order_id: pending.id,
+            p_sale_lines: items.map(item => ({
+              product_id: item.product_id,
+              product_name: item.product_name,
+              quantity: Number(item.quantity),
+              unit_price: Number(item.unit_price)
+            }))
+          });
+          if (error) {
+            console.error("No se pudo sincronizar la venta pendiente.", error);
+            throw error;
+          }
+          continue;
+        }
+
+        if (pending.status === "Entregado" && !financeSaleOrderIds.has(pending.id)) {
+          remainingStatuses.push(pending);
+          adminChangesDeferred = true;
+          setAdminSyncStatus("Un pedido entregado sin venta financiera requiere revisión manual.");
+          continue;
+        }
         const { error } = await supabaseClient
           .from("orders")
           .update({ status: pending.status })
           .eq("id", pending.id);
         if (error) throw error;
       }
-      if (pendingStatuses.length) savePendingRecords(STORAGE_PENDING_ORDER_STATUS_KEY, []);
+      if (pendingStatuses.length) savePendingRecords(STORAGE_PENDING_ORDER_STATUS_KEY, remainingStatuses);
 
       const pendingDeletes = readPendingRecords(STORAGE_PENDING_ORDER_DELETES_KEY);
+      const remainingDeletes = [];
       for (const pending of pendingDeletes) {
+        if (financeSaleOrderIds.has(pending.id)) {
+          adminChangesDeferred = true;
+          setAdminSyncStatus("Se conservó un pedido con venta financiera; no se puede eliminar.");
+          continue;
+        }
         const { error } = await supabaseClient
           .from("orders")
           .delete()
           .eq("id", pending.id);
         if (error) throw error;
       }
-      if (pendingDeletes.length) savePendingRecords(STORAGE_PENDING_ORDER_DELETES_KEY, []);
+      if (pendingDeletes.length) savePendingRecords(STORAGE_PENDING_ORDER_DELETES_KEY, remainingDeletes);
     }
 
     async function saveProductStockToSupabase(product) {
@@ -2576,6 +3201,7 @@
     async function syncAdminData(migrateLocalOrders) {
       if (!supabaseClient || !currentAdminUser || !navigator.onLine || adminSyncInProgress) return;
       adminSyncInProgress = true;
+      adminChangesDeferred = false;
       setAdminSyncStatus("Sincronizando inventario y pedidos con Supabase…");
 
       try {
@@ -2583,7 +3209,9 @@
         await flushPendingAdminChanges();
         await syncProductStockFromSupabase(true);
         await syncOrdersFromSupabase(migrateLocalOrders);
-        setAdminSyncStatus("Inventario y pedidos sincronizados.");
+        setAdminSyncStatus(adminChangesDeferred
+          ? "Sincronización completada; algunos cambios anteriores requieren revisión manual."
+          : "Inventario y pedidos sincronizados.");
       } catch (error) {
         console.error("No se pudo completar la sincronización con Supabase.", error);
         setAdminSyncStatus("Sin conexión con Supabase. Se muestran los datos guardados localmente y se reintentará automáticamente.");
@@ -2645,6 +3273,30 @@
       window.clearInterval(adminSyncInterval);
       adminSyncInterval = null;
       currentAdminUser = null;
+      financeProductCosts = [];
+      financePurchases = [];
+      financeSales = [];
+      financeExpenses = [];
+      financeSaleOrderIds = new Set();
+      financeDataLoaded = false;
+      ["finance-purchases-tbody", "finance-profitability-tbody",
+        "finance-sales-tbody", "finance-expenses-tbody"].forEach(id => {
+        const tbody = document.getElementById(id);
+        if (tbody) tbody.textContent = "";
+      });
+      ["finance-kpi-investment", "finance-kpi-potential-sales",
+        "finance-kpi-potential-profit", "finance-kpi-sales",
+        "finance-kpi-gross-profit", "finance-kpi-expenses",
+        "finance-kpi-net-profit"].forEach(id => {
+        const metric = document.getElementById(id);
+        if (metric) metric.textContent = "—";
+      });
+      ["finance-sales-chart", "finance-profit-chart",
+        "finance-investment-chart", "finance-expenses-chart",
+        "finance-cashflow-chart"].forEach(id => {
+        const chart = document.getElementById(id);
+        if (chart) chart.textContent = "";
+      });
     }
 
     window.addEventListener("online", () => {
@@ -2674,11 +3326,126 @@
     }
 
     function getProductColorImage(product, color) {
-      if (!product.colorImages) return "";
-      const colorKey = Object.keys(product.colorImages).find(
+      const colorKey = Object.keys(product.colorImages || {}).find(
         key => normalizeColorName(key) === normalizeColorName(color)
       );
-      return colorKey ? product.colorImages[colorKey] : "";
+      if (colorKey) return product.colorImages[colorKey];
+
+      const defaultProduct = DEFAULT_PRODUCTS.find(item => item.id === product.id);
+      const defaultColorKey = Object.keys(defaultProduct && defaultProduct.colorImages || {}).find(
+        key => normalizeColorName(key) === normalizeColorName(color)
+      );
+      const defaultImage = defaultColorKey ? defaultProduct.colorImages[defaultColorKey] : "";
+      return defaultImage && getProductImages(product).some(image => image.trim() === defaultImage.trim())
+        ? defaultImage
+        : "";
+    }
+
+    function getProductImages(product) {
+      const images = Array.isArray(product.images) ? product.images.slice() : [];
+      Object.values(product.colorImages || {}).forEach(image => {
+        if (typeof image === "string" && image.trim() &&
+            !images.some(existing => existing.trim() === image.trim())) {
+          images.push(image);
+        }
+      });
+      return images;
+    }
+
+    function getProductImageIndex(product, image) {
+      if (!image) return -1;
+      return getProductImages(product).findIndex(source => source.trim() === image.trim());
+    }
+
+    function getImageModelName(product, imageIndex) {
+      const label = Array.isArray(product.modelLabels)
+        ? String(product.modelLabels[imageIndex] || "").trim()
+        : "";
+      return label || `Modelo ${imageIndex + 1}`;
+    }
+
+    function getImageVariantName(product, color, imageIndex) {
+      const modelName = getImageModelName(product, imageIndex);
+      const prefix = `${color} - `;
+      return modelName.toLowerCase().startsWith(prefix.toLowerCase())
+        ? modelName
+        : `${color} - ${modelName}`;
+    }
+
+    function getImageColor(product, image) {
+      if (!image) return "";
+      const entry = Object.entries(product.colorImages || {}).find(([, source]) =>
+        typeof source === "string" && source.trim() === image.trim()
+      );
+      if (entry) return entry[0];
+
+      const imageIndex = getProductImageIndex(product, image);
+      const modelName = Array.isArray(product.modelLabels)
+        ? normalizeColorName(product.modelLabels[imageIndex])
+        : "";
+      const labelColor = (product.colors || []).find(color =>
+        modelName.startsWith(`${normalizeColorName(color)} - `)
+      );
+      if (labelColor) return labelColor;
+
+      const defaultProduct = DEFAULT_PRODUCTS.find(item => item.id === product.id);
+      const defaultEntry = Object.entries(defaultProduct && defaultProduct.colorImages || {}).find(
+        ([, source]) => source.trim() === image.trim()
+      );
+      return defaultEntry ? defaultEntry[0] : "";
+    }
+
+    function getCurrentDetailVariantName() {
+      if (!currentDetailProduct) return "";
+      return getImageVariantName(currentDetailProduct, currentDetailColor, currentDetailPhotoIdx);
+    }
+
+    function getProductImageVariantName(product, imageIndex, fallbackColor) {
+      const images = getProductImages(product);
+      const imageColor = getImageColor(product, images[imageIndex]);
+      return getImageVariantName(product, imageColor || fallbackColor, imageIndex);
+    }
+
+    function getOrderImageReference(image) {
+      if (!image) return "No disponible";
+      try {
+        const url = new URL(image, document.baseURI);
+        return url.protocol === "file:" ? image : url.href;
+      } catch (error) {
+        console.error("No se pudo preparar la referencia de la foto del pedido.", error);
+        return image;
+      }
+    }
+
+    function buildWhatsAppOrderLines(items) {
+      return items.map(item =>
+        `• ${item.qty}x ${item.name} (${item.variant_name}) - ${formatCOP(item.price * item.qty)}\n  Foto: ${getOrderImageReference(item.image_url)}`
+      ).join("\n");
+    }
+
+    function buildOrderProductQuantities(items) {
+      const groupedItems = new Map();
+      items.forEach(item => {
+        let grouped = groupedItems.get(item.id);
+        if (!grouped) {
+          grouped = {
+            product_id: item.id,
+            product_name: item.name,
+            unit_price: Number(item.price),
+            quantity: 0,
+            variants: []
+          };
+          groupedItems.set(item.id, grouped);
+        }
+        grouped.quantity += item.qty;
+        grouped.variants.push({
+          quantity: item.qty,
+          color: item.color,
+          variant_name: item.variant_name,
+          image_url: item.image_url
+        });
+      });
+      return Array.from(groupedItems.values());
     }
 
     function showAdminLogin(message) {
@@ -2861,10 +3628,99 @@
       `).join("");
     }
 
+    function getProductImageIndexForColor(product, color) {
+      const colorImageIndex = getProductImageIndex(product, getProductColorImage(product, color));
+      if (colorImageIndex >= 0) return colorImageIndex;
+
+      const normalizedColor = normalizeColorName(color);
+      return getProductImages(product).findIndex((image, index) => {
+        const label = Array.isArray(product.modelLabels)
+          ? normalizeColorName(product.modelLabels[index])
+          : "";
+        return label.startsWith(`${normalizedColor} - `);
+      });
+    }
+
+    function updateProductCardVariant(product, color, imageIndex) {
+      const images = getProductImages(product);
+      const validIndex = Number.isInteger(imageIndex) && images[imageIndex] ? imageIndex : 0;
+      selectedCardColors[product.id] = color;
+      selectedCardImageIndices[product.id] = validIndex;
+
+      const card = Array.from(document.querySelectorAll("#products-grid .product-card"))
+        .find(element => element.dataset.productId === product.id);
+      if (!card) return;
+
+      const image = card.querySelector(".product-media img");
+      if (image) {
+        image.src = images[validIndex] || "";
+        image.alt = `${product.name} · ${getImageVariantName(product, color, validIndex)}`;
+      }
+      card.querySelectorAll(".swatch-dot[data-color]").forEach(swatch => {
+        const isSelected = normalizeColorName(swatch.dataset.color) === normalizeColorName(color);
+        swatch.classList.toggle("selected", isSelected);
+        swatch.setAttribute("aria-pressed", String(isSelected));
+      });
+      const colorLabel = card.querySelector(".swatch-selected-name");
+      if (colorLabel) colorLabel.textContent = color;
+    }
+
     function selectCardColor(prodId, color, event) {
       event.stopPropagation();
-      selectedCardColors[prodId] = color;
-      renderCatalog();
+      const product = products.find(item => item.id === prodId);
+      if (!product) return;
+      const imageIndex = getProductImageIndexForColor(product, color);
+      updateProductCardVariant(product, color, imageIndex >= 0 ? imageIndex : 0);
+    }
+
+    function startProductCardSwipe(event, prodId) {
+      if (event.pointerType === "mouse") return;
+      productCardSwipeStart = {
+        productId: prodId,
+        pointerId: event.pointerId,
+        x: event.clientX,
+        y: event.clientY
+      };
+    }
+
+    function endProductCardSwipe(event, prodId) {
+      const start = productCardSwipeStart;
+      productCardSwipeStart = null;
+      if (!start || start.productId !== prodId || start.pointerId !== event.pointerId) return;
+
+      const deltaX = event.clientX - start.x;
+      const deltaY = event.clientY - start.y;
+      if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+      const product = products.find(item => item.id === prodId);
+      const images = product ? getProductImages(product) : [];
+      if (!product || images.length < 2) return;
+
+      const currentIndex = selectedCardImageIndices[prodId];
+      const startingIndex = Number.isInteger(currentIndex) && images[currentIndex]
+        ? currentIndex
+        : Math.max(0, getProductImageIndexForColor(product, selectedCardColors[prodId] || product.colors[0]));
+      const direction = deltaX < 0 ? 1 : -1;
+      const nextIndex = (startingIndex + direction + images.length) % images.length;
+      const color = getImageColor(product, images[nextIndex]) ||
+        selectedCardColors[prodId] || product.colors[0] || "Dorado";
+      updateProductCardVariant(product, color, nextIndex);
+      suppressProductCardClickUntil = Date.now() + 400;
+      if (event.cancelable) event.preventDefault();
+    }
+
+    function cancelProductCardSwipe() {
+      productCardSwipeStart = null;
+    }
+
+    function openProductDetailFromCard(event, prodId) {
+      if (Date.now() < suppressProductCardClickUntil) {
+        suppressProductCardClickUntil = 0;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      openProductDetail(prodId);
     }
 
     function renderCatalog() {
@@ -2875,21 +3731,35 @@
 
       grid.innerHTML = filtered.map(prod => {
         const currentColor = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
-        const mainImg = getProductColorImage(prod, currentColor) || (prod.images && prod.images.length ? prod.images[0] : "");
+        const images = getProductImages(prod);
+        const selectedImageIndex = selectedCardImageIndices[prod.id];
+        const mainImg = Number.isInteger(selectedImageIndex) && images[selectedImageIndex]
+          ? images[selectedImageIndex]
+          : getProductColorImage(prod, currentColor) || images[0] || "";
         const extraPhotos = prod.images && prod.images.length > 1 ? `<span class="photo-count-badge">+${prod.images.length - 1} fotos</span>` : "";
 
         const swatchesHtml = prod.colors.map(col => `
           <span
             class="swatch-dot ${normalizeColorName(col) === normalizeColorName(currentColor) ? "selected" : ""}"
             style="background:${getSwatchColor(col)}"
+            data-color="${escapeHtml(col)}"
+            role="button"
+            tabindex="0"
+            aria-label="Elegir color ${escapeHtml(col)}"
+            aria-pressed="${normalizeColorName(col) === normalizeColorName(currentColor)}"
             title="${col}"
             onclick="selectCardColor('${prod.id}', '${col}', event)"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectCardColor('${prod.id}', '${col}', event)}"
           ></span>
         `).join("");
 
         return `
           <article class="product-card" data-product-id="${prod.id}">
-            <div class="product-media" onclick="openProductDetail('${prod.id}')">
+            <div class="product-media"
+              onpointerdown="startProductCardSwipe(event, '${prod.id}')"
+              onpointerup="endProductCardSwipe(event, '${prod.id}')"
+              onpointercancel="cancelProductCardSwipe()"
+              onclick="openProductDetailFromCard(event, '${prod.id}')">
               <img src="${mainImg}" alt="${prod.name}" loading="lazy" />
               ${extraPhotos}
             </div>
@@ -2917,10 +3787,15 @@
 
       currentDetailProduct = prod;
       currentDetailColor = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
-      const colorImage = getProductColorImage(prod, currentDetailColor);
-      currentDetailPhotoIdx = colorImage && prod.images
-        ? prod.images.findIndex(image => image.trim() === colorImage.trim())
-        : 0;
+      const images = getProductImages(prod);
+      const savedImageIndex = selectedCardImageIndices[prod.id];
+      const colorImageIndex = getProductImageIndexForColor(prod, currentDetailColor);
+      currentDetailPhotoIdx = Number.isInteger(savedImageIndex) && images[savedImageIndex]
+        ? savedImageIndex
+        : colorImageIndex >= 0 ? colorImageIndex : 0;
+      currentDetailColor = getImageColor(prod, images[currentDetailPhotoIdx]) || currentDetailColor;
+      selectedCardColors[prod.id] = currentDetailColor;
+      selectedCardImageIndices[prod.id] = currentDetailPhotoIdx;
       if (currentDetailPhotoIdx < 0) currentDetailPhotoIdx = 0;
       currentDetailQty = 1;
 
@@ -2933,21 +3808,18 @@
       document.getElementById("detail-qty").textContent = "1";
 
       renderDetailGallery();
-      const colorImageIsInGallery = (prod.images || []).some(image => image.trim() === colorImage.trim());
-      if (colorImage && !colorImageIsInGallery) {
-        document.getElementById("detail-main-img").src = colorImage;
-        document.querySelectorAll("#detail-thumbs .detail-thumb").forEach(thumb => {
-          thumb.classList.remove("active");
-        });
-      }
       renderDetailSwatches();
 
       document.getElementById("detail-modal-backdrop").classList.add("open");
     }
 
     function renderDetailGallery() {
-      const imgs = currentDetailProduct.images || [];
-      document.getElementById("detail-main-img").src = imgs[currentDetailPhotoIdx] || "";
+      const imgs = getProductImages(currentDetailProduct);
+      const variantName = getCurrentDetailVariantName();
+      const mainImage = document.getElementById("detail-main-img");
+      mainImage.src = imgs[currentDetailPhotoIdx] || "";
+      mainImage.alt = variantName;
+      document.getElementById("detail-model-label").textContent = variantName;
 
       const showArrows = imgs.length > 1;
       document.getElementById("gallery-prev-btn").style.display = showArrows ? "flex" : "none";
@@ -2955,21 +3827,49 @@
 
       const thumbsEl = document.getElementById("detail-thumbs");
       thumbsEl.innerHTML = imgs.length > 1 ? imgs.map((src, i) => `
-        <div class="detail-thumb ${i === currentDetailPhotoIdx ? "active" : ""}" onclick="setDetailPhoto(${i})">
-          <img src="${src}" alt="Vista ${i + 1}" />
-        </div>
+        <button type="button" class="detail-thumb ${i === currentDetailPhotoIdx ? "active" : ""}" onclick="setDetailPhoto(${i})"
+          aria-pressed="${i === currentDetailPhotoIdx}"
+          aria-label="Elegir ${escapeHtml(getProductImageVariantName(currentDetailProduct, i, currentDetailColor))}"
+          title="${escapeHtml(getProductImageVariantName(currentDetailProduct, i, currentDetailColor))}">
+          <img src="${escapeHtml(src)}" alt="${escapeHtml(getProductImageVariantName(currentDetailProduct, i, currentDetailColor))}" />
+        </button>
       `).join("") : "";
     }
 
     function setDetailPhoto(index) {
+      const images = getProductImages(currentDetailProduct);
+      if (!Number.isInteger(index) || index < 0 || index >= images.length) return;
       currentDetailPhotoIdx = index;
+      currentDetailColor = getImageColor(currentDetailProduct, images[index]) || currentDetailColor;
+      updateProductCardVariant(currentDetailProduct, currentDetailColor, index);
       renderDetailGallery();
+      renderDetailSwatches();
+    }
+
+    function startDetailPhotoSwipe(event) {
+      if (event.pointerType === "mouse") return;
+      detailPhotoSwipeStart = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+    }
+
+    function endDetailPhotoSwipe(event) {
+      const start = detailPhotoSwipeStart;
+      detailPhotoSwipeStart = null;
+      if (!start || start.pointerId !== event.pointerId) return;
+
+      const deltaX = event.clientX - start.x;
+      const deltaY = event.clientY - start.y;
+      if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+      if (event.cancelable) event.preventDefault();
+      stepDetailPhoto(deltaX < 0 ? 1 : -1);
+    }
+
+    function cancelDetailPhotoSwipe() {
+      detailPhotoSwipeStart = null;
     }
 
     function stepDetailPhoto(dir) {
-      const len = currentDetailProduct.images.length;
-      currentDetailPhotoIdx = (currentDetailPhotoIdx + dir + len) % len;
-      renderDetailGallery();
+      const len = getProductImages(currentDetailProduct).length;
+      if (len) setDetailPhoto((currentDetailPhotoIdx + dir + len) % len);
     }
 
     function renderDetailSwatches() {
@@ -2986,26 +3886,16 @@
 
     function selectDetailColor(col) {
       currentDetailColor = col;
-      const targetSrc = getProductColorImage(currentDetailProduct, col);
-      const imgs = currentDetailProduct.images || [];
-      const foundIdx = targetSrc
-        ? imgs.findIndex(imgPath => imgPath.trim() === targetSrc.trim())
-        : -1;
+      const foundIdx = getProductImageIndexForColor(currentDetailProduct, col);
 
       if (foundIdx !== -1) {
         currentDetailPhotoIdx = foundIdx;
-        renderDetailGallery();
       } else {
         currentDetailPhotoIdx = 0;
-        renderDetailGallery();
-        if (targetSrc) {
-          document.getElementById("detail-main-img").src = targetSrc;
-          document.querySelectorAll("#detail-thumbs .detail-thumb").forEach(thumb => {
-            thumb.classList.remove("active");
-          });
-        }
       }
+      updateProductCardVariant(currentDetailProduct, currentDetailColor, currentDetailPhotoIdx);
 
+      renderDetailGallery();
       renderDetailSwatches();
     }
 
@@ -3026,29 +3916,42 @@
       const prod = products.find(p => p.id === prodId);
       if (!prod) return;
       const color = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
-      addItemToCart(prod, color, 1);
+      const images = getProductImages(prod);
+      const mappedImageIndex = getProductImageIndex(prod, getProductColorImage(prod, color));
+      const savedImageIndex = selectedCardImageIndices[prod.id];
+      const imageIndex = Number.isInteger(savedImageIndex) && images[savedImageIndex]
+        ? savedImageIndex
+        : mappedImageIndex >= 0 ? mappedImageIndex : 0;
+      addItemToCart(prod, color, 1, imageIndex);
       toggleCart(true);
     }
 
     function addDetailToCart() {
       if (!currentDetailProduct) return;
-      addItemToCart(currentDetailProduct, currentDetailColor, currentDetailQty);
+      addItemToCart(currentDetailProduct, currentDetailColor, currentDetailQty, currentDetailPhotoIdx);
       closeProductDetail();
       toggleCart(true);
     }
 
-    function addItemToCart(prod, color, qty) {
-      const existing = cart.find(item => item.id === prod.id && item.color === color);
+    function addItemToCart(prod, color, qty, imageIndex = 0) {
+      const image = getProductImages(prod)[imageIndex] || "";
+      const variantName = getImageVariantName(prod, color, imageIndex);
+      const existing = cart.find(item =>
+        item.id === prod.id && item.color === color &&
+        item.variant_name === variantName && item.image_url === image
+      );
       if (existing) {
         existing.qty += qty;
       } else {
         cart.push({
           id: prod.id,
           name: prod.name,
-          price: prod.price,
+          price: Math.round(Number(prod.price)),
           color: color,
+          variant_name: variantName,
           qty: qty,
-          image: prod.images[0] || ""
+          image_url: image,
+          image: image
         });
       }
       orderConfirmed = false;
@@ -3086,10 +3989,10 @@
         total += item.price * item.qty;
         return `
           <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}" />
+            <img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.variant_name)}" />
             <div class="cart-item-info">
-              <div class="cart-item-title">${item.name}</div>
-              <div class="cart-item-meta">Tono: ${item.color} · Cant: ${item.qty}</div>
+              <div class="cart-item-title">${escapeHtml(item.name)}</div>
+              <div class="cart-item-meta">Modelo: ${escapeHtml(item.variant_name)} · Cant: ${item.qty}</div>
               <div class="cart-item-price">${formatCOP(item.price * item.qty)}</div>
             </div>
             <button class="remove-item-btn" onclick="removeFromCart(${idx})" aria-label="Eliminar">
@@ -3108,7 +4011,7 @@
       if (cart.length === 0) return;
 
       const customerName = document.getElementById("customer-name").value.trim() || "Clienta";
-      const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
+      const total = Math.round(cart.reduce((acc, item) => acc + item.price * item.qty, 0));
       const itemsContainer = document.getElementById("order-confirmation-items");
       itemsContainer.textContent = "";
 
@@ -3122,7 +4025,7 @@
 
         const details = document.createElement("span");
         details.className = "order-confirmation-item-meta";
-        details.textContent = `Tono: ${item.color} · Cantidad: ${item.qty}`;
+        details.textContent = `Modelo: ${item.variant_name} · Cantidad: ${item.qty}`;
 
         const subtotal = document.createElement("span");
         subtotal.className = "order-confirmation-item-subtotal";
@@ -3200,16 +4103,16 @@
       }
 
       const customerName = document.getElementById("customer-name-confirm").value.trim() || "Clienta";
-      const total = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
-      const summaryLines = cart.map(item => `• ${item.qty}x ${item.name} (${item.color}) - ${formatCOP(item.price * item.qty)}`).join("\n");
+      const total = Math.round(cart.reduce((acc, item) => acc + item.price * item.qty, 0));
+      const summaryLines = buildWhatsAppOrderLines(cart);
       const order = {
         id: `ORD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`,
-        date: new Date().toLocaleDateString("es-CO"),
+        date: localOrderDateTime(),
         customer: customerName,
-        items: cart.map(item => `${item.qty}x ${item.name} (${item.color})`).join(", "),
+        items: cart.map(item => `${item.qty}x ${item.name} (${item.variant_name})`).join(", "),
         total: total,
         status: "Pendiente",
-        product_quantities: Array.from(requestedUnits, ([product_id, quantity]) => ({ product_id, quantity })),
+        product_quantities: buildOrderProductQuantities(cart),
         stock_deducted: false
       };
       const status = document.getElementById("order-confirmation-status");
@@ -3356,7 +4259,9 @@
       renderAdminProducts();
       renderAdminOrders();
       if (navigator.onLine) {
+        await loadFinanceData();
         await syncAdminData(true);
+        if (financeDataLoaded) renderFinanceDashboard();
       } else {
         setAdminSyncStatus("Sin conexión; se usarán los datos guardados localmente.");
       }
@@ -3364,6 +4269,22 @@
     }
 
     async function switchAdminTab(tab) {
+      if (tab === "finance") {
+        ["inventory", "orders", "finance", "settings"].forEach(t => {
+          const panel = document.getElementById(`admin-tab-${t}`);
+          const button = document.getElementById(`tab-btn-${t}`);
+          if (panel) panel.style.display = t === "finance" ? "block" : "none";
+          if (button) button.classList.toggle("active", t === "finance");
+        });
+        const today = localDateValue();
+        ["finance-purchase-date", "finance-expense-date"].forEach(id => {
+          const input = document.getElementById(id);
+          if (!input.value) input.value = today;
+        });
+        await loadFinanceData();
+        return;
+      }
+
       if (tab === "orders") {
         try {
           if (currentAdminUser && navigator.onLine) {
@@ -3394,12 +4315,528 @@
           renderAdminProducts();
         }
       }
-      ["inventory", "orders", "settings"].forEach(t => {
+      ["inventory", "orders", "finance", "settings"].forEach(t => {
         document.getElementById(`admin-tab-${t}`).style.display = t === tab ? (t === "inventory" ? "grid" : "block") : "none";
         document.getElementById(`tab-btn-${t}`).classList.toggle("active", t === tab);
       });
     }
 
+    function switchFinanceSection(section) {
+      const sections = ["summary", "purchases", "profitability", "sales", "expenses"];
+      if (!sections.includes(section)) return;
+      sections.forEach(name => {
+        document.getElementById(`finance-section-${name}`).classList.toggle("active", name === section);
+        document.getElementById(`finance-subtab-btn-${name}`).classList.toggle("active", name === section);
+      });
+      if (section === "purchases") renderFinancePurchases();
+      if (section === "profitability") renderFinanceProfitability();
+      if (section === "sales") renderFinanceSales();
+      if (section === "expenses") renderFinanceExpenses();
+    }
+
+    async function loadFinanceData() {
+      const status = document.getElementById("finance-data-status");
+      if (!supabaseClient || !currentAdminUser || !navigator.onLine) {
+        status.textContent = "Finanzas requiere una sesión de administradora y conexión a Supabase.";
+        return;
+      }
+
+      const requestedBy = currentAdminUser.id;
+      status.textContent = "Cargando información financiera…";
+      let results;
+      try {
+        results = await Promise.all([
+          supabaseClient.from("finance_product_costs").select("*"),
+          supabaseClient.from("inventory_purchases")
+            .select("*, inventory_purchase_items(*)")
+            .order("acquired_on", { ascending: false }),
+          supabaseClient.from("sales")
+            .select("*, sale_items(*)")
+            .order("sold_at", { ascending: false }),
+          supabaseClient.from("business_expenses")
+            .select("*")
+            .order("spent_on", { ascending: false })
+        ]);
+      } catch (error) {
+        financeDataLoaded = false;
+        status.textContent = "No se pudo conectar con Supabase para cargar Finanzas.";
+        console.error("Falló la carga de datos de Finanzas.", error);
+        return;
+      }
+      const [costResult, purchaseResult, salesResult, expenseResult] = results;
+      if (!currentAdminUser || currentAdminUser.id !== requestedBy) return;
+      const failed = [costResult, purchaseResult, salesResult, expenseResult].find(result => result.error);
+      if (failed) {
+        financeDataLoaded = false;
+        status.textContent = "No se pudieron cargar los datos financieros. Verifica que el Bloque SQL 1 esté instalado y que la sesión tenga permisos de administradora.";
+        console.error("No se pudieron cargar los datos de Finanzas.", failed.error);
+        return;
+      }
+
+      financeProductCosts = costResult.data || [];
+      financePurchases = purchaseResult.data || [];
+      financeSales = salesResult.data || [];
+      financeExpenses = expenseResult.data || [];
+      financeSaleOrderIds = new Set(financeSales.map(sale => sale.order_id));
+      financeDataLoaded = true;
+      status.textContent = financeSales.some(sale => sale.cost_incomplete)
+        ? "Algunas ventas anteriores no tienen todos los datos de compra, por eso la ganancia puede aparecer como parcial."
+        : "Datos financieros sincronizados con Supabase.";
+      populateFinanceProductSelect();
+      renderFinanceDashboard();
+      renderFinancePurchases();
+      renderFinanceProfitability();
+      renderFinanceSales();
+      renderFinanceExpenses();
+      renderAdminOrders();
+    }
+
+    function financeDateMatches(value) {
+      const date = String(value || "").slice(0, 10);
+      const from = document.getElementById("finance-date-from").value;
+      const to = document.getElementById("finance-date-to").value;
+      return (!from || date >= from) && (!to || date <= to);
+    }
+
+    function financeFilteredSales() {
+      return financeSales.filter(sale => financeDateMatches(sale.sold_at));
+    }
+
+    function financeFilteredExpenses() {
+      return financeExpenses.filter(expense => financeDateMatches(expense.spent_on));
+    }
+
+    function financeFilteredPurchases() {
+      return financePurchases.filter(purchase => financeDateMatches(purchase.acquired_on));
+    }
+
+    function financeMonth(value) {
+      return String(value || "").slice(0, 7);
+    }
+
+    function renderFinanceBars(containerId, entries) {
+      const container = document.getElementById(containerId);
+      if (!entries.length) {
+        container.innerHTML = `<p class="finance-note">No hay movimientos para el período seleccionado.</p>`;
+        return;
+      }
+      const maximum = Math.max(...entries.map(entry => Math.abs(Number(entry.value) || 0)), 1);
+      container.innerHTML = entries.map(entry => {
+        const value = Number(entry.value) || 0;
+        const width = Math.max(2, Math.abs(value) / maximum * 100);
+        return `
+          <div class="finance-chart-row">
+            <span class="finance-chart-label">${escapeHtml(entry.label)}</span>
+            <div class="finance-chart-track" role="img" aria-label="${escapeHtml(entry.label)}: ${formatCOP(value)}">
+              <div class="finance-chart-bar" style="width:${width}%"></div>
+            </div>
+            <strong class="finance-chart-value">${formatCOP(value)}</strong>
+          </div>`;
+      }).join("");
+    }
+
+    function renderFinanceDashboard() {
+      if (!financeDataLoaded) return;
+
+      const costByProduct = new Map(financeProductCosts.map(cost => [cost.product_id, cost]));
+      let knownInventoryInvestment = 0;
+      let potentialSales = 0;
+      let knownPotentialProfit = 0;
+      products.forEach(product => {
+        const stock = getProductAvailableUnits(product);
+        const price = Number(product.price) || 0;
+        const cost = costByProduct.get(product.id);
+        potentialSales += price * stock;
+        if (!cost) return;
+        const knownUnits = Math.min(Number(cost.tracked_quantity) || 0, stock);
+        const averageCost = Number(cost.average_unit_cost) || 0;
+        knownInventoryInvestment += averageCost * knownUnits;
+        knownPotentialProfit += (price - averageCost) * knownUnits;
+      });
+
+      const filteredSales = financeFilteredSales();
+      const filteredExpenses = financeFilteredExpenses();
+      const totalSales = filteredSales.reduce((sum, sale) => sum + Number(sale.total_revenue || 0), 0);
+      const knownGross = filteredSales.reduce((sum, sale) =>
+        sum + (sale.gross_profit === null ? 0 : Number(sale.gross_profit || 0)), 0);
+      const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+      const incompleteSales = filteredSales.some(sale => sale.cost_incomplete);
+
+      document.getElementById("finance-kpi-investment").textContent = formatCOP(knownInventoryInvestment);
+      document.getElementById("finance-kpi-potential-sales").textContent = formatCOP(potentialSales);
+      document.getElementById("finance-kpi-potential-profit").textContent = formatCOP(knownPotentialProfit);
+      document.getElementById("finance-kpi-sales").textContent = formatCOP(totalSales);
+      document.getElementById("finance-kpi-gross-profit").textContent = `${incompleteSales ? "Parcial · " : ""}${formatCOP(knownGross)}`;
+      document.getElementById("finance-kpi-expenses").textContent = formatCOP(totalExpenses);
+      document.getElementById("finance-kpi-net-profit").textContent =
+        `${incompleteSales ? "Parcial · " : ""}${formatCOP(knownGross - totalExpenses)}`;
+
+      const salesByMonth = new Map();
+      const profitByMonth = new Map();
+      filteredSales.forEach(sale => {
+        const month = financeMonth(sale.sold_at) || "Sin fecha";
+        salesByMonth.set(month, (salesByMonth.get(month) || 0) + Number(sale.total_revenue || 0));
+        if (sale.gross_profit !== null) {
+          profitByMonth.set(month, (profitByMonth.get(month) || 0) + Number(sale.gross_profit || 0));
+        }
+      });
+      const investmentByMonth = new Map();
+      financeFilteredPurchases().forEach(purchase => {
+        const month = financeMonth(purchase.acquired_on) || "Sin fecha";
+        const amount = (purchase.inventory_purchase_items || [])
+          .reduce((sum, item) => sum + Number(item.line_total || Number(item.quantity) * Number(item.unit_cost)), 0);
+        investmentByMonth.set(month, (investmentByMonth.get(month) || 0) + amount);
+      });
+      const expensesByCategory = new Map();
+      filteredExpenses.forEach(expense => {
+        expensesByCategory.set(expense.category, (expensesByCategory.get(expense.category) || 0) + Number(expense.amount || 0));
+      });
+      const allMonths = Array.from(new Set([
+        ...salesByMonth.keys(), ...profitByMonth.keys(),
+        ...investmentByMonth.keys(),
+        ...filteredExpenses.map(expense => financeMonth(expense.spent_on) || "Sin fecha")
+      ])).sort();
+      const monthlyExpenses = new Map();
+      filteredExpenses.forEach(expense => {
+        const month = financeMonth(expense.spent_on) || "Sin fecha";
+        monthlyExpenses.set(month, (monthlyExpenses.get(month) || 0) + Number(expense.amount || 0));
+      });
+      investmentByMonth.forEach((amount, month) => {
+        monthlyExpenses.set(month, (monthlyExpenses.get(month) || 0) + amount);
+      });
+
+      renderFinanceBars("finance-sales-chart",
+        Array.from(salesByMonth, ([label, value]) => ({ label, value })));
+      renderFinanceBars("finance-profit-chart",
+        Array.from(profitByMonth, ([label, value]) => ({ label, value })));
+      renderFinanceBars("finance-investment-chart",
+        Array.from(investmentByMonth, ([label, value]) => ({ label, value })));
+      renderFinanceBars("finance-expenses-chart",
+        Array.from(expensesByCategory, ([label, value]) => ({ label, value })));
+      renderFinanceBars("finance-cashflow-chart",
+        allMonths.flatMap(month => [
+          { label: `${month} · ingresos`, value: salesByMonth.get(month) || 0 },
+          { label: `${month} · egresos`, value: monthlyExpenses.get(month) || 0 }
+        ]));
+    }
+
+    function clearFinanceDateFilters() {
+      document.getElementById("finance-date-from").value = "";
+      document.getElementById("finance-date-to").value = "";
+      renderFinanceDashboard();
+      renderFinancePurchases();
+      renderFinanceSales();
+      renderFinanceExpenses();
+    }
+
+    function populateFinanceProductSelect() {
+      const container = document.getElementById("finance-purchase-lines");
+      if (!container.children.length) addFinancePurchaseLine();
+      container.querySelectorAll(".finance-purchase-product").forEach(select => {
+        const currentValue = select.value;
+        select.innerHTML = `<option value="">Elige una pieza</option>` + products.map(product =>
+          `<option value="${escapeHtml(product.id)}">${escapeHtml(product.name)} · ${escapeHtml(product.category)}</option>`
+        ).join("");
+        if (products.some(product => product.id === currentValue)) select.value = currentValue;
+      });
+    }
+
+    function addFinancePurchaseLine() {
+      const container = document.getElementById("finance-purchase-lines");
+      const row = document.createElement("div");
+      row.className = "finance-purchase-line";
+      row.innerHTML = `
+        <select class="form-input finance-purchase-product" aria-label="Producto de la compra"></select>
+        <input type="number" class="form-input finance-purchase-quantity" min="1" step="1" aria-label="Cantidad comprada" placeholder="Cantidad" />
+        <input type="text" class="form-input finance-purchase-unit-cost" inputmode="numeric" aria-label="Valor unitario" placeholder="Valor unitario" oninput="formatCOPInput(this)" />
+        <button type="button" class="btn-outline-sm finance-purchase-remove" aria-label="Quitar pieza" onclick="this.closest('.finance-purchase-line').remove()">Quitar</button>`;
+      container.appendChild(row);
+      const select = row.querySelector(".finance-purchase-product");
+      select.innerHTML = `<option value="">Elige una pieza</option>` + products.map(product =>
+        `<option value="${escapeHtml(product.id)}">${escapeHtml(product.name)} · ${escapeHtml(product.category)}</option>`
+      ).join("");
+    }
+
+    function renderFinancePurchases() {
+      const tbody = document.getElementById("finance-purchases-tbody");
+      if (!tbody) return;
+      const purchases = financeFilteredPurchases();
+      const rows = purchases.flatMap(purchase =>
+        (purchase.inventory_purchase_items || []).map(item => ({ purchase, item }))
+      );
+      tbody.innerHTML = rows.length ? rows.map(({ purchase, item }) => `
+        <tr>
+          <td>${escapeHtml(purchase.acquired_on)}</td>
+          <td><strong>${escapeHtml(item.product_name)}</strong><br><small>${escapeHtml(purchase.description)}</small></td>
+          <td>${formatCOP(item.unit_cost)}</td>
+          <td>${Number(item.quantity).toLocaleString("es-CO")}</td>
+          <td>${formatCOP(item.line_total || Number(item.quantity) * Number(item.unit_cost))}</td>
+        </tr>`).join("") : `<tr><td colspan="5" class="finance-note">No hay compras para el período seleccionado.</td></tr>`;
+    }
+
+    function renderFinanceProfitability() {
+      const tbody = document.getElementById("finance-profitability-tbody");
+      if (!tbody) return;
+      const costByProduct = new Map(financeProductCosts.map(cost => [cost.product_id, cost]));
+      const query = document.getElementById("finance-product-search").value.trim().toLowerCase();
+      const sort = document.getElementById("finance-product-sort").value;
+      const rows = products
+        .filter(product => `${product.name} ${product.category}`.toLowerCase().includes(query))
+        .map(product => {
+          const cost = costByProduct.get(product.id);
+          const stock = getProductAvailableUnits(product);
+          const knownUnits = cost ? Math.min(Number(cost.tracked_quantity) || 0, stock) : 0;
+          const average = cost && cost.average_unit_cost !== null
+            ? Number(cost.average_unit_cost)
+            : null;
+          const price = Number(product.price) || 0;
+          return {
+            product, cost, stock, knownUnits, average, price,
+            investment: average === null ? null : average * knownUnits,
+            profit: average === null ? null : (price - average) * knownUnits
+          };
+        });
+      rows.sort((a, b) => {
+        if (sort === "profit") {
+          const profitA = a.profit === null ? -Infinity : a.profit;
+          const profitB = b.profit === null ? -Infinity : b.profit;
+          return profitB - profitA;
+        }
+        if (sort === "margin") return Number(b.cost && b.cost.margin_percent || 0) - Number(a.cost && a.cost.margin_percent || 0);
+        if (sort === "price") return b.price - a.price;
+        return a.product.name.localeCompare(b.product.name, "es");
+      });
+
+      tbody.innerHTML = rows.length ? rows.map(row => {
+        const image = row.product.images && row.product.images[0];
+        const knownSaleValue = row.knownUnits * row.price;
+        return `<tr>
+          <td><span style="display:flex;align-items:center;gap:0.55rem;">
+            ${image ? `<img src="${escapeHtml(image)}" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:8px;">` : ""}
+            <span><strong>${escapeHtml(row.product.name)}</strong><br><small>${escapeHtml(row.product.category)}</small></span>
+          </span></td>
+          <td>${escapeHtml(row.product.category)}</td>
+          <td>${row.average === null ? "Sin datos" : formatCOP(row.average)}</td>
+          <td>${row.cost && row.cost.margin_percent !== null ? `${escapeHtml(row.cost.margin_percent)}%` : "—"}</td>
+          <td>${formatCOP(row.price)}</td>
+          <td>${row.average === null ? "—" : formatCOP(row.price - row.average)}</td>
+          <td>${row.stock}</td>
+          <td>${row.investment === null ? "Sin datos" : formatCOP(row.investment)}</td>
+          <td>${formatCOP(knownSaleValue)}${row.stock > row.knownUnits ? " · parcial" : ""}</td>
+          <td>${row.profit === null ? "Sin datos" : `${formatCOP(row.profit)}${row.stock > row.knownUnits ? " · parcial" : ""}`}</td>
+        </tr>`;
+      }).join("") : `<tr><td colspan="10" class="finance-note">No hay productos para mostrar.</td></tr>`;
+    }
+
+    function renderFinanceSales() {
+      const tbody = document.getElementById("finance-sales-tbody");
+      if (!tbody) return;
+      const sales = financeFilteredSales();
+      tbody.innerHTML = sales.length ? sales.map(sale => `
+        <tr>
+          <td>${escapeHtml(String(sale.sold_at || "").slice(0, 10))}</td>
+          <td>${escapeHtml(sale.order_id)}</td>
+          <td>${formatCOP(sale.total_revenue)}</td>
+          <td>${formatCOP(sale.known_cost_total)}</td>
+          <td>${sale.gross_profit === null ? "Parcial" : formatCOP(sale.gross_profit)}</td>
+          <td>${sale.cost_incomplete ? "Faltan datos de compra" : "Completa"}</td>
+        </tr>`).join("") : `<tr><td colspan="6" class="finance-note">No hay ventas confirmadas para el período seleccionado.</td></tr>`;
+    }
+
+    function renderFinanceExpenses() {
+      const tbody = document.getElementById("finance-expenses-tbody");
+      if (!tbody) return;
+      const expenses = financeFilteredExpenses();
+      tbody.innerHTML = expenses.length ? expenses.map(expense => `
+        <tr>
+          <td>${escapeHtml(expense.spent_on)}</td>
+          <td>${escapeHtml(expense.concept)}</td>
+          <td>${escapeHtml(expense.category)}</td>
+          <td>${formatCOP(expense.amount)}</td>
+        </tr>`).join("") : `<tr><td colspan="4" class="finance-note">No hay gastos para el período seleccionado.</td></tr>`;
+    }
+
+    async function recordInventoryRestock() {
+      if (!currentAdminUser || !navigator.onLine || !supabaseClient) {
+        alert("Para registrar una compra necesitas conexión y una sesión de administradora.");
+        return;
+      }
+      const description = document.getElementById("finance-purchase-description").value.trim();
+      const acquiredOn = document.getElementById("finance-purchase-date").value;
+      const rows = Array.from(document.querySelectorAll("#finance-purchase-lines .finance-purchase-line"));
+      const items = rows.map(row => {
+        const product = products.find(item => item.id === row.querySelector(".finance-purchase-product").value);
+        return {
+          product,
+          quantity: Number(row.querySelector(".finance-purchase-quantity").value),
+          unitCost: parseCOPInput(row.querySelector(".finance-purchase-unit-cost").value)
+        };
+      });
+      const productIds = items.map(item => item.product && item.product.id);
+      if (!description || !acquiredOn || !items.length ||
+          items.some(item => !item.product || !Number.isInteger(item.quantity) || item.quantity <= 0 ||
+            !Number.isInteger(item.unitCost) || item.unitCost <= 0) ||
+          new Set(productIds).size !== productIds.length) {
+        alert("Completa la descripción, fecha y una línea válida por cada producto. No repitas productos en la misma compra.");
+        return;
+      }
+
+      const requestIdInput = document.getElementById("finance-purchase-request-id");
+      if (!requestIdInput.value) requestIdInput.value = createRequestId();
+      let result;
+      try {
+        result = await supabaseClient.rpc("record_inventory_purchase", {
+          p_request_id: requestIdInput.value,
+          p_purchase_type: "restock",
+          p_description: description,
+          p_acquired_on: acquiredOn,
+          p_supplier: document.getElementById("finance-purchase-supplier").value.trim() || null,
+          p_items: items.map(item => ({
+            product_id: item.product.id,
+            product_name: item.product.name,
+            quantity: item.quantity,
+            unit_cost: item.unitCost,
+            margin_percent: null
+          }))
+        });
+      } catch (error) {
+        console.error("Falló la comunicación al registrar la reposición.", error);
+        alert("No se pudo confirmar la compra con Supabase. Conserva el formulario e inténtalo nuevamente.");
+        return;
+      }
+      const { error } = result;
+      if (error) {
+        console.error("No se pudo registrar la reposición.", error);
+        alert(error.message || "No se pudo registrar la compra. No se modificó el stock.");
+        return;
+      }
+
+      document.getElementById("finance-purchase-description").value = "";
+      document.getElementById("finance-purchase-lines").textContent = "";
+      addFinancePurchaseLine();
+      document.getElementById("finance-purchase-request-id").value = "";
+      try {
+        await syncProductStockFromSupabase(false);
+        await loadFinanceData();
+      } catch (error) {
+        console.error("La compra se registró, pero no se pudo actualizar la vista.", error);
+        document.getElementById("finance-data-status").textContent =
+          "La compra quedó registrada; no se pudo refrescar el inventario. Vuelve a cargar Finanzas.";
+      }
+    }
+
+    async function recordBusinessExpense() {
+      if (!currentAdminUser || !navigator.onLine || !supabaseClient) {
+        alert("Para registrar un gasto necesitas conexión y una sesión de administradora.");
+        return;
+      }
+      const concept = document.getElementById("finance-expense-concept").value.trim();
+      const category = document.getElementById("finance-expense-category").value;
+      const amount = parseCOPInput(document.getElementById("finance-expense-amount").value);
+      const spentOn = document.getElementById("finance-expense-date").value;
+      if (!concept || !category || !Number.isInteger(amount) || amount <= 0 || !spentOn) {
+        alert("Completa el concepto, categoría, valor y fecha del gasto.");
+        return;
+      }
+
+      const requestIdInput = document.getElementById("finance-expense-request-id");
+      if (!requestIdInput.value) requestIdInput.value = createRequestId();
+      let result;
+      try {
+        result = await supabaseClient.rpc("record_business_expense", {
+          p_request_id: requestIdInput.value,
+          p_concept: concept,
+          p_category: category,
+          p_amount: amount,
+          p_spent_on: spentOn,
+          p_description: document.getElementById("finance-expense-description").value.trim() || null
+        });
+      } catch (error) {
+        console.error("Falló la comunicación al registrar el gasto.", error);
+        alert("No se pudo confirmar el gasto con Supabase. Conserva el formulario e inténtalo nuevamente.");
+        return;
+      }
+      const { error } = result;
+      if (error) {
+        console.error("No se pudo registrar el gasto.", error);
+        alert(error.message || "No se pudo guardar el gasto.");
+        return;
+      }
+
+      document.getElementById("finance-expense-concept").value = "";
+      document.getElementById("finance-expense-amount").value = "";
+      document.getElementById("finance-expense-description").value = "";
+      document.getElementById("finance-expense-request-id").value = "";
+      await loadFinanceData();
+    }
+
+    function printFinanceReport() {
+      if (!financeDataLoaded) {
+        alert("Primero carga la información financiera desde Supabase.");
+        return;
+      }
+      const report = document.getElementById("finance-print-report");
+      const dateFrom = document.getElementById("finance-date-from").value;
+      const dateTo = document.getElementById("finance-date-to").value;
+      const period = dateFrom || dateTo
+        ? `${dateFrom || "Desde el inicio"} — ${dateTo || "Hoy"}`
+        : "Todos los movimientos";
+      const summary = [
+        ["Inversión en inventario", document.getElementById("finance-kpi-investment").textContent],
+        ["Venta potencial del inventario", document.getElementById("finance-kpi-potential-sales").textContent],
+        ["Ganancia potencial", document.getElementById("finance-kpi-potential-profit").textContent],
+        ["Ventas registradas", document.getElementById("finance-kpi-sales").textContent],
+        ["Ganancia de ventas", document.getElementById("finance-kpi-gross-profit").textContent],
+        ["Gastos registrados", document.getElementById("finance-kpi-expenses").textContent],
+        ["Ganancia real", document.getElementById("finance-kpi-net-profit").textContent]
+      ];
+      const table = (headers, rows) => `
+        <table>
+          <thead><tr>${headers.map(header => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead>
+          <tbody>${rows.length
+            ? rows.map(row => `<tr>${row.map(value => `<td>${escapeHtml(value)}</td>`).join("")}</tr>`).join("")
+            : `<tr><td colspan="${headers.length}">Sin movimientos en este período.</td></tr>`}
+          </tbody>
+        </table>`;
+      const purchases = financeFilteredPurchases().flatMap(purchase =>
+        (purchase.inventory_purchase_items || []).map(item => [
+          purchase.acquired_on,
+          item.product_name,
+          formatCOP(item.unit_cost),
+          Number(item.quantity).toLocaleString("es-CO"),
+          formatCOP(item.line_total || Number(item.quantity) * Number(item.unit_cost))
+        ])
+      );
+      const sales = financeFilteredSales().map(sale => [
+        String(sale.sold_at || "").slice(0, 10),
+        sale.order_id,
+        formatCOP(sale.total_revenue),
+        sale.gross_profit === null ? "Parcial" : formatCOP(sale.gross_profit),
+        sale.cost_incomplete ? "Faltan datos de compra" : "Completa"
+      ]);
+      const expenses = financeFilteredExpenses().map(expense => [
+        expense.spent_on,
+        expense.concept,
+        expense.category,
+        formatCOP(expense.amount)
+      ]);
+
+      report.innerHTML = `
+        <header class="finance-print-brand">
+          <h1>Accessories BY ISA</h1>
+          <p>Resumen financiero · ${escapeHtml(period)}</p>
+        </header>
+        <h2>Resumen</h2>
+        ${table(["Concepto", "Valor"], summary)}
+        <h2>Historial de inversiones</h2>
+        ${table(["Fecha", "Producto", "Valor unitario", "Cantidad total de productos", "Total en $"], purchases)}
+        <h2>Ventas confirmadas</h2>
+        ${table(["Fecha", "Pedido", "Ingresos", "Ganancia de ventas", "Detalle"], sales)}
+        <h2>Gastos registrados</h2>
+        ${table(["Fecha", "Concepto", "Categoría", "Valor"], expenses)}
+        <p class="finance-print-note">Reporte generado el ${escapeHtml(new Date().toLocaleString("es-CO"))}.</p>`;
+      window.print();
+    }
     function getProductAvailableUnits(product) {
       const unitsValue = product.stock !== undefined && product.stock !== null
         ? product.stock
@@ -3424,16 +4861,18 @@
     function renderAdminSalesSummary() {
       const savedInvestment = localStorage.getItem(STORAGE_INVESTMENT_KEY);
       const parsedInvestment = savedInvestment === null ? 0 : Number(savedInvestment);
-      const investment = Number.isFinite(parsedInvestment) && parsedInvestment >= 0 ? parsedInvestment : 0;
+      const investment = Number.isFinite(parsedInvestment) && parsedInvestment >= 0
+        ? Math.round(parsedInvestment)
+        : 0;
       const projectedSales = calculateProjectedSales();
 
-      document.getElementById("admin-investment").value = String(investment);
+      document.getElementById("admin-investment").value = formatCOPNumber(investment);
       document.getElementById("admin-projected-sales").textContent = formatCOP(projectedSales);
       document.getElementById("admin-estimated-profit").textContent = formatCOP(projectedSales - investment);
     }
 
     function updateAdminInvestment(value) {
-      const parsedInvestment = Number(value);
+      const parsedInvestment = parseCOPInput(value);
       const investment = Number.isFinite(parsedInvestment) ? Math.max(parsedInvestment, 0) : 0;
       try {
         localStorage.setItem(STORAGE_INVESTMENT_KEY, String(investment));
@@ -3443,6 +4882,17 @@
       }
 
       document.getElementById("admin-estimated-profit").textContent = formatCOP(calculateProjectedSales() - investment);
+    }
+
+    function normalizeAdminInvestment(input) {
+      const value = parseCOPInput(input.value);
+      input.value = Number.isFinite(value) ? formatCOPNumber(Math.max(value, 0)) : "0";
+      updateAdminInvestment(input.value);
+    }
+
+    function formatAdminInvestment(input) {
+      formatCOPInput(input);
+      updateAdminInvestment(input.value);
     }
 
     function renderAdminProducts() {
@@ -3463,36 +4913,104 @@
       renderAdminSalesSummary();
     }
 
+    function updateCalculatedProductPrice() {
+      if (document.getElementById("edit-product-id").value) return;
+      const costInput = document.getElementById("prod-unit-cost").value.trim();
+      const marginInput = document.getElementById("prod-margin").value.trim();
+      const cost = parseCOPInput(costInput);
+      const margin = Number(marginInput);
+      const priceInput = document.getElementById("prod-price");
+      if (costInput && marginInput && Number.isFinite(cost) && cost > 0 &&
+          Number.isFinite(margin) && margin >= 0) {
+        priceInput.value = formatCOPNumber(Math.round(cost * (1 + margin / 100)));
+      } else {
+        priceInput.value = "";
+      }
+      updateProductUnitProfit();
+    }
+
+    function formatProductPriceInput(input) {
+      formatCOPInput(input);
+      updateProductUnitProfit();
+    }
+
+    function normalizeProductPriceInput(input) {
+      const price = parseCOPInput(input.value);
+      const priceInput = document.getElementById("prod-price");
+      if (priceInput.value.trim() && Number.isFinite(price)) {
+        priceInput.value = formatCOPNumber(price);
+      }
+      updateProductUnitProfit();
+    }
+
+    function updateProductUnitProfit() {
+      if (document.getElementById("edit-product-id").value) return;
+      const costInput = document.getElementById("prod-unit-cost").value.trim();
+      const priceInput = document.getElementById("prod-price").value.trim();
+      const cost = parseCOPInput(costInput);
+      const salePrice = parseCOPInput(priceInput);
+      const unitProfit = document.getElementById("prod-unit-profit");
+      unitProfit.textContent = costInput && priceInput && Number.isFinite(cost) && Number.isFinite(salePrice)
+        ? formatCOP(salePrice - cost)
+        : "—";
+    }
+
     async function saveProductFromAdmin() {
       const id = document.getElementById("edit-product-id").value;
       const name = document.getElementById("prod-name").value.trim();
       const category = document.getElementById("prod-category").value;
-      const price = Number(document.getElementById("prod-price").value);
+      const price = parseCOPInput(document.getElementById("prod-price").value);
       const stockInput = document.getElementById("prod-stock").value.trim();
       const stock = Number(stockInput);
       const material = document.getElementById("prod-material").value.trim();
       const colors = document.getElementById("prod-colors").value.split(",").map(color => color.trim().replace(/\s+/g, " ")).filter(Boolean);
       const description = document.getElementById("prod-desc").value.trim();
       const images = document.getElementById("prod-images").value.split("\n").map(u => u.trim()).filter(Boolean);
+      const imageModelInput = document.getElementById("prod-image-models").value.trim();
+      const modelLabels = imageModelInput
+        ? document.getElementById("prod-image-models").value.split(/\r?\n/).map(label => label.trim())
+        : [];
 
-      if (!name || !price || images.length === 0 || !stockInput || !Number.isInteger(stock) || stock < 0) {
-        alert("Completa nombre, precio, unidades disponibles válidas y una ruta de imagen.");
+      const isNewProduct = !id;
+      const unitCostInput = document.getElementById("prod-unit-cost").value.trim();
+      const marginInput = document.getElementById("prod-margin").value.trim();
+      const unitCost = parseCOPInput(unitCostInput);
+      const margin = Number(marginInput);
+      if (!name || !Number.isInteger(price) || price <= 0 || images.length === 0 ||
+          (modelLabels.length && (modelLabels.length !== images.length || modelLabels.some(label => !label))) ||
+          !stockInput || !Number.isInteger(stock) || stock < 0 ||
+          (isNewProduct && (!unitCostInput || !Number.isInteger(unitCost) || unitCost <= 0 ||
+            !marginInput || !Number.isFinite(margin) || margin < 0 || stock <= 0))) {
+        alert("Completa nombre, precio entero en pesos, unidades e imagen; para piezas nuevas también indica compra y ganancia. Si agregas etiquetas, usa una por foto.");
         return;
       }
 
       const existingProduct = id ? products.find(product => product.id === id) : null;
+      const productIdInput = document.getElementById("new-product-id");
+      const requestIdInput = document.getElementById("new-product-request-id");
+      const productId = id || productIdInput.value || `p${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      const requestId = requestIdInput.value || createRequestId();
+      if (isNewProduct) {
+        productIdInput.value = productId;
+        requestIdInput.value = requestId;
+      }
+
+      const hasManagedCost = Boolean(existingProduct &&
+        financeProductCosts.some(cost => cost.product_id === existingProduct.id));
       const productObj = {
         ...(existingProduct || {}),
-        id: id || "p" + Date.now(),
+        id: productId,
         name,
         category,
         price,
-        stock,
+        stock: hasManagedCost ? getProductAvailableUnits(existingProduct) : stock,
         material: material || "Acero inoxidable 316L",
         colors: colors.length ? colors : ["Dorado"],
         description,
         images
       };
+      if (modelLabels.length) productObj.modelLabels = modelLabels;
+      else delete productObj.modelLabels;
 
       if (existingProduct && Object.prototype.hasOwnProperty.call(existingProduct, "availableQuantity")) {
         productObj.availableQuantity = stock;
@@ -3509,52 +5027,168 @@
         nextProducts.unshift(productObj);
       }
 
+      if (isNewProduct) {
+        if (!supabaseClient || !currentAdminUser || !navigator.onLine) {
+          alert("Para crear un producto con costos e inventario financiero necesitas conexión y una sesión de administradora.");
+          return;
+        }
+        let result;
+        try {
+          result = await supabaseClient.rpc("record_inventory_purchase", {
+            p_request_id: requestId,
+            p_purchase_type: "initial",
+            p_description: `Compra inicial: ${name}`,
+            p_acquired_on: localDateValue(),
+            p_supplier: null,
+            p_items: [{
+              product_id: productId,
+              product_name: name,
+              quantity: stock,
+              unit_cost: unitCost,
+              margin_percent: margin
+            }]
+          });
+        } catch (error) {
+          console.error("Falló la comunicación al registrar la compra inicial.", error);
+          alert("No se pudo confirmar la compra inicial con Supabase. Conserva el formulario e inténtalo nuevamente.");
+          return;
+        }
+        const { error } = result;
+        if (error) {
+          console.error("No se pudo registrar la compra inicial del producto.", error);
+          alert(error.message || "No se pudo registrar la compra inicial. El producto no se guardó.");
+          return;
+        }
+      }
+
       try {
         localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(nextProducts));
       } catch (error) {
-        alert("No se pudo guardar el producto en este dispositivo. Intenta nuevamente.");
+        alert(isNewProduct
+          ? "La compra quedó registrada en Supabase, pero el catálogo local no se pudo guardar. Conserva este formulario y vuelve a intentar con el mismo producto."
+          : "No se pudo guardar el producto en este dispositivo. Intenta nuevamente.");
+        console.error("No se pudo guardar el catálogo local.", error);
         return;
       }
 
       products = nextProducts;
+      delete selectedCardImageIndices[productId];
+      if (!productObj.colors.some(color =>
+        normalizeColorName(color) === normalizeColorName(selectedCardColors[productId])
+      )) {
+        delete selectedCardColors[productId];
+      }
       resetProductForm();
       renderAdminProducts();
       renderCatalog();
-      await saveProductStockToSupabase(productObj);
+      if (isNewProduct) {
+        try {
+          await syncProductStockFromSupabase(false);
+          if (financeDataLoaded) await loadFinanceData();
+        } catch (error) {
+          console.error("El producto se guardó, pero no se pudo refrescar su stock.", error);
+          setAdminSyncStatus("Producto y compra guardados; no se pudo refrescar el stock local.");
+        }
+      } else if (!hasManagedCost) {
+        await saveProductStockToSupabase(productObj);
+      }
     }
 
-    function editProductInAdmin(id) {
+    async function editProductInAdmin(id) {
       const p = products.find(item => item.id === id);
       if (!p) return;
+      if (!financeDataLoaded && supabaseClient && currentAdminUser && navigator.onLine) {
+        const { data, error } = await supabaseClient
+          .from("finance_product_costs")
+          .select("product_id, average_unit_cost, margin_percent, tracked_quantity")
+          .eq("product_id", id)
+          .maybeSingle();
+        if (error) {
+          if (!isMissingFinanceSchema(error)) {
+            console.error("No se pudo verificar el costo controlado del producto.", error);
+            alert("No se pudo verificar el costo del producto. Intenta nuevamente antes de editarlo.");
+            return;
+          }
+        }
+        if (data && !financeProductCosts.some(cost => cost.product_id === id)) {
+          financeProductCosts.push(data);
+        }
+      }
+      const hasManagedCost = financeProductCosts.some(cost => cost.product_id === id);
       document.getElementById("form-product-heading").textContent = "Editar Pieza";
       document.getElementById("edit-product-id").value = p.id;
+      document.getElementById("new-product-id").value = "";
+      document.getElementById("new-product-request-id").value = "";
+      document.getElementById("prod-cost-fields").hidden = true;
       document.getElementById("prod-name").value = p.name;
       document.getElementById("prod-category").value = p.category;
-      document.getElementById("prod-price").value = p.price;
+      document.getElementById("prod-price").value = formatCOPNumber(p.price);
       document.getElementById("prod-stock").value = getProductAvailableUnits(p);
+      document.getElementById("prod-stock").disabled = hasManagedCost;
       document.getElementById("prod-material").value = p.material || "";
       document.getElementById("prod-colors").value = p.colors.join(", ");
       document.getElementById("prod-desc").value = p.description || "";
       document.getElementById("prod-images").value = p.images.join("\n");
+      document.getElementById("prod-image-models").value =
+        Array.isArray(p.modelLabels) ? p.modelLabels.join("\n") : "";
       document.getElementById("cancel-edit-btn").style.display = "inline-block";
     }
 
     function resetProductForm() {
       document.getElementById("form-product-heading").textContent = "Agregar Nueva Pieza";
       document.getElementById("edit-product-id").value = "";
+      document.getElementById("new-product-id").value = "";
+      document.getElementById("new-product-request-id").value = "";
+      document.getElementById("prod-cost-fields").hidden = false;
       document.getElementById("prod-name").value = "";
       document.getElementById("prod-price").value = "";
       document.getElementById("prod-stock").value = "1";
+      document.getElementById("prod-stock").disabled = false;
+      document.getElementById("prod-unit-cost").value = "";
+      document.getElementById("prod-margin").value = "";
+      document.getElementById("prod-unit-profit").textContent = "—";
       document.getElementById("prod-colors").value = "";
       document.getElementById("prod-desc").value = "";
       document.getElementById("prod-images").value = "";
+      document.getElementById("prod-image-models").value = "";
       document.getElementById("cancel-edit-btn").style.display = "none";
     }
 
     function deleteProductInAdmin(id) {
+      if (financeProductCosts.some(cost => cost.product_id === id)) {
+        alert("Este producto tiene compras y movimientos financieros. No se puede eliminar; conserva su historial de inventario.");
+        return;
+      }
       products = products.filter(p => p.id !== id);
       localStorage.setItem(STORAGE_PRODUCTS_KEY, JSON.stringify(products));
       renderAdminProducts();
+    }
+
+    function renderOrderItems(order) {
+      const items = Array.isArray(order.product_quantities) ? order.product_quantities : [];
+      if (!items.some(item => item.variant_name || item.image_url ||
+          (Array.isArray(item.variants) && item.variants.length))) {
+        return escapeHtml(order.items);
+      }
+
+      return items.flatMap(item => {
+        const productName = item.product_name || item.product_id || "Producto";
+        const variants = Array.isArray(item.variants) && item.variants.length
+          ? item.variants
+          : [item];
+        return variants.map(variant => {
+          const variantName = variant.variant_name || variant.color || "";
+          const imageSource = variant.image_url || item.image_url;
+          const image = imageSource
+            ? `<img src="${escapeHtml(imageSource)}" alt="${escapeHtml(variantName || productName)}" loading="lazy">`
+            : "";
+          return `<div class="order-item-detail">
+            ${image}
+            <span><strong>${escapeHtml(productName)}</strong><br>
+              ${variantName ? `${escapeHtml(variantName)} · ` : ""}${Number(variant.quantity) || 0} un.</span>
+          </div>`;
+        });
+      }).join("");
     }
 
     function renderAdminOrders() {
@@ -3565,22 +5199,53 @@
       }
       tbody.innerHTML = orders.map((o, idx) => `
         <tr>
-          <td>${o.date}</td>
-          <td><strong>${o.customer}</strong></td>
-          <td>${o.items}</td>
+          <td>${escapeHtml(o.date)}</td>
+          <td><strong>${escapeHtml(o.customer)}</strong></td>
+          <td>${renderOrderItems(o)}</td>
           <td>${formatCOP(o.total)}</td>
           <td>
             <select class="form-input" style="padding:0.35rem 0.6rem;" onchange="updateOrderStatus(${idx}, this.value)">
-              <option value="Pendiente" ${o.status === "Pendiente" ? "selected" : ""}>Pendiente</option>
-              <option value="Confirmado" ${o.status === "Confirmado" ? "selected" : ""}>Confirmado</option>
-              <option value="Entregado" ${o.status === "Entregado" ? "selected" : ""}>Entregado</option>
+              <option value="Pendiente" ${o.status === "Pendiente" ? "selected" : ""} ${o.status !== "Pendiente" ? "disabled" : ""}>Pendiente</option>
+              <option value="Confirmado" ${o.status === "Confirmado" ? "selected" : ""} ${o.status === "Entregado" ? "disabled" : ""}>Confirmado</option>
+              <option value="Entregado" ${o.status === "Entregado" ? "selected" : ""} ${o.status === "Pendiente" ? "disabled" : ""}>Entregado</option>
             </select>
           </td>
           <td>
-            <button type="button" class="btn-outline-sm" onclick="deleteOrderInAdmin(${idx})" aria-label="Eliminar pedido">Eliminar</button>
+            <button type="button" class="btn-outline-sm" onclick="deleteOrderInAdmin(${idx})" aria-label="Eliminar pedido"
+              ${financeSaleOrderIds.has(o.id) ? "disabled title=\"Una venta registrada no se puede eliminar\"" : ""}>Eliminar</button>
           </td>
         </tr>
       `).join("");
+    }
+
+    function getOrderSaleLines(order) {
+      const quantities = Array.isArray(order.product_quantities) ? order.product_quantities : [];
+      const lines = [];
+      for (const item of quantities) {
+        const product = products.find(candidate => candidate.id === item.product_id);
+        let unitPrice = Number(item.unit_price);
+        let productName = item.product_name || (product && product.name) || item.product_id;
+        if (!Number.isFinite(unitPrice) || unitPrice < 0 || !item.product_name) {
+          const suggestedPrice = product ? formatCOPNumber(product.price) : "";
+          const enteredPrice = window.prompt(
+            `Pedido antiguo: confirma el precio unitario real de "${productName}" (COP).`,
+            suggestedPrice
+          );
+          if (enteredPrice === null) return null;
+          unitPrice = parseCOPInput(enteredPrice);
+          if (!Number.isInteger(unitPrice) || unitPrice < 0) {
+            alert("El precio unitario ingresado no es válido.");
+            return null;
+          }
+        }
+        lines.push({
+          product_id: item.product_id,
+          product_name: productName,
+          quantity: Number(item.quantity),
+          unit_price: unitPrice
+        });
+      }
+      return lines;
     }
 
     function isSupabaseTransportFailure(error) {
@@ -3623,12 +5288,18 @@
 
     async function deleteOrderInAdmin(idx) {
       const order = orders[idx];
+      if (order && financeSaleOrderIds.has(order.id)) {
+        alert("Este pedido tiene una venta financiera registrada y no se puede eliminar.");
+        return;
+      }
       if (!order || !window.confirm(`¿Eliminar el pedido de ${order.customer}?\nEsta acción no se puede deshacer.`)) return;
 
       if (supabaseClient && currentAdminUser && navigator.onLine) {
         try {
-          const { error } = await supabaseClient.from("orders").delete().eq("id", order.id);
+          const { data, error } = await supabaseClient
+            .from("orders").delete().eq("id", order.id).select("id");
           if (error) throw error;
+          if (!data || !data.length) throw new Error("Supabase no eliminó el pedido; puede tener una venta asociada.");
         } catch (error) {
           if (!isSupabaseTransportFailure(error)) {
             alert("No se pudo eliminar el pedido de Supabase. Intenta nuevamente.");
@@ -3658,18 +5329,49 @@
     async function updateOrderStatus(idx, status) {
       const order = orders[idx];
       if (!order) return;
+      if (status === "Entregado" && order.status === "Pendiente") {
+        alert("Confirma el pedido primero para registrar la venta y descontar el inventario.");
+        renderAdminOrders();
+        return;
+      }
+      if (status === "Entregado" && order.status === "Confirmado" &&
+          !financeSaleOrderIds.has(order.id)) {
+        if (!financeDataLoaded) await loadFinanceData();
+        if (!financeSaleOrderIds.has(order.id)) {
+          alert("Este pedido fue confirmado antes del registro financiero. No se puede marcar como entregado sin revisar su venta.");
+          renderAdminOrders();
+          return;
+        }
+      }
 
       if (supabaseClient && currentAdminUser && navigator.onLine) {
         let updatedOrder;
         try {
-          const { data, error } = await supabaseClient
-            .from("orders")
-            .update({ status })
-            .eq("id", order.id)
-            .select("*")
-            .single();
-          if (error) throw error;
-          updatedOrder = data;
+          if (status === "Confirmado" && order.status === "Pendiente") {
+            const saleLines = getOrderSaleLines(order);
+            if (!saleLines) {
+              renderAdminOrders();
+              return;
+            }
+            const { error } = await supabaseClient.rpc("confirm_order_as_sale", {
+              p_order_id: order.id,
+              p_sale_lines: saleLines
+            });
+            if (error) throw error;
+            const { data, error: fetchError } = await supabaseClient
+              .from("orders").select("*").eq("id", order.id).single();
+            if (fetchError) throw fetchError;
+            updatedOrder = data;
+          } else {
+            const { data, error } = await supabaseClient
+              .from("orders")
+              .update({ status })
+              .eq("id", order.id)
+              .select("*")
+              .single();
+            if (error) throw error;
+            updatedOrder = data;
+          }
         } catch (error) {
           if (!isSupabaseTransportFailure(error)) {
             alert(error.message || "No se pudo actualizar el estado del pedido.");
@@ -3693,9 +5395,16 @@
             console.error("El estado se actualizó, pero no se pudo refrescar el stock local.", error);
             setAdminSyncStatus("Pedido actualizado en Supabase; el inventario se actualizará al reconectar.");
           }
+          if (status === "Confirmado") await loadFinanceData();
           renderAdminOrders();
           return;
         }
+      }
+
+      if (status === "Confirmado") {
+        alert("Para confirmar una venta se requiere conexión a Supabase; no se cambiará el pedido localmente.");
+        renderAdminOrders();
+        return;
       }
 
       const updatedOrder = { ...order, status };
