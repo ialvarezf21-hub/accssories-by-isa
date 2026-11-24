@@ -200,7 +200,7 @@
       margin: 0 auto;
       padding: 1rem 1.5rem;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
     }
 
@@ -208,6 +208,8 @@
       display: flex;
       justify-content: flex-start;
       align-items: center;
+      gap: 0.45rem;
+      min-width: 0;
     }
 
     .header-bow-link {
@@ -274,7 +276,7 @@
       background: transparent;
       border: 1px solid var(--border-soft);
       color: var(--accent);
-      padding: 0.55rem 1.1rem;
+      padding: 0.55rem 0.75rem;
       border-radius: 999px;
       display: inline-flex;
       align-items: center;
@@ -285,6 +287,10 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       transition: var(--transition);
+    }
+
+    .bag-btn-label {
+      display: none;
     }
 
     .bag-btn:hover {
@@ -311,6 +317,59 @@
     .bag-btn:hover .bag-count {
       background: #FFFFFF;
       color: var(--accent);
+    }
+
+    .account-btn {
+      margin-right: 0.55rem;
+      background: transparent;
+      border: 0;
+      color: var(--text-muted);
+      padding: 0.45rem 0.35rem;
+      cursor: pointer;
+      font: 400 0.72rem 'Montserrat', sans-serif;
+      letter-spacing: 0.08em;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .account-btn:hover {
+      color: var(--accent);
+    }
+
+    .account-btn svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+    }
+
+    .customer-greeting {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      min-width: 0;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+
+    .customer-greeting[hidden] {
+      display: none;
+    }
+
+    .customer-greeting-name {
+      max-width: 11rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .customer-greeting-bow {
+      flex: 0 0 17px;
+      width: 17px;
+      height: 16px;
     }
 
     /* ================= HERO EDITORIAL CON FONDO DE ANILLOS ================= */
@@ -1009,6 +1068,12 @@
       color: var(--accent);
     }
 
+    .delivery-breakdown-note {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      line-height: 1.45;
+    }
+
     .order-confirmation-backdrop {
       position: fixed;
       inset: 0;
@@ -1178,6 +1243,343 @@
     .order-confirmation-close:disabled {
       cursor: wait;
       opacity: 0.65;
+    }
+
+    .account-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: rgba(45, 26, 32, 0.48);
+      backdrop-filter: blur(5px);
+    }
+
+    .account-backdrop.open {
+      display: flex;
+    }
+
+    .account-modal {
+      position: relative;
+      width: min(100%, 760px);
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: clamp(1.1rem, 4vw, 2rem);
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      background: #FFFFFF;
+      box-shadow: 0 25px 60px rgba(45, 26, 32, 0.22);
+    }
+
+    .account-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .account-header h2,
+    .account-section-title {
+      color: var(--accent);
+      font: 500 1.8rem 'Cormorant Garamond', serif;
+    }
+
+    .account-tabs {
+      display: flex;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+    }
+
+    .account-auth-reminder {
+      margin: 0 0 1rem;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .account-auth-reminder strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .account-panel[hidden],
+    .delivery-address-fields[hidden] {
+      display: none;
+    }
+
+    .account-form {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .account-form label,
+    .delivery-form label {
+      display: grid;
+      gap: 0.3rem;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .account-message {
+      min-height: 1.3rem;
+      margin: 0.6rem 0;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+
+    .customer-welcome-toast {
+      position: fixed;
+      inset: 0;
+      z-index: 1400;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      background: rgba(20, 10, 14, 0.45);
+      backdrop-filter: blur(3px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .customer-welcome-toast.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .customer-welcome-card {
+      display: grid;
+      justify-items: center;
+      gap: 0.65rem;
+      width: min(38rem, 100%);
+      padding: 1rem;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      text-align: center;
+      transform: translateY(10px) scale(0.98);
+      transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .customer-welcome-toast.visible .customer-welcome-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .customer-welcome-bow {
+      width: 92px;
+      height: 84px;
+      overflow: visible;
+      filter: drop-shadow(0 0 10px rgba(122, 31, 61, 0.38));
+    }
+
+    .customer-welcome-bow-loop,
+    .customer-welcome-bow-ribbon {
+      stroke: #7A1F3D;
+    }
+
+    .customer-welcome-bow-loop {
+      stroke-dasharray: 120;
+      stroke-dashoffset: 120;
+      transform-box: view-box;
+      transform-origin: 60px 48px;
+    }
+
+    .customer-welcome-bow-loop-left {
+      transform: rotate(16deg) scaleX(0.58);
+    }
+
+    .customer-welcome-bow-loop-right {
+      transform: rotate(-16deg) scaleX(0.58);
+    }
+
+    .customer-welcome-bow-ribbon {
+      stroke-dasharray: 70;
+      stroke-dashoffset: 70;
+    }
+
+    .customer-welcome-bow-center {
+      transform-box: fill-box;
+      transform-origin: center;
+      transform: scale(0);
+      fill: #7A1F3D;
+    }
+
+    .customer-welcome-message {
+      margin: 0;
+      max-width: 100%;
+      font-size: clamp(2.45rem, 4vw, 3.5rem);
+      font-weight: 500;
+      font-family: 'Cormorant Garamond', serif;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+      color: #7A1F3D;
+      text-shadow: 0 1px 3px rgba(255, 255, 255, 0.72), 0 0 14px rgba(252, 238, 242, 0.7);
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    .customer-welcome-initial {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 1.32em;
+      font-weight: 400;
+    }
+
+    .customer-welcome-toast.visible .customer-welcome-bow-loop-left {
+      animation: welcome-bow-draw 0.75s ease-out 0.1s forwards,
+        welcome-bow-open-left 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) 0.75s forwards;
+    }
+
+    .customer-welcome-toast.visible .customer-welcome-bow-loop-right {
+      animation: welcome-bow-draw 0.75s ease-out 0.1s forwards,
+        welcome-bow-open-right 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) 0.75s forwards;
+    }
+
+    .customer-welcome-toast.visible .customer-welcome-bow-ribbon {
+      animation: welcome-bow-draw 0.55s ease-out 0.58s forwards;
+    }
+
+    .customer-welcome-toast.visible .customer-welcome-bow-center {
+      animation: welcome-bow-center 0.3s ease-out 0.72s forwards;
+    }
+
+    .customer-welcome-toast.visible .customer-welcome-message {
+      animation: welcome-message-reveal 0.55s ease-out 1.35s forwards;
+    }
+
+    @keyframes welcome-bow-draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes welcome-bow-open-left {
+      to { transform: rotate(0) scaleX(1); }
+    }
+
+    @keyframes welcome-bow-open-right {
+      to { transform: rotate(0) scaleX(1); }
+    }
+
+    @keyframes welcome-bow-center {
+      to { transform: scale(1); }
+    }
+
+    @keyframes welcome-message-reveal {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .customer-welcome-toast,
+      .customer-welcome-card,
+      .customer-welcome-bow-loop,
+      .customer-welcome-bow-ribbon,
+      .customer-welcome-bow-center,
+      .customer-welcome-message {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .customer-welcome-card {
+        transform: none;
+      }
+
+      .customer-welcome-bow-loop,
+      .customer-welcome-bow-ribbon {
+        stroke-dashoffset: 0;
+        transform: none;
+      }
+
+      .customer-welcome-bow-center {
+        transform: none;
+      }
+
+      .customer-welcome-message {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .account-content {
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .account-delivery-note {
+      padding: 0.8rem;
+      border-radius: 10px;
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+      font-size: 0.76rem;
+    }
+
+    .customer-order-list {
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .customer-order-card {
+      padding: 1rem;
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      background: var(--bg-primary);
+    }
+
+    .customer-order-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+    }
+
+    .customer-order-breakdown {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.3rem 0.7rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--border-soft);
+      color: var(--text-muted);
+      font-size: 0.72rem;
+    }
+
+    .customer-order-timeline {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 0.3rem;
+      margin-top: 0.9rem;
+    }
+
+    .customer-order-step {
+      padding-top: 0.42rem;
+      border-top: 3px solid var(--border-soft);
+      color: var(--text-muted);
+      font-size: 0.58rem;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .customer-order-step.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .delivery-form {
+      display: grid;
+      gap: 0.65rem;
+      margin-top: 0.7rem;
+    }
+
+    .pickup-note {
+      padding: 0.75rem;
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
     }
 
     .order-confetti {
@@ -1614,7 +2016,7 @@
 
     @media (max-width: 820px) {
       .header-inner {
-        grid-template-columns: 1fr auto 1fr;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       }
       .hero-finger-gap-copy {
         transform: translate(0, -18px);
@@ -1636,6 +2038,37 @@
     }
 
     @media (max-width: 640px) {
+      .customer-welcome-card {
+        width: min(22rem, 100%);
+      }
+
+      .customer-welcome-message {
+        font-size: clamp(1.65rem, 7vw, 2.4rem);
+      }
+
+      .header-inner {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 0.25rem;
+        padding: 0.8rem 0.5rem;
+      }
+
+      .header-left {
+        gap: 0.25rem;
+      }
+
+      .header-logo-main {
+        font-size: 1.28rem;
+      }
+
+      .header-logo-sub {
+        font-size: 0.5rem;
+        letter-spacing: 0.3em;
+      }
+
+      .header-actions {
+        gap: 0.1rem;
+      }
+
       .catalog-container {
         padding: 0 0.75rem 3rem;
       }
@@ -1720,21 +2153,59 @@
       }
 
       .bag-btn {
-        gap: 0.35rem;
-        padding: 0.38rem 0.65rem;
-        font-size: 0.65rem;
-        letter-spacing: 0.08em;
+        gap: 0.2rem;
+        padding: 0.32rem 0.42rem;
+        font-size: 0.58rem;
+        letter-spacing: 0.03em;
       }
 
       .bag-btn svg {
-        width: 14px;
-        height: 14px;
+        width: 12px;
+        height: 12px;
       }
 
       .bag-count {
         min-width: 18px;
         height: 18px;
         font-size: 0.62rem;
+      }
+
+      .account-btn {
+        margin-right: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 30px;
+        padding: 0;
+      }
+
+      .account-btn-label {
+        display: none;
+      }
+
+      .account-btn svg {
+        display: block;
+      }
+
+      .customer-greeting {
+        gap: 0.15rem;
+        font-size: 0.62rem;
+      }
+
+      .customer-greeting-name {
+        max-width: 3rem;
+      }
+
+      .customer-greeting-bow {
+        flex-basis: 14px;
+        width: 14px;
+        height: 14px;
+      }
+
+      .customer-order-timeline {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        row-gap: 0.55rem;
       }
     }
   </style>
@@ -1775,6 +2246,16 @@
               <circle cx="60" cy="48" r="5.5" fill="#7A1C37"/>
             </svg>
           </a>
+          <span class="customer-greeting" id="customer-greeting" hidden>
+            <span class="customer-greeting-name" id="customer-greeting-name"></span>
+            <svg class="customer-greeting-bow" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M58 48C42 28 16 26 16 44C16 58 38 56 58 48Z" stroke="#7A1C37" stroke-width="5.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M62 48C78 28 104 26 104 44C104 58 82 56 62 48Z" stroke="#7A1C37" stroke-width="5.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M57 51C49 68 46 86 40 99" stroke="#7A1C37" stroke-width="5.2" stroke-linecap="round"/>
+              <path d="M63 51C71 68 74 86 80 99" stroke="#7A1C37" stroke-width="5.2" stroke-linecap="round"/>
+              <circle cx="60" cy="48" r="5.5" fill="#7A1C37"/>
+            </svg>
+          </span>
         </div>
 
         <a class="header-logo" onclick="replayIntro()">
@@ -1783,12 +2264,19 @@
         </a>
 
         <div class="header-actions">
-          <button class="bag-btn" onclick="toggleCart(true)">
+          <button class="account-btn" type="button" aria-label="Mi cuenta" onclick="openCustomerAccount()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.25"/>
+              <path d="M4.5 20c.7-3.4 3.5-5.5 7.5-5.5s6.8 2.1 7.5 5.5"/>
+            </svg>
+            <span class="account-btn-label">Mi cuenta</span>
+          </button>
+          <button class="bag-btn" aria-label="Abrir bolsa de compras" onclick="toggleCart(true)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M6 7h12l1 13H5L6 7z"/>
               <path d="M9 7V5a3 3 0 0 1 6 0v2"/>
             </svg>
-            <span>Bolsa</span>
+            <span class="bag-btn-label">Bolsa</span>
             <span class="bag-count" id="bag-count">0</span>
           </button>
         </div>
@@ -1904,17 +2392,20 @@
   <div class="drawer-backdrop" id="cart-backdrop" onclick="closeCartOnBackdrop(event)">
     <aside class="cart-drawer">
       <div class="drawer-header">
-        <h2>Tu Bolsa</h2>
+        <h2 id="cart-title">Tu Bolsa</h2>
         <button class="btn-outline-sm" onclick="toggleCart(false)">Cerrar</button>
       </div>
 
       <div class="drawer-body" id="cart-items-container"></div>
 
       <div class="drawer-footer">
-        <input type="text" id="customer-name" class="form-input" placeholder="Tu nombre para el pedido" />
+        <div id="guest-cart-name-field">
+          <label for="customer-name" class="order-confirmation-label">Nombre del cliente</label>
+          <input type="text" id="customer-name" class="form-input" autocomplete="name" placeholder="Tu nombre para el pedido" required />
+        </div>
         <div class="total-row">
-          <span>Total estimado</span>
-          <span class="total-amount" id="cart-total">$0</span>
+          <span>Subtotal productos</span>
+          <span class="total-amount" id="cart-subtotal">$0</span>
         </div>
         <button class="primary-cta-btn" onclick="checkoutWhatsApp()">Revisar y realizar pedido</button>
       </div>
@@ -1934,14 +2425,41 @@
         <span class="order-confirmation-label">Resumen de productos</span>
         <div class="order-confirmation-items" id="order-confirmation-items"></div>
         <div class="order-confirmation-total">
+          <span>Subtotal productos</span>
+          <span id="order-confirmation-subtotal"></span>
+        </div>
+        <div class="order-confirmation-total">
+          <span id="order-confirmation-delivery-label"></span>
+          <span id="order-confirmation-delivery-amount"></span>
+        </div>
+        <p class="delivery-breakdown-note" id="order-confirmation-delivery-note" hidden></p>
+        <div class="order-confirmation-total">
           <span>Total en COP</span>
           <span id="order-confirmation-total"></span>
         </div>
       </div>
       <div class="order-confirmation-section order-confirmation-customer">
-        <label class="order-confirmation-label" for="customer-name-confirm">Nombre de la clienta</label>
-        <input type="text" id="customer-name-confirm" class="form-input" autocomplete="name" placeholder="Tu nombre para el pedido" />
-        <p class="order-confirmation-hint">Verifica el nombre o vuelve a la bolsa para editar tu pedido.</p>
+        <div id="guest-customer-name-field">
+          <label class="order-confirmation-label" for="customer-name-confirm">Nombre del cliente</label>
+          <input type="text" id="customer-name-confirm" class="form-input" autocomplete="name" placeholder="Tu nombre para el pedido" required />
+        </div>
+        <div class="delivery-form">
+          <label for="order-delivery-type">Método de entrega</label>
+          <select id="order-delivery-type" class="form-input" onchange="toggleDeliveryAddressFields('order')">
+            <option value="domicilio">Domicilio</option>
+            <option value="punto_fisico">Recoger en punto físico</option>
+          </select>
+          <div class="delivery-address-fields" id="order-delivery-address-fields">
+            <label for="order-city">Ciudad / Municipio</label>
+            <input type="text" id="order-city" class="form-input" value="Barranco de Loba" autocomplete="address-level2" oninput="updateDeliveryPricing()" />
+            <label for="order-delivery-address">Dirección</label>
+            <input type="text" id="order-delivery-address" class="form-input" autocomplete="street-address" placeholder="Dirección de entrega" />
+            <label for="order-reference-point">Punto de referencia</label>
+            <input type="text" id="order-reference-point" class="form-input" placeholder="Barrio, local o referencia cercana" />
+          </div>
+          <p class="pickup-note" id="order-pickup-note" hidden>Recoge tu pedido en el punto físico de Accessories BY ISA. Coordinaremos contigo por WhatsApp.</p>
+        </div>
+        <p class="order-confirmation-hint">Verifica el nombre y los datos de entrega antes de confirmar.</p>
       </div>
       <p class="order-confirmation-status" id="order-confirmation-status" role="status" aria-live="polite" hidden></p>
       <div class="order-confirmation-actions">
@@ -1950,6 +2468,98 @@
       </div>
     </section>
     <div class="order-confetti" id="order-confetti" aria-hidden="true"></div>
+  </div>
+
+  <div class="account-backdrop" id="account-backdrop" onclick="closeCustomerAccountOnBackdrop(event)">
+    <section class="account-modal" role="dialog" aria-modal="true" aria-labelledby="account-title">
+      <div class="account-header">
+        <div>
+          <p class="order-confirmation-eyebrow">Accessories BY ISA</p>
+          <h2 id="account-title">Mi cuenta</h2>
+        </div>
+        <button class="order-confirmation-close" type="button" aria-label="Cerrar" onclick="closeCustomerAccount()">×</button>
+      </div>
+      <div id="account-auth-view">
+        <div class="account-tabs">
+          <button type="button" class="filter-pill" id="account-login-tab" onclick="switchAccountAuthTab('login')">Iniciar sesión</button>
+          <button type="button" class="filter-pill active" id="account-signup-tab" onclick="switchAccountAuthTab('signup')">Crear cuenta</button>
+        </div>
+        <p class="account-auth-reminder">¿Ya tienes una cuenta? Cambia a <strong>Iniciar sesión</strong> e ingresa tu correo y contraseña. También puedes cerrar esta ventana y seguir navegando o comprar como invitada.</p>
+        <div class="account-panel" id="account-login-panel" hidden>
+          <div class="account-form">
+            <label>Correo<input type="email" id="account-login-email" class="form-input" autocomplete="email" /></label>
+            <label>Contraseña<input type="password" id="account-login-password" class="form-input" autocomplete="current-password" /></label>
+            <button type="button" class="primary-cta-btn" onclick="loginCustomer()">Iniciar sesión</button>
+          </div>
+        </div>
+        <div class="account-panel" id="account-signup-panel">
+          <div class="account-form">
+            <label>Nombre<input type="text" id="account-signup-name" class="form-input" autocomplete="name" /></label>
+            <label>Teléfono<input type="tel" id="account-signup-phone" class="form-input" autocomplete="tel" /></label>
+            <label>Correo<input type="email" id="account-signup-email" class="form-input" autocomplete="email" /></label>
+            <label>Contraseña<input type="password" id="account-signup-password" class="form-input" autocomplete="new-password" minlength="6" /></label>
+            <button type="button" class="primary-cta-btn" onclick="registerCustomer()">Crear cuenta</button>
+          </div>
+        </div>
+      </div>
+      <p class="account-message" id="account-message" role="status" aria-live="polite"></p>
+      <div id="account-customer-view" hidden>
+        <div class="account-header">
+          <p id="account-customer-email" class="order-confirmation-hint"></p>
+          <button type="button" class="btn-outline-sm" onclick="logoutCustomer()">Cerrar sesión</button>
+        </div>
+        <div class="account-content">
+          <section>
+            <h3 class="account-section-title">Mis datos de entrega</h3>
+            <div class="account-form">
+              <label>Nombre<input type="text" id="account-profile-name" class="form-input" autocomplete="name" /></label>
+              <label>Teléfono<input type="tel" id="account-profile-phone" class="form-input" autocomplete="tel" /></label>
+              <label>Método de entrega preferido
+                <select id="account-profile-delivery-type" class="form-input" onchange="toggleDeliveryAddressFields('profile')">
+                  <option value="domicilio">Domicilio</option>
+                  <option value="punto_fisico">Recoger en punto físico</option>
+                </select>
+              </label>
+              <div class="delivery-address-fields" id="profile-delivery-address-fields">
+                <label>Ciudad / Municipio<input type="text" id="account-profile-city" class="form-input" value="Barranco de Loba" autocomplete="address-level2" /></label>
+                <label>Dirección<input type="text" id="account-profile-address" class="form-input" autocomplete="street-address" /></label>
+                <label>Punto de referencia<input type="text" id="account-profile-reference" class="form-input" /></label>
+              </div>
+              <p class="pickup-note" id="profile-pickup-note" hidden>Recoge tu pedido en el punto físico de Accessories BY ISA. No necesitas dirección de envío.</p>
+              <button type="button" class="primary-cta-btn" onclick="saveCustomerProfile()">Guardar mis datos</button>
+            </div>
+          </section>
+          <section>
+            <h3 class="account-section-title">Mis pedidos</h3>
+            <div class="customer-order-list" id="customer-orders-list"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="customer-welcome-toast" id="customer-welcome-toast" role="status" aria-live="polite" aria-hidden="true">
+    <div class="customer-welcome-card">
+      <svg class="customer-welcome-bow" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path class="customer-welcome-bow-loop customer-welcome-bow-loop-left" d="M58 48C42 28 16 26 16 44C16 58 38 56 58 48Z" stroke="#7A1C37" stroke-width="4.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="customer-welcome-bow-loop customer-welcome-bow-loop-right" d="M62 48C78 28 104 26 104 44C104 58 82 56 62 48Z" stroke="#7A1C37" stroke-width="4.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="customer-welcome-bow-ribbon" d="M57 51C49 68 46 86 40 99" stroke="#7A1C37" stroke-width="4.2" stroke-linecap="round"/>
+        <path class="customer-welcome-bow-ribbon" d="M63 51C71 68 74 86 80 99" stroke="#7A1C37" stroke-width="4.2" stroke-linecap="round"/>
+        <circle class="customer-welcome-bow-center" cx="60" cy="48" r="5.5" fill="#7A1C37"/>
+      </svg>
+      <p class="customer-welcome-message" id="customer-welcome-message"></p>
+    </div>
+  </div>
+  <div class="customer-welcome-toast" id="order-success-toast" role="status" aria-live="polite" aria-hidden="true">
+    <div class="customer-welcome-card">
+      <svg class="customer-welcome-bow" viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path class="customer-welcome-bow-loop customer-welcome-bow-loop-left" d="M58 48C42 28 16 26 16 44C16 58 38 56 58 48Z" stroke="#7A1C37" stroke-width="4.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="customer-welcome-bow-loop customer-welcome-bow-loop-right" d="M62 48C78 28 104 26 104 44C104 58 82 56 62 48Z" stroke="#7A1C37" stroke-width="4.2" fill="rgba(122,28,55,0.08)" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="customer-welcome-bow-ribbon" d="M57 51C49 68 46 86 40 99" stroke="#7A1C37" stroke-width="4.2" stroke-linecap="round"/>
+        <path class="customer-welcome-bow-ribbon" d="M63 51C71 68 74 86 80 99" stroke="#7A1C37" stroke-width="4.2" stroke-linecap="round"/>
+        <circle class="customer-welcome-bow-center" cx="60" cy="48" r="5.5" fill="#7A1F3D"/>
+      </svg>
+      <p class="customer-welcome-message" id="order-success-message">¡<span class="customer-welcome-initial">P</span>edido realizado!</p>
+    </div>
   </div>
 
   <!-- ================= SESIÓN 2: PANEL DE ADMINISTRADOR (#admin) ================= -->
@@ -2154,6 +2764,7 @@
                 <th>Fecha</th>
                 <th>Clienta</th>
                 <th>Detalle</th>
+                <th>Entrega</th>
                 <th>Total</th>
                 <th>Estado</th>
                 <th>Acciones</th>
@@ -2354,6 +2965,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const WHATSAPP_NUMBER = "573216298879";
+    const DEFAULT_DELIVERY_CITY = "Barranco de Loba";
+    const LOCAL_DELIVERY_FEE = 2000;
+    const INTRO_SEQUENCE_DURATION_MS = 2800;
+    const INTRO_FADE_OUT_DURATION_MS = 900;
+    const AUTO_ACCOUNT_PROMPT_DELAY_MS = 1000;
     const STORAGE_PRODUCTS_KEY = "isa_accessories_products_v2";
     const STORAGE_ORDERS_KEY = "isa_accessories_orders_v2";
     const STORAGE_INVESTMENT_KEY = "isa_accessories_investment_v1";
@@ -2830,10 +3446,18 @@
     let orderSubmissionPending = false;
     let orderConfirmed = false;
     let introSequenceTimer = null;
+    let autoAccountTimer = null;
+    let autoAccountPromptDismissed = false;
     let adminRealtimeChannel = null;
     let stockRealtimeChannel = null;
     let adminSyncInterval = null;
     let currentAdminUser = null;
+    let currentCustomerUser = null;
+    let currentCustomerProfile = null;
+    let customerAccountRequestId = 0;
+    let customerOrdersRealtimeChannel = null;
+    let customerWelcomeTimer = null;
+    let orderSuccessTimer = null;
     let financeProductCosts = [];
     let financePurchases = [];
     let financeSales = [];
@@ -2856,6 +3480,162 @@
 
     function formatCOP(val) {
       return "$" + formatCOPNumber(val);
+    }
+
+    function normalizeCityName(city) {
+      return String(city || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+    }
+
+    function getDeliveryQuote(deliveryType, city) {
+      if (deliveryType === "punto_fisico") {
+        return {
+          fee: 0,
+          label: "Recoger en punto físico",
+          amount: formatCOP(0),
+          note: ""
+        };
+      }
+
+      const deliveryCity = String(city || "").trim() || DEFAULT_DELIVERY_CITY;
+      if (normalizeCityName(deliveryCity) === normalizeCityName(DEFAULT_DELIVERY_CITY)) {
+        return {
+          fee: LOCAL_DELIVERY_FEE,
+          label: `Domicilio (${deliveryCity})`,
+          amount: formatCOP(LOCAL_DELIVERY_FEE),
+          note: ""
+        };
+      }
+      return {
+        fee: 0,
+        label: `Domicilio (${deliveryCity})`,
+        amount: "Acuerdo vía WhatsApp",
+        note: ""
+      };
+    }
+
+    function getStoredOrderDeliveryQuote(order) {
+      const deliveryType = order.delivery_type || "domicilio";
+      if (deliveryType === "punto_fisico") return getDeliveryQuote(deliveryType);
+
+      const city = String(order.city || "").trim() || DEFAULT_DELIVERY_CITY;
+      const deliveryFee = Number(order.delivery_fee) || 0;
+      if (deliveryFee > 0) {
+        return {
+          fee: deliveryFee,
+          label: `Domicilio (${city})`,
+          amount: formatCOP(deliveryFee),
+          note: ""
+        };
+      }
+      if (normalizeCityName(city) !== normalizeCityName(DEFAULT_DELIVERY_CITY)) {
+        return getDeliveryQuote(deliveryType, city);
+      }
+      return {
+        fee: 0,
+        label: `Domicilio (${city})`,
+        amount: formatCOP(0),
+        note: ""
+      };
+    }
+
+    function updateDeliveryPricing() {
+      const deliveryTypeInput = document.getElementById("order-delivery-type");
+      const cityInput = document.getElementById("order-city");
+      const deliveryType = deliveryTypeInput ? deliveryTypeInput.value : "domicilio";
+      const city = cityInput ? cityInput.value : DEFAULT_DELIVERY_CITY;
+      const quote = getDeliveryQuote(deliveryType, city);
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const total = subtotal > 0 ? subtotal + quote.fee : 0;
+
+      const cartSubtotal = document.getElementById("cart-subtotal");
+      if (cartSubtotal) cartSubtotal.textContent = formatCOP(subtotal);
+
+      const confirmationSubtotal = document.getElementById("order-confirmation-subtotal");
+      const confirmationDeliveryLabel = document.getElementById("order-confirmation-delivery-label");
+      const confirmationDeliveryAmount = document.getElementById("order-confirmation-delivery-amount");
+      const confirmationDeliveryNote = document.getElementById("order-confirmation-delivery-note");
+      const confirmationTotal = document.getElementById("order-confirmation-total");
+      if (confirmationSubtotal) confirmationSubtotal.textContent = formatCOP(subtotal);
+      if (confirmationDeliveryLabel) confirmationDeliveryLabel.textContent = quote.label;
+      if (confirmationDeliveryAmount) confirmationDeliveryAmount.textContent = quote.amount;
+      if (confirmationDeliveryNote) {
+        confirmationDeliveryNote.textContent = quote.note;
+        confirmationDeliveryNote.hidden = !quote.note;
+      }
+      if (confirmationTotal) confirmationTotal.textContent = formatCOP(total);
+      return { ...quote, subtotal, total, city: String(city || "").trim() || DEFAULT_DELIVERY_CITY };
+    }
+
+    function getCurrentCustomerName() {
+      const profileName = currentCustomerProfile && currentCustomerProfile.full_name;
+      const metadataName = currentCustomerUser && currentCustomerUser.user_metadata &&
+        currentCustomerUser.user_metadata.full_name;
+      return String(profileName || metadataName || "").trim();
+    }
+
+    function updateCustomerGreeting() {
+      const greeting = document.getElementById("customer-greeting");
+      const nameElement = document.getElementById("customer-greeting-name");
+      if (!greeting || !nameElement) return;
+      const name = getCurrentCustomerName();
+      if (!currentCustomerUser || !name) {
+        greeting.hidden = true;
+        return;
+      }
+      nameElement.textContent = name;
+      greeting.hidden = false;
+    }
+
+    function showCustomerWelcome(name, message) {
+      const toast = document.getElementById("customer-welcome-toast");
+      const welcomeName = String(name || "").trim() || "clienta";
+      const welcomeMessage = document.getElementById("customer-welcome-message");
+      const greeting = `¡Bienvenida, ${welcomeName}!`;
+      const fullMessage = message || greeting;
+      welcomeMessage.replaceChildren();
+      if (fullMessage.startsWith(greeting)) {
+        const appendText = (text) => welcomeMessage.appendChild(document.createTextNode(text));
+        const appendInitial = (text) => {
+          const initial = document.createElement("span");
+          initial.className = "customer-welcome-initial";
+          initial.textContent = text;
+          welcomeMessage.appendChild(initial);
+        };
+        appendText("¡");
+        appendInitial("B");
+        appendText(`ienvenida, `);
+        appendInitial(welcomeName.charAt(0));
+        appendText(`${welcomeName.slice(1)}!${fullMessage.slice(greeting.length)}`);
+      } else {
+        welcomeMessage.textContent = fullMessage;
+      }
+      toast.setAttribute("aria-hidden", "false");
+      toast.classList.remove("visible");
+      void toast.offsetWidth;
+      toast.classList.add("visible");
+      window.clearTimeout(customerWelcomeTimer);
+      customerWelcomeTimer = window.setTimeout(() => {
+        toast.classList.remove("visible");
+        toast.setAttribute("aria-hidden", "true");
+      }, 4200);
+    }
+
+    function showOrderSuccess() {
+      const toast = document.getElementById("order-success-toast");
+      toast.setAttribute("aria-hidden", "false");
+      toast.classList.remove("visible");
+      void toast.offsetWidth;
+      toast.classList.add("visible");
+      window.clearTimeout(orderSuccessTimer);
+      orderSuccessTimer = window.setTimeout(() => {
+        toast.classList.remove("visible");
+        toast.setAttribute("aria-hidden", "true");
+      }, 4200);
     }
 
     function parseCOPInput(value) {
@@ -3000,7 +3780,13 @@
         total: Number(order.total) || 0,
         status: order.status || "Pendiente",
         product_quantities: Array.isArray(order.product_quantities) ? order.product_quantities : [],
-        stock_deducted: Boolean(order.stock_deducted)
+        stock_deducted: Boolean(order.stock_deducted),
+        user_id: order.user_id || null,
+        delivery_type: order.delivery_type || "domicilio",
+        city: order.city || DEFAULT_DELIVERY_CITY,
+        delivery_address: order.delivery_address || null,
+        reference_point: order.reference_point || null,
+        delivery_fee: Number(order.delivery_fee) || 0
       };
     }
 
@@ -3466,6 +4252,464 @@
       return Boolean(data);
     }
 
+    function setAccountMessage(message, isError = false) {
+      const element = document.getElementById("account-message");
+      element.textContent = message || "";
+      element.style.color = isError ? "#B00020" : "";
+    }
+
+    function setAccountView(view) {
+      document.getElementById("account-auth-view").hidden = view !== "auth";
+      document.getElementById("account-customer-view").hidden = view !== "customer";
+    }
+
+    function switchAccountAuthTab(tab) {
+      const signup = tab === "signup";
+      document.getElementById("account-login-panel").hidden = signup;
+      document.getElementById("account-signup-panel").hidden = !signup;
+      document.getElementById("account-login-tab").classList.toggle("active", !signup);
+      document.getElementById("account-signup-tab").classList.toggle("active", signup);
+    }
+
+    async function openCustomerAccount() {
+      const requestId = ++customerAccountRequestId;
+      document.getElementById("account-backdrop").classList.add("open");
+      setAccountMessage("");
+      setAccountView("auth");
+      switchAccountAuthTab("signup");
+      stopCustomerOrdersRealtime();
+      currentCustomerUser = null;
+      currentCustomerProfile = null;
+      document.getElementById("customer-orders-list").textContent = "";
+      document.getElementById("account-customer-email").textContent = "";
+      updateCustomerGreeting();
+      if (!supabaseClient) {
+        setAccountMessage("No se pudo cargar Supabase. Intenta nuevamente más tarde.", true);
+        document.getElementById("account-signup-name").focus();
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        if (requestId !== customerAccountRequestId) return;
+        if (!data.session) {
+          document.getElementById("account-signup-name").focus();
+          return;
+        }
+        if (await isSupabaseAdmin(data.session.user)) {
+          if (requestId !== customerAccountRequestId) return;
+          currentCustomerUser = null;
+          currentCustomerProfile = null;
+          updateCustomerGreeting();
+          document.getElementById("account-signup-name").focus();
+          return;
+        }
+
+        currentCustomerUser = data.session.user;
+        await loadCustomerAccount(requestId);
+      } catch (error) {
+        if (requestId !== customerAccountRequestId) return;
+        console.error("No se pudo cargar la cuenta de clienta.", error);
+        setAccountView("auth");
+        setAccountMessage("No se pudo verificar la cuenta. Revisa tu conexión e inténtalo nuevamente.", true);
+        document.getElementById("account-signup-name").focus();
+      }
+    }
+
+    function closeCustomerAccount() {
+      autoAccountPromptDismissed = true;
+      window.clearTimeout(autoAccountTimer);
+      customerAccountRequestId += 1;
+      document.getElementById("account-backdrop").classList.remove("open");
+      setAccountView("auth");
+      setAccountMessage("");
+    }
+
+    function closeCustomerAccountOnBackdrop(event) {
+      if (event.target.id === "account-backdrop") closeCustomerAccount();
+    }
+
+    async function loadCustomerAccount(requestId = customerAccountRequestId) {
+      const user = currentCustomerUser;
+      if (!supabaseClient || !user) return;
+      const { data, error } = await supabaseClient
+        .from("customer_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (error) throw error;
+      if (requestId !== customerAccountRequestId ||
+          !currentCustomerUser || currentCustomerUser.id !== user.id) return;
+      let profile = data;
+      if (!profile) {
+        const metadata = user.user_metadata || {};
+        const { data: createdProfile, error: createError } = await supabaseClient
+          .from("customer_profiles")
+          .insert({
+            user_id: user.id,
+            full_name: metadata.full_name || null,
+            phone: metadata.phone || null
+          })
+          .select("*")
+          .single();
+        if (createError) throw createError;
+        if (requestId !== customerAccountRequestId ||
+            !currentCustomerUser || currentCustomerUser.id !== user.id) return;
+        profile = createdProfile;
+      }
+
+      currentCustomerProfile = profile;
+      document.getElementById("account-profile-name").value = currentCustomerProfile.full_name || "";
+      document.getElementById("account-profile-phone").value = currentCustomerProfile.phone || "";
+      document.getElementById("account-profile-delivery-type").value =
+        currentCustomerProfile.default_delivery_type || "domicilio";
+      document.getElementById("account-profile-city").value =
+        currentCustomerProfile.city || DEFAULT_DELIVERY_CITY;
+      document.getElementById("account-profile-address").value = currentCustomerProfile.address || "";
+      document.getElementById("account-profile-reference").value = currentCustomerProfile.reference_point || "";
+      document.getElementById("account-customer-email").textContent = user.email || "";
+      updateCustomerGreeting();
+      toggleDeliveryAddressFields("profile");
+      await loadCustomerOrders(requestId, user.id);
+      if (requestId !== customerAccountRequestId ||
+          !currentCustomerUser || currentCustomerUser.id !== user.id) return;
+      setAccountView("customer");
+      startCustomerOrdersRealtime();
+    }
+
+    async function loginCustomer() {
+      if (!supabaseClient) return;
+      const email = document.getElementById("account-login-email").value.trim();
+      const password = document.getElementById("account-login-password").value;
+      setAccountMessage("");
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        document.getElementById("account-login-password").value = "";
+        if (await isSupabaseAdmin(data.user)) {
+          currentCustomerUser = null;
+          currentCustomerProfile = null;
+          stopCustomerOrdersRealtime();
+          updateCustomerGreeting();
+          setAccountView("auth");
+          switchAccountAuthTab("login");
+          setAccountMessage("");
+          return;
+        }
+        currentCustomerUser = data.user;
+        await loadCustomerAccount();
+        const welcomeName = currentCustomerProfile.full_name ||
+          data.user.user_metadata && data.user.user_metadata.full_name;
+        closeCustomerAccount();
+        showCustomerWelcome(welcomeName);
+      } catch (error) {
+        console.error("No se pudo iniciar sesión de clienta.", error);
+        setAccountMessage(error.message || "No se pudo iniciar sesión. Revisa tus datos.", true);
+      }
+    }
+
+    async function registerCustomer() {
+      if (!supabaseClient) return;
+      const fullName = document.getElementById("account-signup-name").value.trim();
+      const phone = document.getElementById("account-signup-phone").value.trim();
+      const email = document.getElementById("account-signup-email").value.trim();
+      const password = document.getElementById("account-signup-password").value;
+      if (!fullName || !phone || !email || password.length < 6) {
+        setAccountMessage("Completa nombre, teléfono, correo y una contraseña de al menos 6 caracteres.", true);
+        return;
+      }
+
+      setAccountMessage("");
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: fullName, phone } }
+        });
+        if (error) throw error;
+        if (!data.session || !data.user) {
+          closeCustomerAccount();
+          showCustomerWelcome(
+            fullName,
+            `¡Bienvenida, ${fullName}! Revisa tu correo para confirmar tu cuenta.`
+          );
+          return;
+        }
+        currentCustomerUser = data.user;
+        const { error: profileError } = await supabaseClient.from("customer_profiles").upsert({
+          user_id: data.user.id,
+          full_name: fullName,
+          phone,
+          default_delivery_type: "domicilio",
+          city: DEFAULT_DELIVERY_CITY,
+          address: null,
+          reference_point: null,
+          updated_at: new Date().toISOString()
+        }, { onConflict: "user_id" });
+        if (profileError) throw profileError;
+        await loadCustomerAccount();
+        closeCustomerAccount();
+        showCustomerWelcome(currentCustomerProfile.full_name || fullName);
+      } catch (error) {
+        console.error("No se pudo crear la cuenta de clienta.", error);
+        setAccountMessage(error.message || "No se pudo crear la cuenta.", true);
+      }
+    }
+
+    function toggleDeliveryAddressFields(form) {
+      const isPickup = document.getElementById(
+        form === "profile" ? "account-profile-delivery-type" : "order-delivery-type"
+      ).value === "punto_fisico";
+      document.getElementById(`${form}-delivery-address-fields`).hidden = isPickup;
+      document.getElementById(`${form}-pickup-note`).hidden = !isPickup;
+      if (form === "order") updateDeliveryPricing();
+    }
+
+    async function saveCustomerProfile() {
+      if (!supabaseClient || !currentCustomerUser) return;
+      const fullName = document.getElementById("account-profile-name").value.trim();
+      const phone = document.getElementById("account-profile-phone").value.trim();
+      const deliveryType = document.getElementById("account-profile-delivery-type").value;
+      const city = document.getElementById("account-profile-city").value.trim();
+      const address = document.getElementById("account-profile-address").value.trim();
+      const referencePoint = document.getElementById("account-profile-reference").value.trim();
+      if (!fullName || !phone || !["domicilio", "punto_fisico"].includes(deliveryType) ||
+          (deliveryType === "domicilio" && (!city || !address))) {
+        setAccountMessage("Completa nombre, teléfono, ciudad y dirección para entregas a domicilio.", true);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.from("customer_profiles").upsert({
+          user_id: currentCustomerUser.id,
+          full_name: fullName,
+          phone,
+          default_delivery_type: deliveryType,
+          city: city || DEFAULT_DELIVERY_CITY,
+          address: deliveryType === "domicilio" ? address : null,
+          reference_point: deliveryType === "domicilio" ? referencePoint || null : null,
+          updated_at: new Date().toISOString()
+        }, { onConflict: "user_id" }).select("*").single();
+        if (error) throw error;
+        currentCustomerProfile = data;
+        updateCustomerGreeting();
+        setAccountMessage("Tus datos quedaron guardados.");
+      } catch (error) {
+        console.error("No se pudo guardar el perfil de clienta.", error);
+        setAccountMessage(error.message || "No se pudieron guardar tus datos.", true);
+      }
+    }
+
+    async function logoutCustomer() {
+      if (!supabaseClient || !currentCustomerUser) return;
+      try {
+        const { error } = await supabaseClient.auth.signOut();
+        if (error) throw error;
+        customerAccountRequestId += 1;
+        stopCustomerOrdersRealtime();
+        currentCustomerUser = null;
+        currentCustomerProfile = null;
+        updateCustomerGreeting();
+        setAccountView("auth");
+        setAccountMessage("Sesión cerrada.");
+      } catch (error) {
+        console.error("No se pudo cerrar la sesión de clienta.", error);
+        setAccountMessage("No se pudo cerrar la sesión. Intenta nuevamente.", true);
+      }
+    }
+
+    async function loadCustomerOrders(requestId = customerAccountRequestId, requestedUserId = null) {
+      const list = document.getElementById("customer-orders-list");
+      if (!list) return;
+      const userId = requestedUserId || currentCustomerUser && currentCustomerUser.id;
+      if (!userId || requestId !== customerAccountRequestId ||
+          !currentCustomerUser || currentCustomerUser.id !== userId) return;
+      if (!supabaseClient || !navigator.onLine) {
+        renderCustomerOrders(orders.filter(order => order.user_id === userId));
+        return;
+      }
+      try {
+        const { data, error } = await supabaseClient
+          .from("orders")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+        if (error) throw error;
+        if (requestId !== customerAccountRequestId ||
+            !currentCustomerUser || currentCustomerUser.id !== userId) return;
+        renderCustomerOrders(data || []);
+      } catch (error) {
+        if (requestId !== customerAccountRequestId ||
+            !currentCustomerUser || currentCustomerUser.id !== userId) return;
+        console.error("No se pudo cargar el historial de pedidos de clienta.", error);
+        list.innerHTML = `<p class="order-confirmation-hint">No se pudo cargar el historial. Intenta actualizar esta vista.</p>`;
+      }
+    }
+
+    function renderCustomerOrders(customerOrders) {
+      const list = document.getElementById("customer-orders-list");
+      const steps = ["En proceso", "Confirmación de pago", "Confirmado", "Empacado", "Entregado", "Finalizado"];
+      if (!customerOrders.length) {
+        list.innerHTML = `<p class="order-confirmation-hint">Aún no tienes pedidos asociados a esta cuenta.</p>`;
+        return;
+      }
+      const sortedOrders = customerOrders.slice().sort((a, b) => {
+        const orderTimestamp = order => {
+          const createdAt = Date.parse(order.created_at || "");
+          if (Number.isFinite(createdAt)) return createdAt;
+          const match = String(order.date || "").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}):?(\d{2})?)?/);
+          return match
+            ? Date.UTC(Number(match[3]), Number(match[2]) - 1, Number(match[1]),
+              Number(match[4] || 0), Number(match[5] || 0), Number(match[6] || 0))
+            : 0;
+        };
+        return orderTimestamp(b) - orderTimestamp(a);
+      });
+      list.innerHTML = sortedOrders.map(order => {
+        const status = order.status === "Pendiente" ? "En proceso" : order.status;
+        const activeIndex = steps.indexOf(status);
+        const date = order.created_at
+          ? new Date(order.created_at).toLocaleString("es-CO", {
+            timeZone: "America/Bogota", dateStyle: "medium", timeStyle: "short"
+          })
+          : escapeHtml(order.date || "Fecha no disponible");
+        const items = (Array.isArray(order.product_quantities) ? order.product_quantities : [])
+          .map(item => {
+            const variants = Array.isArray(item.variants) && item.variants.length ? item.variants : [item];
+            return variants.map(variant =>
+              `${Number(variant.quantity) || 0}x ${escapeHtml(item.product_name || item.product_id || "Producto")}` +
+              `${variant.variant_name || variant.color ? ` (${escapeHtml(variant.variant_name || variant.color)})` : ""}`
+            ).join("<br>");
+          }).filter(Boolean).join("<br>") || escapeHtml(order.items || "Detalle no disponible");
+        const deliveryQuote = getStoredOrderDeliveryQuote(order);
+        const subtotal = Number(order.total) || 0;
+        const orderTotal = subtotal + deliveryQuote.fee;
+        const delivery = order.delivery_type === "punto_fisico"
+          ? `${escapeHtml(deliveryQuote.label)} de Accessories BY ISA`
+          : `${escapeHtml(deliveryQuote.label)} · ${escapeHtml(order.delivery_address || "Dirección no disponible")}` +
+            `${order.reference_point ? ` · Referencia: ${escapeHtml(order.reference_point)}` : ""}` +
+            `${deliveryQuote.note ? `<br><small>${escapeHtml(deliveryQuote.note)}</small>` : ""}`;
+        return `<article class="customer-order-card">
+          <div class="customer-order-heading"><strong>${escapeHtml(date)}</strong><strong>${formatCOP(orderTotal)}</strong></div>
+          <p class="order-confirmation-hint" style="margin-top:0.45rem;">${items}</p>
+          <p class="order-confirmation-hint" style="margin-top:0.35rem;">${delivery}</p>
+          <div class="customer-order-breakdown">
+            <span>Subtotal productos</span><span>${formatCOP(subtotal)}</span>
+            <span>${escapeHtml(deliveryQuote.label)}</span><span>${escapeHtml(deliveryQuote.amount)}</span>
+            <strong>Total</strong><strong>${formatCOP(orderTotal)}</strong>
+          </div>
+          <div class="customer-order-timeline" aria-label="Estado: ${escapeHtml(status)}">
+            ${steps.map((step, index) => `<span class="customer-order-step ${index <= activeIndex ? "active" : ""}">${escapeHtml(step)}</span>`).join("")}
+          </div>
+        </article>`;
+      }).join("");
+    }
+
+    function startCustomerOrdersRealtime() {
+      if (!supabaseClient || !currentCustomerUser) return;
+      stopCustomerOrdersRealtime();
+      customerOrdersRealtimeChannel = supabaseClient
+        .channel(`customer-orders-${currentCustomerUser.id}`)
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "orders",
+          filter: `user_id=eq.${currentCustomerUser.id}`
+        }, () => {
+          loadCustomerOrders();
+        })
+        .subscribe();
+    }
+
+    function stopCustomerOrdersRealtime() {
+      if (customerOrdersRealtimeChannel && supabaseClient) {
+        supabaseClient.removeChannel(customerOrdersRealtimeChannel);
+      }
+      customerOrdersRealtimeChannel = null;
+    }
+
+    async function restoreCustomerSessionDisplay() {
+      const requestId = ++customerAccountRequestId;
+      if (!supabaseClient) {
+        currentCustomerUser = null;
+        currentCustomerProfile = null;
+        updateCustomerGreeting();
+        return;
+      }
+      try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        if (requestId !== customerAccountRequestId) return;
+        if (!data.session) {
+          currentCustomerUser = null;
+          currentCustomerProfile = null;
+          stopCustomerOrdersRealtime();
+          updateCustomerGreeting();
+          return;
+        }
+        const isAdmin = await isSupabaseAdmin(data.session.user);
+        if (requestId !== customerAccountRequestId) return;
+        if (isAdmin) {
+          currentCustomerUser = null;
+          currentCustomerProfile = null;
+          stopCustomerOrdersRealtime();
+          updateCustomerGreeting();
+          return;
+        }
+        const user = data.session.user;
+        currentCustomerUser = user;
+        const { data: profile, error: profileError } = await supabaseClient
+          .from("customer_profiles").select("*")
+          .eq("user_id", user.id).maybeSingle();
+        if (requestId !== customerAccountRequestId ||
+            !currentCustomerUser || currentCustomerUser.id !== user.id) return;
+        if (profileError) {
+          console.error("No se pudo cargar el perfil para el saludo de clienta.", profileError);
+          currentCustomerProfile = {
+            full_name: user.user_metadata && user.user_metadata.full_name || "",
+            city: DEFAULT_DELIVERY_CITY
+          };
+          updateCustomerGreeting();
+          return;
+        }
+        currentCustomerProfile = profile || {
+          full_name: user.user_metadata && user.user_metadata.full_name || "",
+          city: DEFAULT_DELIVERY_CITY
+        };
+        updateCustomerGreeting();
+      } catch (error) {
+        if (requestId !== customerAccountRequestId) return;
+        console.error("No se pudo restaurar la sesión de clienta.", error);
+        currentCustomerUser = null;
+        currentCustomerProfile = null;
+        stopCustomerOrdersRealtime();
+        updateCustomerGreeting();
+      }
+    }
+
+    async function openCustomerAccountIfSignedOut() {
+      if (window.location.hash.toLowerCase() === "#admin" ||
+          autoAccountPromptDismissed ||
+          document.getElementById("account-backdrop").classList.contains("open")) return;
+      if (!supabaseClient) {
+        await openCustomerAccount();
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        if (data.session && !await isSupabaseAdmin(data.session.user)) return;
+        if (autoAccountPromptDismissed ||
+            document.getElementById("account-backdrop").classList.contains("open")) return;
+        await openCustomerAccount();
+      } catch (error) {
+        console.error("No se pudo verificar la sesión antes de abrir Mi cuenta.", error);
+        await openCustomerAccount();
+      }
+    }
+
     async function handleRoute() {
       const isAdminHash = window.location.hash.toLowerCase() === "#admin";
       const storefront = document.getElementById("storefront-view");
@@ -3474,6 +4718,7 @@
 
       if (isAdminHash) {
         clearTimeout(introSequenceTimer);
+        clearTimeout(autoAccountTimer);
         intro.style.display = "none";
         intro.classList.add("fade-out");
         intro.classList.remove("intro-running");
@@ -3523,6 +4768,7 @@
         adminView.style.display = "none";
         storefront.style.display = "flex";
         renderCatalog();
+        restoreCustomerSessionDisplay();
       }
     }
 
@@ -3566,9 +4812,11 @@
       }, 5000);
     }
 
-    function runIntroSequence() {
+    function runIntroSequence(autoOpenAccount = false) {
       const overlay = document.getElementById("intro-overlay");
       clearTimeout(introSequenceTimer);
+      clearTimeout(autoAccountTimer);
+      autoAccountTimer = null;
 
       if (!overlay) {
         renderCategories();
@@ -3599,7 +4847,13 @@
         overlay.classList.add("fade-out");
         renderCategories();
         renderCatalog();
-      }, 2800);
+        if (autoOpenAccount) {
+          autoAccountTimer = window.setTimeout(
+            openCustomerAccountIfSignedOut,
+            INTRO_FADE_OUT_DURATION_MS + AUTO_ACCOUNT_PROMPT_DELAY_MS
+          );
+        }
+      }, INTRO_SEQUENCE_DURATION_MS);
     }
 
     function replayIntro() {
@@ -3976,17 +5230,21 @@
     function updateCartUI() {
       const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
       document.getElementById("bag-count").textContent = totalItems;
+      const customerName = getCurrentCustomerName();
+      document.getElementById("cart-title").textContent =
+        currentCustomerUser && customerName
+          ? `Bolsa de ${customerName}`
+          : "Tu Bolsa";
+      document.getElementById("guest-cart-name-field").hidden = Boolean(currentCustomerUser);
 
       const container = document.getElementById("cart-items-container");
       if (cart.length === 0) {
         container.innerHTML = `<p style="text-align:center; color:var(--text-muted); margin-top:2rem; font-size:0.85rem;">Tu bolsa está vacía.</p>`;
-        document.getElementById("cart-total").textContent = "$0";
+        updateDeliveryPricing();
         return;
       }
 
-      let total = 0;
       container.innerHTML = cart.map((item, idx) => {
-        total += item.price * item.qty;
         return `
           <div class="cart-item">
             <img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.variant_name)}" />
@@ -4004,14 +5262,61 @@
         `;
       }).join("");
 
-      document.getElementById("cart-total").textContent = formatCOP(total);
+      updateDeliveryPricing();
     }
 
-    function checkoutWhatsApp() {
+    async function checkoutWhatsApp() {
       if (cart.length === 0) return;
 
-      const customerName = document.getElementById("customer-name").value.trim() || "Clienta";
-      const total = Math.round(cart.reduce((acc, item) => acc + item.price * item.qty, 0));
+      document.getElementById("order-confirmation-status").textContent = "";
+      document.getElementById("order-confirmation-status").hidden = true;
+      let profile = currentCustomerProfile;
+      let customerSession = Boolean(currentCustomerUser);
+      try {
+        if (supabaseClient) {
+          const { data, error } = await supabaseClient.auth.getSession();
+          if (error) throw error;
+          if (data.session && !await isSupabaseAdmin(data.session.user)) {
+            currentCustomerUser = data.session.user;
+            customerSession = true;
+            const result = await supabaseClient.from("customer_profiles")
+              .select("*").eq("user_id", data.session.user.id).maybeSingle();
+            if (result.error) throw result.error;
+            const metadata = data.session.user.user_metadata || {};
+            profile = result.data || {
+              full_name: metadata.full_name || "",
+              default_delivery_type: "domicilio",
+              city: DEFAULT_DELIVERY_CITY,
+              address: "",
+              reference_point: ""
+            };
+            currentCustomerProfile = profile;
+          } else {
+            currentCustomerUser = null;
+            currentCustomerProfile = null;
+            customerSession = false;
+            profile = null;
+          }
+        }
+      } catch (error) {
+        console.error("No se pudieron autocompletar los datos de entrega.", error);
+        document.getElementById("order-confirmation-status").textContent =
+          "No se pudieron cargar tus datos guardados; puedes completar el pedido manualmente.";
+        document.getElementById("order-confirmation-status").hidden = false;
+      }
+      updateCustomerGreeting();
+
+      const accountName = getCurrentCustomerName();
+      const customerName = customerSession
+        ? accountName
+        : document.getElementById("customer-name").value.trim();
+      const guestCartNameField = document.getElementById("guest-cart-name-field");
+      const guestConfirmationNameField = document.getElementById("guest-customer-name-field");
+      guestCartNameField.hidden = customerSession;
+      guestConfirmationNameField.hidden = customerSession;
+      document.getElementById("cart-title").textContent =
+        customerSession && accountName ? `Bolsa de ${accountName}` : "Tu Bolsa";
+      document.getElementById("customer-name").value = customerName || "";
       const itemsContainer = document.getElementById("order-confirmation-items");
       itemsContainer.textContent = "";
 
@@ -4035,18 +5340,30 @@
         itemsContainer.appendChild(row);
       });
 
-      document.getElementById("order-confirmation-total").textContent = formatCOP(total);
-      document.getElementById("customer-name-confirm").value = customerName;
+      document.getElementById("customer-name-confirm").value = customerName || "";
+      document.getElementById("order-delivery-type").value =
+        profile && profile.default_delivery_type || "domicilio";
+      document.getElementById("order-city").value =
+        profile && profile.city || DEFAULT_DELIVERY_CITY;
+      document.getElementById("order-delivery-address").value = profile && profile.address || "";
+      document.getElementById("order-reference-point").value = profile && profile.reference_point || "";
+      toggleDeliveryAddressFields("order");
+      updateDeliveryPricing();
       const status = document.getElementById("order-confirmation-status");
-      status.textContent = orderConfirmed ? "Este pedido ya fue confirmado." : "";
-      status.hidden = !orderConfirmed;
+      if (orderConfirmed) status.textContent = "Este pedido ya fue confirmado.";
+      else if (!status.textContent.startsWith("No se pudieron cargar")) status.textContent = "";
+      status.hidden = !status.textContent;
       document.getElementById("order-confetti").textContent = "";
       document.getElementById("order-confirmation-close").disabled = orderSubmissionPending;
       document.getElementById("order-confirm-back").disabled = orderSubmissionPending;
       document.getElementById("order-confirm-submit").disabled = orderSubmissionPending || orderConfirmed;
       document.getElementById("customer-name-confirm").disabled = orderSubmissionPending;
+      document.getElementById("order-delivery-type").disabled = orderSubmissionPending;
+      document.getElementById("order-city").disabled = orderSubmissionPending;
+      document.getElementById("order-delivery-address").disabled = orderSubmissionPending;
+      document.getElementById("order-reference-point").disabled = orderSubmissionPending;
       document.getElementById("order-confirmation-backdrop").classList.add("open");
-      document.getElementById("customer-name-confirm").focus();
+      document.getElementById(customerSession ? "order-delivery-type" : "customer-name-confirm").focus();
     }
 
     function closeOrderConfirmation() {
@@ -4084,6 +5401,18 @@
     async function confirmOrder() {
       if (cart.length === 0 || orderSubmissionPending || orderConfirmed) return;
 
+      const deliveryType = document.getElementById("order-delivery-type").value;
+      const city = document.getElementById("order-city").value.trim();
+      const deliveryAddress = document.getElementById("order-delivery-address").value.trim();
+      const referencePoint = document.getElementById("order-reference-point").value.trim();
+      if (!["domicilio", "punto_fisico"].includes(deliveryType) ||
+          (deliveryType === "domicilio" && (!city || !deliveryAddress))) {
+        const status = document.getElementById("order-confirmation-status");
+        status.textContent = "Ingresa la ciudad y dirección para recibir tu pedido a domicilio o elige recoger en punto físico.";
+        status.hidden = false;
+        return;
+      }
+
       const requestedUnits = new Map();
       cart.forEach(item => {
         requestedUnits.set(item.id, (requestedUnits.get(item.id) || 0) + item.qty);
@@ -4102,18 +5431,73 @@
         }
       }
 
-      const customerName = document.getElementById("customer-name-confirm").value.trim() || "Clienta";
-      const total = Math.round(cart.reduce((acc, item) => acc + item.price * item.qty, 0));
+      let userId = null;
+      let customerName = "";
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient.auth.getSession();
+          if (error) throw error;
+          if (data.session && !await isSupabaseAdmin(data.session.user)) {
+            userId = data.session.user.id;
+            currentCustomerUser = data.session.user;
+            if (!currentCustomerProfile || currentCustomerProfile.user_id !== userId) {
+              const { data: profile, error: profileError } = await supabaseClient
+                .from("customer_profiles").select("*").eq("user_id", userId).maybeSingle();
+              if (profileError) throw profileError;
+              currentCustomerProfile = profile || null;
+            }
+            customerName = currentCustomerProfile && currentCustomerProfile.full_name ||
+              data.session.user.user_metadata && data.session.user.user_metadata.full_name || "";
+            updateCustomerGreeting();
+          } else {
+            currentCustomerUser = null;
+            currentCustomerProfile = null;
+            updateCustomerGreeting();
+            customerName = document.getElementById("customer-name-confirm").value.trim();
+          }
+        } catch (error) {
+          console.error("No se pudo verificar la sesión antes de guardar el pedido.", error);
+          const status = document.getElementById("order-confirmation-status");
+          status.textContent = "No se pudo verificar tu sesión. Intenta nuevamente o cierra sesión para comprar como invitada.";
+          status.hidden = false;
+          return;
+        }
+      } else {
+        customerName = document.getElementById("customer-name-confirm").value.trim();
+      }
+      if (!customerName) {
+        const status = document.getElementById("order-confirmation-status");
+        status.textContent = userId
+          ? "Completa tu nombre en Mi cuenta para continuar con el pedido."
+          : "Escribe tu nombre para continuar con el pedido.";
+        status.hidden = false;
+        if (userId) {
+          document.getElementById("guest-customer-name-field").hidden = true;
+        } else {
+          document.getElementById("guest-customer-name-field").hidden = false;
+          document.getElementById("customer-name-confirm").focus();
+        }
+        return;
+      }
+      const subtotal = Math.round(cart.reduce((acc, item) => acc + item.price * item.qty, 0));
+      const deliveryQuote = getDeliveryQuote(deliveryType, city);
+      const orderTotal = subtotal + deliveryQuote.fee;
       const summaryLines = buildWhatsAppOrderLines(cart);
       const order = {
         id: `ORD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`,
         date: localOrderDateTime(),
         customer: customerName,
         items: cart.map(item => `${item.qty}x ${item.name} (${item.variant_name})`).join(", "),
-        total: total,
-        status: "Pendiente",
+        total: subtotal,
+        status: "En proceso",
         product_quantities: buildOrderProductQuantities(cart),
-        stock_deducted: false
+        stock_deducted: false,
+        user_id: userId,
+        delivery_type: deliveryType,
+        city: deliveryType === "domicilio" ? city : DEFAULT_DELIVERY_CITY,
+        delivery_address: deliveryType === "domicilio" ? deliveryAddress : null,
+        reference_point: deliveryType === "domicilio" ? referencePoint || null : null,
+        delivery_fee: deliveryQuote.fee
       };
       const status = document.getElementById("order-confirmation-status");
 
@@ -4122,6 +5506,10 @@
       document.getElementById("order-confirmation-close").disabled = true;
       document.getElementById("order-confirm-back").disabled = true;
       document.getElementById("customer-name-confirm").disabled = true;
+      document.getElementById("order-delivery-type").disabled = true;
+      document.getElementById("order-city").disabled = true;
+      document.getElementById("order-delivery-address").disabled = true;
+      document.getElementById("order-reference-point").disabled = true;
 
       let savedInCloud = false;
       if (supabaseClient && navigator.onLine) {
@@ -4147,6 +5535,10 @@
         document.getElementById("order-confirmation-close").disabled = false;
         document.getElementById("order-confirm-back").disabled = false;
         document.getElementById("customer-name-confirm").disabled = false;
+        document.getElementById("order-delivery-type").disabled = false;
+        document.getElementById("order-city").disabled = false;
+        document.getElementById("order-delivery-address").disabled = false;
+        document.getElementById("order-reference-point").disabled = false;
         status.textContent = "No se pudo guardar el pedido. Intenta nuevamente.";
         status.hidden = false;
         return;
@@ -4163,6 +5555,10 @@
           document.getElementById("order-confirmation-close").disabled = false;
           document.getElementById("order-confirm-back").disabled = false;
           document.getElementById("customer-name-confirm").disabled = false;
+          document.getElementById("order-delivery-type").disabled = false;
+          document.getElementById("order-city").disabled = false;
+          document.getElementById("order-delivery-address").disabled = false;
+          document.getElementById("order-reference-point").disabled = false;
           status.textContent = "No se pudo guardar el pedido. Intenta nuevamente.";
           status.hidden = false;
           return;
@@ -4172,8 +5568,16 @@
       orderConfirmed = true;
       cart = [];
       updateCartUI();
+      document.getElementById("order-confirmation-backdrop").classList.remove("open");
+      showOrderSuccess();
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
-      const msg = `Hola Isa, soy *${customerName}*. Me gustaría pedir estas piezas de *Accessories BY ISA*:\n\n${summaryLines}\n\n*Total:* ${formatCOP(total)}\n¿Me confirmas disponibilidad?`;
+      const deliveryMessage = deliveryType === "punto_fisico"
+        ? `Método de entrega: ${deliveryQuote.label}.`
+        : `Método de entrega: ${deliveryQuote.label}.\nDirección: ${deliveryAddress}` +
+          `${referencePoint ? `\nPunto de referencia: ${referencePoint}` : ""}`;
+      const deliveryNote = deliveryQuote.note ? `\n${deliveryQuote.note}` : "";
+      const msg = `Hola Isa, soy *${customerName}*. Me gustaría pedir estas piezas de *Accessories BY ISA*:\n\n${summaryLines}\n\n${deliveryMessage}\n\n*Subtotal productos:* ${formatCOP(subtotal)}\n*${deliveryQuote.label}:* ${deliveryQuote.amount}${deliveryNote}\n*Total:* ${formatCOP(orderTotal)}\n¿Me confirmas disponibilidad?`;
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
       const whatsappWindow = window.open("about:blank", "_blank");
       if (whatsappWindow) whatsappWindow.opener = null;
@@ -4181,6 +5585,10 @@
       document.getElementById("customer-name").value = customerName;
       document.getElementById("customer-name-confirm").value = customerName;
       document.getElementById("customer-name-confirm").disabled = true;
+      document.getElementById("order-delivery-type").disabled = true;
+      document.getElementById("order-city").disabled = true;
+      document.getElementById("order-delivery-address").disabled = true;
+      document.getElementById("order-reference-point").disabled = true;
       document.getElementById("order-confirmation-close").disabled = true;
       document.getElementById("order-confirm-back").disabled = true;
       document.getElementById("order-confirm-submit").disabled = true;
@@ -5194,20 +6602,33 @@
     function renderAdminOrders() {
       const tbody = document.getElementById("admin-orders-tbody");
       if (orders.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);">Aún no hay pedidos registrados.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);">Aún no hay pedidos registrados.</td></tr>`;
         return;
       }
-      tbody.innerHTML = orders.map((o, idx) => `
+      const statuses = ["En proceso", "Confirmación de pago", "Confirmado", "Empacado", "Entregado", "Finalizado"];
+      tbody.innerHTML = orders.map((o, idx) => {
+        const currentStatus = o.status === "Pendiente" ? -1 : statuses.indexOf(o.status);
+        const options = statuses.map((status, statusIndex) =>
+          `<option value="${status}" ${o.status === status ? "selected" : ""} ${statusIndex < currentStatus ? "disabled" : ""}>${status}</option>`
+        ).join("");
+        const deliveryQuote = getStoredOrderDeliveryQuote(o);
+        const delivery = o.delivery_type === "punto_fisico"
+          ? `<strong>Punto físico</strong><br><small>Accessories BY ISA</small>`
+          : `<strong>${escapeHtml(deliveryQuote.label)}</strong><br><small>${escapeHtml(o.delivery_address || "Dirección no disponible")}</small>` +
+            `${o.reference_point ? `<br><small>Referencia: ${escapeHtml(o.reference_point)}</small>` : ""}` +
+            `<br><small>Domicilio: ${escapeHtml(deliveryQuote.amount)}</small>` +
+            `${deliveryQuote.note ? `<br><small>${escapeHtml(deliveryQuote.note)}</small>` : ""}`;
+        return `
         <tr>
           <td>${escapeHtml(o.date)}</td>
           <td><strong>${escapeHtml(o.customer)}</strong></td>
           <td>${renderOrderItems(o)}</td>
-          <td>${formatCOP(o.total)}</td>
+          <td>${delivery}</td>
+          <td>${formatCOP((Number(o.total) || 0) + deliveryQuote.fee)}<br><small>Productos: ${formatCOP(o.total)}</small></td>
           <td>
             <select class="form-input" style="padding:0.35rem 0.6rem;" onchange="updateOrderStatus(${idx}, this.value)">
-              <option value="Pendiente" ${o.status === "Pendiente" ? "selected" : ""} ${o.status !== "Pendiente" ? "disabled" : ""}>Pendiente</option>
-              <option value="Confirmado" ${o.status === "Confirmado" ? "selected" : ""} ${o.status === "Entregado" ? "disabled" : ""}>Confirmado</option>
-              <option value="Entregado" ${o.status === "Entregado" ? "selected" : ""} ${o.status === "Pendiente" ? "disabled" : ""}>Entregado</option>
+              ${o.status === "Pendiente" ? `<option value="Pendiente" selected>Pendiente (anterior)</option>` : ""}
+              ${options}
             </select>
           </td>
           <td>
@@ -5215,7 +6636,8 @@
               ${financeSaleOrderIds.has(o.id) ? "disabled title=\"Una venta registrada no se puede eliminar\"" : ""}>Eliminar</button>
           </td>
         </tr>
-      `).join("");
+      `;
+      }).join("");
     }
 
     function getOrderSaleLines(order) {
@@ -5329,16 +6751,18 @@
     async function updateOrderStatus(idx, status) {
       const order = orders[idx];
       if (!order) return;
-      if (status === "Entregado" && order.status === "Pendiente") {
+      const preConfirmationStatuses = ["Pendiente", "En proceso", "Confirmación de pago"];
+      const confirmedStatuses = ["Confirmado", "Empacado", "Entregado", "Finalizado"];
+      if (status === "Entregado" && preConfirmationStatuses.includes(order.status)) {
         alert("Confirma el pedido primero para registrar la venta y descontar el inventario.");
         renderAdminOrders();
         return;
       }
-      if (status === "Entregado" && order.status === "Confirmado" &&
+      if (["Empacado", "Entregado", "Finalizado"].includes(status) &&
           !financeSaleOrderIds.has(order.id)) {
         if (!financeDataLoaded) await loadFinanceData();
         if (!financeSaleOrderIds.has(order.id)) {
-          alert("Este pedido fue confirmado antes del registro financiero. No se puede marcar como entregado sin revisar su venta.");
+          alert("No se puede avanzar este pedido sin confirmar primero su venta financiera.");
           renderAdminOrders();
           return;
         }
@@ -5347,7 +6771,7 @@
       if (supabaseClient && currentAdminUser && navigator.onLine) {
         let updatedOrder;
         try {
-          if (status === "Confirmado" && order.status === "Pendiente") {
+          if (status === "Confirmado" && preConfirmationStatuses.includes(order.status)) {
             const saleLines = getOrderSaleLines(order);
             if (!saleLines) {
               renderAdminOrders();
@@ -5440,7 +6864,7 @@
     handleRoute();
     startStockRealtime();
     startHeroCarousel();
-    runIntroSequence();
+    runIntroSequence(true);
     syncPublicProductStock();
     flushPendingOrders().catch(error => {
       console.error("No se pudieron sincronizar pedidos pendientes.", error);
