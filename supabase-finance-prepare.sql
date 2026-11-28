@@ -1,7 +1,7 @@
 begin;
 
 -- Tablas privadas para costos, compras, ventas y gastos.
-create table public.finance_product_costs (
+create table if not exists public.finance_product_costs (
   product_id text primary key,
   average_unit_cost numeric(14, 4),
   margin_percent numeric(7, 2),
@@ -15,7 +15,7 @@ create table public.finance_product_costs (
   )
 );
 
-create table public.inventory_purchases (
+create table if not exists public.inventory_purchases (
   purchase_id uuid primary key default pg_catalog.gen_random_uuid(),
   request_id uuid not null unique,
   purchase_type text not null check (purchase_type in ('initial', 'restock')),
@@ -23,21 +23,22 @@ create table public.inventory_purchases (
   acquired_on date not null,
   supplier text,
   created_by uuid references auth.users (id) on delete set null,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  stock_added boolean not null default true
 );
 
-create table public.inventory_purchase_items (
+create table if not exists public.inventory_purchase_items (
   purchase_item_id uuid primary key default pg_catalog.gen_random_uuid(),
   purchase_id uuid not null references public.inventory_purchases (purchase_id) on delete restrict,
   product_id text not null,
   product_name text not null,
+  variant_label text not null default '',
   quantity integer not null check (quantity > 0),
   unit_cost numeric(12, 2) not null check (unit_cost > 0),
-  line_total numeric generated always as (quantity * unit_cost) stored,
-  unique (purchase_id, product_id)
+  line_total numeric generated always as (quantity * unit_cost) stored
 );
 
-create table public.sales (
+create table if not exists public.sales (
   sale_id uuid primary key default pg_catalog.gen_random_uuid(),
   order_id text not null unique,
   sold_at timestamptz not null default now(),
@@ -50,7 +51,7 @@ create table public.sales (
   created_by uuid references auth.users (id) on delete set null
 );
 
-create table public.sale_items (
+create table if not exists public.sale_items (
   sale_item_id uuid primary key default pg_catalog.gen_random_uuid(),
   sale_id uuid not null references public.sales (sale_id) on delete restrict,
   product_id text not null,
@@ -72,7 +73,7 @@ create table public.sale_items (
   unique (sale_id, product_id)
 );
 
-create table public.business_expenses (
+create table if not exists public.business_expenses (
   expense_id uuid primary key default pg_catalog.gen_random_uuid(),
   request_id uuid not null unique,
   concept text not null,
@@ -84,6 +85,17 @@ create table public.business_expenses (
   created_at timestamptz not null default now()
 );
 
+alter table public.inventory_purchases
+  add column if not exists stock_added boolean not null default true;
+alter table public.inventory_purchase_items
+  add column if not exists variant_label text not null default '';
+alter table public.inventory_purchase_items
+  drop constraint if exists inventory_purchase_items_purchase_id_product_id_key;
+alter table public.inventory_purchase_items
+  drop constraint if exists inventory_purchase_items_purchase_id_product_id_variant_label_key;
+create unique index if not exists inventory_purchase_items_purchase_variant_key
+  on public.inventory_purchase_items (purchase_id, product_id, variant_label);
+
 alter table public.finance_product_costs enable row level security;
 alter table public.inventory_purchases enable row level security;
 alter table public.inventory_purchase_items enable row level security;
@@ -91,21 +103,27 @@ alter table public.sales enable row level security;
 alter table public.sale_items enable row level security;
 alter table public.business_expenses enable row level security;
 
+drop policy if exists "Admins can read finance product costs" on public.finance_product_costs;
 create policy "Admins can read finance product costs"
   on public.finance_product_costs for select to authenticated
   using (public.is_inventory_admin());
+drop policy if exists "Admins can read inventory purchases" on public.inventory_purchases;
 create policy "Admins can read inventory purchases"
   on public.inventory_purchases for select to authenticated
   using (public.is_inventory_admin());
+drop policy if exists "Admins can read inventory purchase items" on public.inventory_purchase_items;
 create policy "Admins can read inventory purchase items"
   on public.inventory_purchase_items for select to authenticated
   using (public.is_inventory_admin());
+drop policy if exists "Admins can read sales" on public.sales;
 create policy "Admins can read sales"
   on public.sales for select to authenticated
   using (public.is_inventory_admin());
+drop policy if exists "Admins can read sale items" on public.sale_items;
 create policy "Admins can read sale items"
   on public.sale_items for select to authenticated
   using (public.is_inventory_admin());
+drop policy if exists "Admins can read business expenses" on public.business_expenses;
 create policy "Admins can read business expenses"
   on public.business_expenses for select to authenticated
   using (public.is_inventory_admin());
@@ -118,7 +136,8 @@ grant select on public.finance_product_costs, public.inventory_purchases,
   public.business_expenses to authenticated;
 
 -- El mismo RPC registra una compra inicial o una reposición y actualiza stock.
--- p_items: [{product_id, product_name, quantity, unit_cost, margin_percent}]
+-- p_items: [{product_id, product_name, variant_label, quantity, unit_cost,
+--            margin_percent, add_to_stock}]
 create or replace function public.record_inventory_purchase(
   p_request_id uuid,
   p_purchase_type text,
@@ -138,6 +157,7 @@ declare
   v_existing_description text;
   v_existing_date date;
   v_existing_supplier text;
+  v_existing_stock_added boolean;
   v_existing_items integer;
   v_item record;
   v_stock integer;
@@ -146,6 +166,7 @@ declare
   v_old_margin numeric(7, 2);
   v_new_average numeric(14, 4);
   v_new_tracked integer;
+  v_add_to_stock boolean;
   v_profile_found boolean;
 begin
   if not public.is_inventory_admin() then
@@ -164,11 +185,16 @@ begin
     raise exception 'Los datos de la compra no son válidos.';
   end if;
 
+  v_add_to_stock := coalesce((p_items -> 0 ->> 'add_to_stock')::boolean, true);
+  if p_purchase_type = 'initial' and not v_add_to_stock then
+    raise exception 'La compra inicial debe crear las unidades iniciales del catálogo.';
+  end if;
+
   if exists (
     select 1
     from pg_catalog.jsonb_to_recordset(p_items) as i(
-      product_id text, product_name text, quantity integer,
-      unit_cost numeric, margin_percent numeric
+      product_id text, product_name text, variant_label text, quantity integer,
+      unit_cost numeric, margin_percent numeric, add_to_stock boolean
     )
     where i.product_id is null or pg_catalog.btrim(i.product_id) = ''
        or i.product_name is null or pg_catalog.btrim(i.product_name) = ''
@@ -176,42 +202,45 @@ begin
        or i.unit_cost is null or i.unit_cost <= 0
        or (i.margin_percent is not null and i.margin_percent < 0)
        or (p_purchase_type = 'initial' and i.margin_percent is null)
+       or coalesce(i.add_to_stock, true) is distinct from v_add_to_stock
   ) then
-    raise exception 'Hay productos o valores inválidos en la compra.';
+    raise exception 'Hay productos, cantidades o valores inválidos en la compra.';
   end if;
 
   if exists (
-    select i.product_id
+    select i.product_id, coalesce(i.variant_label, '')
     from pg_catalog.jsonb_to_recordset(p_items) as i(
-      product_id text, product_name text, quantity integer,
-      unit_cost numeric, margin_percent numeric
+      product_id text, product_name text, variant_label text, quantity integer,
+      unit_cost numeric, margin_percent numeric, add_to_stock boolean
     )
-    group by i.product_id
+    group by i.product_id, coalesce(i.variant_label, '')
     having count(*) > 1
   ) then
-    raise exception 'Cada producto debe aparecer una sola vez por compra.';
+    raise exception 'Cada producto y variante debe aparecer una sola vez por compra.';
   end if;
 
   insert into public.inventory_purchases (
-    request_id, purchase_type, description, acquired_on, supplier, created_by
+    request_id, purchase_type, description, acquired_on, supplier, created_by, stock_added
   )
   values (
-    p_request_id, p_purchase_type, p_description, p_acquired_on,
-    nullif(pg_catalog.btrim(p_supplier), ''), auth.uid()
+    p_request_id, p_purchase_type, pg_catalog.btrim(p_description), p_acquired_on,
+    nullif(pg_catalog.btrim(p_supplier), ''), auth.uid(), v_add_to_stock
   )
   on conflict (request_id) do nothing
   returning purchase_id into v_purchase_id;
 
   if v_purchase_id is null then
-    select p.purchase_id, p.purchase_type, p.description, p.acquired_on, p.supplier
+    select p.purchase_id, p.purchase_type, p.description, p.acquired_on,
+           p.supplier, p.stock_added
       into v_purchase_id, v_existing_type, v_existing_description,
-           v_existing_date, v_existing_supplier
+           v_existing_date, v_existing_supplier, v_existing_stock_added
     from public.inventory_purchases p
     where p.request_id = p_request_id;
     if v_existing_type is distinct from p_purchase_type
-       or v_existing_description is distinct from p_description
+       or v_existing_description is distinct from pg_catalog.btrim(p_description)
        or v_existing_date is distinct from p_acquired_on
-       or v_existing_supplier is distinct from nullif(pg_catalog.btrim(p_supplier), '') then
+       or v_existing_supplier is distinct from nullif(pg_catalog.btrim(p_supplier), '')
+       or v_existing_stock_added is distinct from v_add_to_stock then
       raise exception 'El identificador de solicitud ya fue usado con datos distintos.';
     end if;
 
@@ -222,20 +251,17 @@ begin
        or exists (
          select 1
          from pg_catalog.jsonb_to_recordset(p_items) as i(
-           product_id text, product_name text, quantity integer,
-           unit_cost numeric, margin_percent numeric
+           product_id text, product_name text, variant_label text, quantity integer,
+           unit_cost numeric, margin_percent numeric, add_to_stock boolean
          )
          left join public.inventory_purchase_items saved
            on saved.purchase_id = v_purchase_id
           and saved.product_id = i.product_id
-         left join public.finance_product_costs cost
-           on cost.product_id = i.product_id
+          and saved.variant_label = coalesce(i.variant_label, '')
          where saved.purchase_item_id is null
             or saved.product_name is distinct from i.product_name
             or saved.quantity is distinct from i.quantity
             or saved.unit_cost is distinct from i.unit_cost
-            or (p_purchase_type = 'initial'
-                and cost.margin_percent is distinct from i.margin_percent)
        ) then
       raise exception 'El identificador de solicitud ya fue usado con productos distintos.';
     end if;
@@ -243,11 +269,15 @@ begin
   end if;
 
   for v_item in
-    select *
+    select i.product_id,
+           pg_catalog.sum(i.quantity)::integer as quantity,
+           pg_catalog.sum(i.quantity * i.unit_cost) as total_cost,
+           pg_catalog.max(i.margin_percent) as margin_percent
     from pg_catalog.jsonb_to_recordset(p_items) as i(
-      product_id text, product_name text, quantity integer,
-      unit_cost numeric, margin_percent numeric
+      product_id text, product_name text, variant_label text, quantity integer,
+      unit_cost numeric, margin_percent numeric, add_to_stock boolean
     )
+    group by i.product_id
     order by i.product_id
   loop
     if p_purchase_type = 'initial' then
@@ -262,7 +292,10 @@ begin
       insert into public.finance_product_costs (
         product_id, average_unit_cost, margin_percent, tracked_quantity
       )
-      values (v_item.product_id, v_item.unit_cost, v_item.margin_percent, v_item.quantity);
+      values (
+        v_item.product_id, round(v_item.total_cost / v_item.quantity, 4),
+        v_item.margin_percent, v_item.quantity
+      );
     else
       select s.quantity into v_stock
       from public.product_stock s
@@ -287,17 +320,21 @@ begin
       if v_old_tracked > v_stock then
         raise exception 'El costo registrado supera el stock del producto %.', v_item.product_id;
       end if;
+      if not v_add_to_stock and v_old_tracked + v_item.quantity > v_stock then
+        raise exception 'Las unidades a costear superan el stock ya cargado del producto %.', v_item.product_id;
+      end if;
 
       v_new_tracked := v_old_tracked + v_item.quantity;
       v_new_average := round(
-        (coalesce(v_old_average, 0) * v_old_tracked
-          + v_item.unit_cost * v_item.quantity) / v_new_tracked,
+        (coalesce(v_old_average, 0) * v_old_tracked + v_item.total_cost) / v_new_tracked,
         4
       );
 
-      update public.product_stock
-      set quantity = quantity + v_item.quantity, updated_at = now()
-      where product_id = v_item.product_id;
+      if v_add_to_stock then
+        update public.product_stock
+        set quantity = quantity + v_item.quantity, updated_at = now()
+        where product_id = v_item.product_id;
+      end if;
 
       if v_profile_found then
         update public.finance_product_costs
@@ -316,15 +353,17 @@ begin
       end if;
     end if;
 
-    insert into public.inventory_purchase_items (
-      purchase_id, product_id, product_name, quantity, unit_cost
-    )
-    values (
-      v_purchase_id, v_item.product_id, v_item.product_name,
-      v_item.quantity, v_item.unit_cost
-    );
   end loop;
 
+  insert into public.inventory_purchase_items (
+    purchase_id, product_id, product_name, variant_label, quantity, unit_cost
+  )
+  select v_purchase_id, i.product_id, i.product_name,
+         coalesce(i.variant_label, ''), i.quantity, i.unit_cost
+  from pg_catalog.jsonb_to_recordset(p_items) as i(
+    product_id text, product_name text, variant_label text, quantity integer,
+    unit_cost numeric, margin_percent numeric, add_to_stock boolean
+  );
   return v_purchase_id;
 end;
 $function$;
