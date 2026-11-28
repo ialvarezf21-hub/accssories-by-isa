@@ -1,5 +1,47 @@
 begin;
 
+insert into storage.buckets (id, name, public)
+values ('product-images', 'product-images', true)
+on conflict (id) do nothing;
+
+update storage.buckets
+set public = true
+where id = 'product-images'
+  and public is distinct from true;
+
+drop policy if exists "Public can view product images" on storage.objects;
+create policy "Public can view product images"
+  on storage.objects for select to public
+  using (bucket_id = 'product-images');
+
+drop policy if exists "Admins can upload product images" on storage.objects;
+create policy "Admins can upload product images"
+  on storage.objects for insert to authenticated
+  with check (
+    public.is_inventory_admin()
+    and bucket_id = 'product-images'
+  );
+
+drop policy if exists "Admins can update product images" on storage.objects;
+create policy "Admins can update product images"
+  on storage.objects for update to authenticated
+  using (
+    public.is_inventory_admin()
+    and bucket_id = 'product-images'
+  )
+  with check (
+    public.is_inventory_admin()
+    and bucket_id = 'product-images'
+  );
+
+drop policy if exists "Admins can delete product images" on storage.objects;
+create policy "Admins can delete product images"
+  on storage.objects for delete to authenticated
+  using (
+    public.is_inventory_admin()
+    and bucket_id = 'product-images'
+  );
+
 -- These restrictions are activated only after the updated panel is deployed.
 -- Legacy, non-costed products retain the current stock editing/sync path.
 drop policy if exists "Admins can insert product stock" on public.product_stock;

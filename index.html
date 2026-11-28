@@ -2010,6 +2010,65 @@
       margin-bottom: 0.35rem;
     }
 
+    .product-image-previews {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-top: 0.65rem;
+      min-width: 0;
+    }
+
+    #prod-image-files {
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .product-image-preview {
+      width: 92px;
+      display: grid;
+      gap: 0.3rem;
+      text-align: center;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      overflow-wrap: anywhere;
+    }
+
+    .product-image-preview img {
+      width: 92px;
+      height: 92px;
+      object-fit: cover;
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+    }
+
+    .product-image-preview button {
+      border: 1px solid var(--border-soft);
+      border-radius: 6px;
+      padding: 0.25rem 0.4rem;
+      color: var(--accent);
+      background: #FFFFFF;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .product-image-preview button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .product-image-upload-status {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+
+    .product-image-upload-status[hidden] {
+      display: none;
+    }
+
     .admin-table-wrap {
       overflow-x: auto;
     }
@@ -2758,7 +2817,12 @@
 
           <div class="admin-form-group">
             <label>Rutas o URLs de fotos (una por línea)</label>
-            <textarea id="prod-images" class="form-input" rows="3" placeholder="./img/foto1.jpg&#10;./img/foto2.jpg"></textarea>
+            <textarea id="prod-images" class="form-input" rows="3" placeholder="./img/foto1.jpg&#10;./img/foto2.jpg" oninput="renderProductImagePreviews()"></textarea>
+            <p class="finance-note">Las fotos nuevas se añaden al final; conserva el mismo orden en los nombres de modelo.</p>
+            <label for="prod-image-files">Subir fotos desde el dispositivo</label>
+            <input type="file" id="prod-image-files" class="form-input" accept="image/*" multiple onchange="handleProductImageFiles(this.files)" />
+            <div id="prod-image-previews" class="product-image-previews" aria-live="polite"></div>
+            <p id="prod-image-upload-status" class="product-image-upload-status" role="status" aria-live="polite" hidden></p>
           </div>
 
           <div class="admin-form-group">
@@ -3535,6 +3599,10 @@
     let detailPhotoSwipeStart = null;
     let productCardSwipeStart = null;
     let suppressProductCardClickUntil = 0;
+    let pendingProductImageFiles = [];
+    let productImagePreviewUrls = [];
+    let productImagesUploading = false;
+    let productSaveInProgress = false;
 
     function formatCOPNumber(value) {
       return Number(value).toLocaleString("es-CO", { maximumFractionDigits: 0 });
@@ -4154,7 +4222,36 @@
     });
 
     function normalizeColorName(colorName) {
-      return String(colorName || "").trim().replace(/\s+/g, " ").toLowerCase();
+      return String(colorName || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+    }
+
+    function labelContainsColor(label, color) {
+      const normalizedLabel = normalizeColorName(label);
+      const normalizedColor = normalizeColorName(color);
+      if (!normalizedLabel || !normalizedColor) return false;
+      const escapedColor = normalizedColor.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`(^|[^a-z0-9])${escapedColor}($|[^a-z0-9])`).test(normalizedLabel);
+    }
+
+    function inferImageColor(product, label) {
+      const knownColors = [
+        "Aguamarina", "Agua marina", "Esmeralda", "Vinotinto", "Borgoña",
+        "Plateado", "Amarillo", "Rosado", "Dorado", "Blanco", "Negro",
+        "Perla", "Nácar", "Morado", "Vino", "Rojo", "Rosa", "Azul",
+        "Verde", "Plata", "Oro", "Aqua"
+      ];
+      const productColors = Array.isArray(product.colors) ? product.colors : [];
+      const candidates = Array.from(new Map(
+        [...productColors, ...knownColors]
+          .filter(color => String(color || "").trim())
+          .map(color => [normalizeColorName(color), String(color).trim()])
+      ).values()).sort((a, b) => normalizeColorName(b).length - normalizeColorName(a).length);
+      return candidates.find(color => labelContainsColor(label, color)) || "";
     }
 
     function getSwatchColor(colorName) {
@@ -4165,9 +4262,12 @@
       if (c.includes("rojo")) return "#C8324B";
       if (c.includes("azul")) return "#6B9AC4";
       if (c.includes("rosa") || c.includes("rosado")) return "var(--rosegold-swatch)";
+      if (c.includes("vino") || c.includes("borgona") || c.includes("vinotinto")) return "#7A1C37";
+      if (c.includes("verde")) return "#3F8C68";
+      if (c.includes("morado")) return "#8B6AAE";
+      if (c.includes("perla") || c.includes("nacar") || c.includes("blanco")) return "#F8F6F2";
       if (c.includes("plata") || c.includes("plateado")) return "var(--silver-swatch)";
       if (c.includes("negro")) return "#222222";
-      if (c.includes("blanco") || c.includes("nácar")) return "#F8F6F2";
       return "var(--gold-swatch)";
     }
 
@@ -4198,22 +4298,40 @@
       return images;
     }
 
+    function getProductVariantColors(product) {
+      const colors = Array.isArray(product.colors) ? product.colors.slice() : [];
+      getProductImages(product).forEach(image => {
+        const color = getImageColor(product, image);
+        if (color && !colors.some(existing =>
+          normalizeColorName(existing) === normalizeColorName(color)
+        )) {
+          colors.push(color);
+        }
+      });
+      return colors;
+    }
+
     function getProductImageIndex(product, image) {
       if (!image) return -1;
       return getProductImages(product).findIndex(source => source.trim() === image.trim());
     }
 
     function getImageModelName(product, imageIndex) {
+      const images = getProductImages(product);
+      const image = images[imageIndex];
+      const sourceIndex = Array.isArray(product.images)
+        ? product.images.findIndex(source => source.trim() === String(image || "").trim())
+        : imageIndex;
+      const labelIndex = sourceIndex >= 0 ? sourceIndex : imageIndex;
       const label = Array.isArray(product.modelLabels)
-        ? String(product.modelLabels[imageIndex] || "").trim()
+        ? String(product.modelLabels[labelIndex] || "").trim()
         : "";
       return label || `Modelo ${imageIndex + 1}`;
     }
 
     function getImageVariantName(product, color, imageIndex) {
       const modelName = getImageModelName(product, imageIndex);
-      const prefix = `${color} - `;
-      return modelName.toLowerCase().startsWith(prefix.toLowerCase())
+      return labelContainsColor(modelName, color)
         ? modelName
         : `${color} - ${modelName}`;
     }
@@ -4225,20 +4343,17 @@
       );
       if (entry) return entry[0];
 
-      const imageIndex = getProductImageIndex(product, image);
-      const modelName = Array.isArray(product.modelLabels)
-        ? normalizeColorName(product.modelLabels[imageIndex])
-        : "";
-      const labelColor = (product.colors || []).find(color =>
-        modelName.startsWith(`${normalizeColorName(color)} - `)
-      );
-      if (labelColor) return labelColor;
-
       const defaultProduct = DEFAULT_PRODUCTS.find(item => item.id === product.id);
       const defaultEntry = Object.entries(defaultProduct && defaultProduct.colorImages || {}).find(
         ([, source]) => source.trim() === image.trim()
       );
-      return defaultEntry ? defaultEntry[0] : "";
+      if (defaultEntry) return defaultEntry[0];
+
+      const imageIndex = getProductImageIndex(product, image);
+      const modelName = getImageModelName(product, imageIndex);
+      const imagePath = String(image).split(/[?#]/)[0].split(/[\\/]/).pop() || "";
+      const imageName = imagePath.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ");
+      return inferImageColor(product, `${modelName} ${imageName}`);
     }
 
     function getCurrentDetailVariantName() {
@@ -4947,12 +5062,9 @@
       if (colorImageIndex >= 0) return colorImageIndex;
 
       const normalizedColor = normalizeColorName(color);
-      return getProductImages(product).findIndex((image, index) => {
-        const label = Array.isArray(product.modelLabels)
-          ? normalizeColorName(product.modelLabels[index])
-          : "";
-        return label.startsWith(`${normalizedColor} - `);
-      });
+      return getProductImages(product).findIndex(image =>
+        normalizeColorName(getImageColor(product, image)) === normalizedColor
+      );
     }
 
     function updateProductCardVariant(product, color, imageIndex) {
@@ -5013,11 +5125,14 @@
       const currentIndex = selectedCardImageIndices[prodId];
       const startingIndex = Number.isInteger(currentIndex) && images[currentIndex]
         ? currentIndex
-        : Math.max(0, getProductImageIndexForColor(product, selectedCardColors[prodId] || product.colors[0]));
+        : Math.max(0, getProductImageIndexForColor(
+          product,
+          selectedCardColors[prodId] || getProductVariantColors(product)[0]
+        ));
       const direction = deltaX < 0 ? 1 : -1;
       const nextIndex = (startingIndex + direction + images.length) % images.length;
       const color = getImageColor(product, images[nextIndex]) ||
-        selectedCardColors[prodId] || product.colors[0] || "Dorado";
+        selectedCardColors[prodId] || getProductVariantColors(product)[0] || "Dorado";
       updateProductCardVariant(product, color, nextIndex);
       suppressProductCardClickUntil = Date.now() + 400;
       if (event.cancelable) event.preventDefault();
@@ -5044,15 +5159,22 @@
         : products.filter(p => p.category === activeCategory);
 
       grid.innerHTML = filtered.map(prod => {
-        const currentColor = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
         const images = getProductImages(prod);
+        const colors = getProductVariantColors(prod);
         const selectedImageIndex = selectedCardImageIndices[prod.id];
+        const imageColor = Number.isInteger(selectedImageIndex) && images[selectedImageIndex]
+          ? getImageColor(prod, images[selectedImageIndex])
+          : "";
+        const currentColor = imageColor || selectedCardColors[prod.id] || colors[0] ||
+          getImageColor(prod, images[0]) || "Dorado";
+        selectedCardColors[prod.id] = currentColor;
+        const colorImageIndex = getProductImageIndexForColor(prod, currentColor);
         const mainImg = Number.isInteger(selectedImageIndex) && images[selectedImageIndex]
           ? images[selectedImageIndex]
-          : getProductColorImage(prod, currentColor) || images[0] || "";
+          : colorImageIndex >= 0 ? images[colorImageIndex] : images[0] || "";
         const extraPhotos = prod.images && prod.images.length > 1 ? `<span class="photo-count-badge">+${prod.images.length - 1} fotos</span>` : "";
 
-        const swatchesHtml = prod.colors.map(col => `
+        const swatchesHtml = colors.map(col => `
           <span
             class="swatch-dot ${normalizeColorName(col) === normalizeColorName(currentColor) ? "selected" : ""}"
             style="background:${getSwatchColor(col)}"
@@ -5100,8 +5222,10 @@
       if (!prod) return;
 
       currentDetailProduct = prod;
-      currentDetailColor = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
       const images = getProductImages(prod);
+      const colors = getProductVariantColors(prod);
+      currentDetailColor = selectedCardColors[prod.id] || colors[0] ||
+        getImageColor(prod, images[0]) || "Dorado";
       const savedImageIndex = selectedCardImageIndices[prod.id];
       const colorImageIndex = getProductImageIndexForColor(prod, currentDetailColor);
       currentDetailPhotoIdx = Number.isInteger(savedImageIndex) && images[savedImageIndex]
@@ -5189,11 +5313,18 @@
     function renderDetailSwatches() {
       document.getElementById("detail-color-label").textContent = currentDetailColor;
       const container = document.getElementById("detail-swatches");
-      container.innerHTML = currentDetailProduct.colors.map(col => `
+      container.innerHTML = getProductVariantColors(currentDetailProduct).map(col => `
         <span
           class="swatch-dot ${normalizeColorName(col) === normalizeColorName(currentDetailColor) ? "selected" : ""}"
           style="background:${getSwatchColor(col)}"
+          data-color="${escapeHtml(col)}"
+          role="button"
+          tabindex="0"
+          aria-label="Elegir color ${escapeHtml(col)}"
+          aria-pressed="${normalizeColorName(col) === normalizeColorName(currentDetailColor)}"
+          title="${escapeHtml(col)}"
           onclick="selectDetailColor('${col}')"
+          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDetailColor('${col}')}"
         ></span>
       `).join("");
     }
@@ -5229,14 +5360,13 @@
     function quickAddToCart(prodId) {
       const prod = products.find(p => p.id === prodId);
       if (!prod) return;
-      const color = selectedCardColors[prod.id] || prod.colors[0] || "Dorado";
+      const color = selectedCardColors[prod.id] || getProductVariantColors(prod)[0] || "Dorado";
       const images = getProductImages(prod);
-      const mappedImageIndex = getProductImageIndex(prod, getProductColorImage(prod, color));
       const savedImageIndex = selectedCardImageIndices[prod.id];
       const imageIndex = Number.isInteger(savedImageIndex) && images[savedImageIndex]
         ? savedImageIndex
-        : mappedImageIndex >= 0 ? mappedImageIndex : 0;
-      addItemToCart(prod, color, 1, imageIndex);
+        : getProductImageIndexForColor(prod, color);
+      addItemToCart(prod, color, 1, imageIndex >= 0 ? imageIndex : 0);
       toggleCart(true);
     }
 
@@ -6886,7 +7016,226 @@
         : "—";
     }
 
+    function getProductImageUrlLines() {
+      return document.getElementById("prod-images").value
+        .split(/\r?\n/)
+        .map(url => url.trim())
+        .filter(Boolean);
+    }
+
+    function setProductImageUploadStatus(message, visible) {
+      const status = document.getElementById("prod-image-upload-status");
+      status.textContent = message;
+      status.hidden = !visible;
+    }
+
+    function renderProductImagePreviews() {
+      productImagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+      productImagePreviewUrls = [];
+
+      const container = document.getElementById("prod-image-previews");
+      if (!container) return;
+      document.getElementById("prod-image-files").disabled = productImagesUploading;
+      container.textContent = "";
+      const urlLines = getProductImageUrlLines();
+      const entries = [
+        ...urlLines.map((url, index) => ({ type: "url", source: url, index })),
+        ...pendingProductImageFiles.map((entry, index) => ({
+          type: "file",
+          source: entry.file.name,
+          file: entry.file,
+          index
+        }))
+      ];
+
+      entries.forEach(entry => {
+        const preview = document.createElement("div");
+        preview.className = "product-image-preview";
+        const image = document.createElement("img");
+        image.alt = entry.type === "file" ? entry.file.name : `Foto ${entry.index + 1}`;
+        if (entry.type === "file") {
+          const previewUrl = URL.createObjectURL(entry.file);
+          productImagePreviewUrls.push(previewUrl);
+          image.src = previewUrl;
+        } else {
+          image.src = entry.source;
+        }
+
+        const name = document.createElement("span");
+        name.textContent = entry.type === "file"
+          ? entry.file.name
+          : `Foto ${entry.index + 1}`;
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "Quitar";
+        remove.disabled = productImagesUploading;
+        remove.setAttribute("aria-label", `Quitar ${name.textContent}`);
+        remove.addEventListener("click", () => removeProductImagePreview(entry.type, entry.index));
+
+        preview.append(image, name, remove);
+        container.appendChild(preview);
+      });
+    }
+
+    function removeProductImagePreview(type, index) {
+      const images = getProductImageUrlLines();
+      const labelsInput = document.getElementById("prod-image-models");
+      const labels = labelsInput.value.split(/\r?\n/).map(label => label.trim());
+      const combinedIndex = type === "url" ? index : images.length + index;
+
+      if (type === "url") {
+        images.splice(index, 1);
+        document.getElementById("prod-images").value = images.join("\n");
+      } else {
+        const [removed] = pendingProductImageFiles.splice(index, 1);
+        if (removed && removed.storagePath && supabaseClient && currentAdminUser && navigator.onLine) {
+          supabaseClient.storage.from("product-images").remove([removed.storagePath])
+            .then(({ error }) => {
+              if (error) console.error("No se pudo retirar una foto pendiente de Storage.", error);
+            })
+            .catch(error => console.error("Falló la limpieza de una foto pendiente.", error));
+        }
+      }
+
+      if (labels.length > combinedIndex) {
+        labels.splice(combinedIndex, 1);
+        labelsInput.value = labels.join("\n");
+      }
+      renderProductImagePreviews();
+    }
+
+    function discardPendingProductImageUploads() {
+      const paths = pendingProductImageFiles
+        .map(entry => entry.storagePath)
+        .filter(Boolean);
+      if (!paths.length) return;
+      if (!supabaseClient || !currentAdminUser || !navigator.onLine) {
+        console.error("No se pudieron limpiar fotos sin guardar porque no hay conexión administrativa.");
+        return;
+      }
+      supabaseClient.storage.from("product-images").remove(paths)
+        .then(({ error }) => {
+          if (error) console.error("No se pudieron limpiar fotos sin guardar.", error);
+        })
+        .catch(error => console.error("Falló la limpieza de fotos sin guardar.", error));
+    }
+
+    function handleProductImageFiles(fileList) {
+      const files = Array.from(fileList || []);
+      const previousFileCount = pendingProductImageFiles.length;
+      const urlCount = getProductImageUrlLines().length;
+      const invalidFiles = files.filter(file => !file.type || !file.type.startsWith("image/"));
+      if (invalidFiles.length) {
+        alert("Selecciona únicamente archivos de imagen.");
+      }
+      files.filter(file => file.type && file.type.startsWith("image/")).forEach(file => {
+        pendingProductImageFiles.push({
+          file,
+          storagePath: "",
+          publicUrl: ""
+        });
+      });
+      const labelsInput = document.getElementById("prod-image-models");
+      const labels = labelsInput.value.trim()
+        ? labelsInput.value.split(/\r?\n/).map(label => label.trim())
+        : [];
+      const validFiles = files.filter(file => file.type && file.type.startsWith("image/"));
+      if (validFiles.length && !labels.length) {
+        const urls = getProductImageUrlLines();
+        const existingFileLabels = pendingProductImageFiles
+          .slice(0, previousFileCount)
+          .map((entry, index) => getProductImageLabelFromSource(entry.file.name, urls.length + index));
+        labelsInput.value = urls
+          .map((url, index) => getProductImageLabelFromSource(url, index))
+          .concat(existingFileLabels)
+          .concat(validFiles.map((file, index) =>
+            getProductImageLabelFromSource(file.name, urlCount + previousFileCount + index)
+          ))
+          .join("\n");
+      } else if (validFiles.length && labels.length === urlCount + previousFileCount &&
+          labels.every(Boolean)) {
+        labelsInput.value = labels.concat(validFiles.map((file, index) =>
+          getProductImageLabelFromSource(file.name, urlCount + previousFileCount + index)
+        )).join("\n");
+      }
+      document.getElementById("prod-image-files").value = "";
+      renderProductImagePreviews();
+    }
+
+    function getProductImageLabelFromSource(source, index) {
+      const path = String(source || "").split(/[?#]/)[0].split(/[\\/]/).pop() || "";
+      const label = path.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+      return label || `Modelo ${index + 1}`;
+    }
+
+    async function uploadProductImageFiles(productId) {
+      if (!pendingProductImageFiles.length) return [];
+      const status = document.getElementById("prod-image-upload-status");
+      productImagesUploading = true;
+      status.hidden = false;
+      renderProductImagePreviews();
+
+      try {
+        const urls = [];
+        for (let index = 0; index < pendingProductImageFiles.length; index += 1) {
+          const entry = pendingProductImageFiles[index];
+          if (!entry.publicUrl) {
+            if (!entry.storagePath) {
+              const safeProductId = `p-${String(productId).replace(/[^\w.-]+/g, "-") || "producto"}`;
+              const safeName = entry.file.name
+                .split(/[\\/]/)
+                .pop()
+                .replace(/[^\w.-]+/g, "-")
+                .replace(/^-+|-+$/g, "") || "foto";
+              entry.storagePath = `${safeProductId}/${createRequestId()}-${safeName}`;
+            }
+            status.textContent = `Subiendo fotos (${index + 1} de ${pendingProductImageFiles.length})...`;
+            const { error } = await supabaseClient.storage
+              .from("product-images")
+              .upload(entry.storagePath, entry.file, {
+                cacheControl: "3600",
+                contentType: entry.file.type,
+                upsert: true
+              });
+            if (error) throw error;
+
+            const { data } = supabaseClient.storage
+              .from("product-images")
+              .getPublicUrl(entry.storagePath);
+            if (!data || !data.publicUrl) {
+              throw new Error("Supabase no devolvió la URL pública de la foto.");
+            }
+            entry.publicUrl = data.publicUrl;
+          }
+          urls.push(entry.publicUrl);
+        }
+        status.textContent = "Fotos subidas. Guarda la pieza para conservar los cambios.";
+        return urls;
+      } catch (error) {
+        console.error("No se pudieron subir las fotos del producto.", error);
+        status.textContent = "No se pudieron subir las fotos. Revisa la conexión y vuelve a intentar.";
+        alert(error.message || "No se pudieron subir las fotos. Intenta nuevamente.");
+        return null;
+      } finally {
+        productImagesUploading = false;
+        renderProductImagePreviews();
+      }
+    }
+
     async function saveProductFromAdmin() {
+      if (productSaveInProgress) return;
+      productSaveInProgress = true;
+      const saveButton = document.getElementById("save-product-btn");
+      saveButton.disabled = true;
+      try {
+        await saveProductFromAdminInternal();
+      } finally {
+        productSaveInProgress = false;
+        saveButton.disabled = false;
+      }
+    }
+
+    async function saveProductFromAdminInternal() {
       const id = document.getElementById("edit-product-id").value;
       const name = document.getElementById("prod-name").value.trim();
       const category = document.getElementById("prod-category").value;
@@ -6896,9 +7245,10 @@
       const material = document.getElementById("prod-material").value.trim();
       const colors = document.getElementById("prod-colors").value.split(",").map(color => color.trim().replace(/\s+/g, " ")).filter(Boolean);
       const description = document.getElementById("prod-desc").value.trim();
-      const images = document.getElementById("prod-images").value.split("\n").map(u => u.trim()).filter(Boolean);
+      let images = getProductImageUrlLines();
+      const imageCount = images.length + pendingProductImageFiles.length;
       const imageModelInput = document.getElementById("prod-image-models").value.trim();
-      const modelLabels = imageModelInput
+      let modelLabels = imageModelInput
         ? document.getElementById("prod-image-models").value.split(/\r?\n/).map(label => label.trim())
         : [];
 
@@ -6907,8 +7257,8 @@
       const marginInput = document.getElementById("prod-margin").value.trim();
       const unitCost = parseCOPInput(unitCostInput);
       const margin = Number(marginInput);
-      if (!name || !Number.isInteger(price) || price <= 0 || images.length === 0 ||
-          (modelLabels.length && (modelLabels.length !== images.length || modelLabels.some(label => !label))) ||
+      if (!name || !Number.isInteger(price) || price <= 0 || imageCount === 0 ||
+          (modelLabels.length && (modelLabels.length !== imageCount || modelLabels.some(label => !label))) ||
           !stockInput || !Number.isInteger(stock) || stock < 0 ||
           (isNewProduct && (!unitCostInput || !Number.isInteger(unitCost) || unitCost <= 0 ||
             !marginInput || !Number.isFinite(margin) || margin < 0 || stock <= 0))) {
@@ -6924,6 +7274,28 @@
       if (isNewProduct) {
         productIdInput.value = productId;
         requestIdInput.value = requestId;
+      }
+
+      if (pendingProductImageFiles.length) {
+        if (!supabaseClient || !currentAdminUser || !navigator.onLine) {
+          alert("Para subir fotos necesitas conexión y una sesión de administradora.");
+          return;
+        }
+        const uploadedUrls = await uploadProductImageFiles(productId);
+        if (!uploadedUrls) return;
+        images = images.concat(uploadedUrls);
+        if (modelLabels.length < images.length) {
+          const providedLabels = modelLabels.slice();
+          const firstNewImageIndex = images.length - pendingProductImageFiles.length;
+          modelLabels = images.map((image, index) => {
+            if (providedLabels[index]) return providedLabels[index];
+            const pendingFileIndex = index - firstNewImageIndex;
+            const source = pendingFileIndex >= 0
+              ? pendingProductImageFiles[pendingFileIndex].file.name
+              : image;
+            return getProductImageLabelFromSource(source, index);
+          });
+        }
       }
 
       const stockChanged = Boolean(existingProduct &&
@@ -6942,6 +7314,22 @@
       };
       if (modelLabels.length) productObj.modelLabels = modelLabels;
       else delete productObj.modelLabels;
+
+      const retainedColorImages = Object.fromEntries(
+        Object.entries(productObj.colorImages || {}).filter(([, source]) =>
+          images.some(image => image.trim() === String(source).trim())
+        )
+      );
+      productObj.colorImages = retainedColorImages;
+      images.forEach((image, index) => {
+        const color = getImageColor(productObj, image);
+        if (color && !Object.keys(productObj.colorImages).some(existingColor =>
+          normalizeColorName(existingColor) === normalizeColorName(color)
+        )) {
+          productObj.colorImages[color] = image;
+        }
+      });
+      if (!Object.keys(productObj.colorImages).length) delete productObj.colorImages;
 
       if (existingProduct && Object.prototype.hasOwnProperty.call(existingProduct, "availableQuantity")) {
         productObj.availableQuantity = stock;
@@ -7004,12 +7392,10 @@
 
       products = nextProducts;
       delete selectedCardImageIndices[productId];
-      if (!productObj.colors.some(color =>
-        normalizeColorName(color) === normalizeColorName(selectedCardColors[productId])
-      )) {
-        delete selectedCardColors[productId];
-      }
-      resetProductForm();
+      const savedImageColor = getImageColor(productObj, images[0]);
+      selectedCardColors[productId] = savedImageColor ||
+        getProductVariantColors(productObj)[0] || "Dorado";
+      resetProductForm(true);
       renderAdminProducts();
       renderCatalog();
       if (stockChanged && financeDataLoaded) {
@@ -7070,15 +7456,30 @@
       document.getElementById("prod-stock").value = getProductAvailableUnits(p);
       document.getElementById("prod-stock").disabled = false;
       document.getElementById("prod-material").value = p.material || "";
-      document.getElementById("prod-colors").value = p.colors.join(", ");
+      document.getElementById("prod-colors").value =
+        (Array.isArray(p.colors) ? p.colors : []).join(", ");
       document.getElementById("prod-desc").value = p.description || "";
-      document.getElementById("prod-images").value = p.images.join("\n");
-      document.getElementById("prod-image-models").value =
-        Array.isArray(p.modelLabels) ? p.modelLabels.join("\n") : "";
+      const imageSources = getProductImages(p);
+      document.getElementById("prod-images").value = imageSources.join("\n");
+      document.getElementById("prod-image-models").value = imageSources.map((_, index) =>
+        getProductImageVariantName(
+          p,
+          index,
+          getImageColor(p, imageSources[index]) ||
+            (Array.isArray(p.colors) ? p.colors[0] : "") ||
+            "Dorado"
+        )
+      ).join("\n");
+      discardPendingProductImageUploads();
+      pendingProductImageFiles = [];
+      document.getElementById("prod-image-files").value = "";
+      setProductImageUploadStatus("", false);
+      renderProductImagePreviews();
       document.getElementById("cancel-edit-btn").style.display = "inline-block";
     }
 
-    function resetProductForm() {
+    function resetProductForm(preserveUploadedFiles = false) {
+      if (!preserveUploadedFiles) discardPendingProductImageUploads();
       document.getElementById("form-product-heading").textContent = "Agregar pieza";
       document.getElementById("save-product-btn").textContent = "Agregar pieza";
       document.getElementById("edit-product-id").value = "";
@@ -7096,6 +7497,10 @@
       document.getElementById("prod-desc").value = "";
       document.getElementById("prod-images").value = "";
       document.getElementById("prod-image-models").value = "";
+      pendingProductImageFiles = [];
+      document.getElementById("prod-image-files").value = "";
+      setProductImageUploadStatus("", false);
+      renderProductImagePreviews();
       document.getElementById("cancel-edit-btn").style.display = "none";
     }
 
